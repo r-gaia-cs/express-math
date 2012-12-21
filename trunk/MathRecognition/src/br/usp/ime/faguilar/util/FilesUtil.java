@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,7 +19,7 @@ import java.util.logging.Logger;
  *
  * @author frank
  */
-public class RWFiles {
+public class FilesUtil {
      public static void write(String fileName,String str){
 
         FileWriter fichero = null;
@@ -74,7 +75,7 @@ public class RWFiles {
                 line = br.readLine();
             }
         } catch (IOException ex) {
-            Logger.getLogger(RWFiles.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FilesUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
         return content;
     }
@@ -82,6 +83,25 @@ public class RWFiles {
     public void closeBReader(){
 
 
+    }
+
+    public static ArrayList<String> getNotHiddenFileNames(String path){
+        ArrayList<String> fileNames = new ArrayList<String>();
+        File file = null;
+        try {
+            file = new File (path);
+            File[] files = file.listFiles();
+            File file_i;
+            for (int i = 0; i < files.length; i++) {
+                file_i = files[i];
+                if(!file_i.isHidden())
+                    fileNames.add(file_i.getName());
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        return fileNames;
     }
 
 }

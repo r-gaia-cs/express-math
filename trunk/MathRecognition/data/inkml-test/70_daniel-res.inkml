@@ -78,34 +78,38 @@
 		<annotationXML href="=_1"/>
 	</traceGroup>
 	<traceGroup xml:id="20">
-		<annotation type="truth">-</annotation>
+		<annotation type="truth">\frac</annotation>
 		<traceView traceDataRef="6"/>
-		<traceView traceDataRef="7"/>
-		<annotationXML href="-_1"/>
+		<annotationXML href="\frac_1"/>
 	</traceGroup>
 	<traceGroup xml:id="21">
+		<annotation type="truth">x</annotation>
+		<traceView traceDataRef="7"/>
+		<annotationXML href="x_1"/>
+	</traceGroup>
+	<traceGroup xml:id="22">
 		<annotation type="truth">\sqrt</annotation>
 		<traceView traceDataRef="8"/>
 		<annotationXML href="\sqrt_1"/>
 	</traceGroup>
-	<traceGroup xml:id="22">
+	<traceGroup xml:id="23">
 		<annotation type="truth">\theta</annotation>
 		<traceView traceDataRef="9"/>
 		<traceView traceDataRef="10"/>
 		<annotationXML href="\theta_2"/>
 	</traceGroup>
-	<traceGroup xml:id="23">
-		<annotation type="truth">+</annotation>
-		<traceView traceDataRef="11"/>
-		<annotationXML href="+_1"/>
-	</traceGroup>
 	<traceGroup xml:id="24">
+		<annotation type="truth">\theta</annotation>
+		<traceView traceDataRef="11"/>
+		<annotationXML href="\theta_3"/>
+	</traceGroup>
+	<traceGroup xml:id="25">
 		<annotation type="truth">r</annotation>
 		<traceView traceDataRef="12"/>
 		<traceView traceDataRef="13"/>
 		<annotationXML href="r_1"/>
 	</traceGroup>
-	<traceGroup xml:id="25">
+	<traceGroup xml:id="26">
 		<annotation type="truth">c</annotation>
 		<traceView traceDataRef="14"/>
 		<annotationXML href="c_1"/>

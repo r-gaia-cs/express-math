@@ -97,8 +97,8 @@ public class GraphicalStrokeKruskalMST{
         for (DStroke dStroke : strokes) {
             ((GStroke) dStroke).drawStroke(g);
             //to DRAW ORDER OF STROKES
-//            g.drawString(String.valueOf(index++), (int) ((GStroke) dStroke).getLtPoint().getX(), 
-//                    (int) (((GStroke) dStroke).getLtPoint().getY()-6));
+            g.drawString(String.valueOf(index++), (int) ((GStroke) dStroke).getLtPoint().getX(), 
+                    (int) (((GStroke) dStroke).getLtPoint().getY()-6));
         }
     }
 

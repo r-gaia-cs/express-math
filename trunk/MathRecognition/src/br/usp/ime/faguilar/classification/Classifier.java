@@ -15,4 +15,5 @@ public interface Classifier {
     public void setTrainingData(ArrayList<Classifible> classifiables);
     public void train();
     public Object classify(Classifible classifible);
+    public Object orderedListOfClasses();
 }

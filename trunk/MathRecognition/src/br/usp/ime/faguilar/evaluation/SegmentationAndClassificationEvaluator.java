@@ -17,7 +17,7 @@ import br.usp.ime.faguilar.graphics.GMathExpression;
 import br.usp.ime.faguilar.guis.EvaluationView;
 import br.usp.ime.faguilar.segmentation.Segmentation;
 import br.usp.ime.faguilar.segmentation.TreeSearchSegmentation;
-import br.usp.ime.faguilar.util.RWFiles;
+import br.usp.ime.faguilar.util.FilesUtil;
 import br.usp.ime.faguilar.util.SymbolUtil;
 import edu.princeton.cs.algs4.Edge;
 import edu.princeton.cs.algs4.EdgeWeightedGraph;
@@ -61,14 +61,16 @@ public class SegmentationAndClassificationEvaluator {
         String resultFileNames = "";
         int count = 0;
         for (String fileName : getInkFiles()) {
+            if(fileName.endsWith(".inkml")){
             count++;
             System.out.println("count: "+ count);
             System.out.println("processing: " + fileName);
             partExpressionFromINKMLFile(fileName);
             resultFileNames += (fileName + ", "+ fileName.substring(0,
                     fileName.length() - 6) + "-res.inkml"+ "\n");
+            }
         }
-        RWFiles.write("fileNames.txt", resultFileNames);
+        FilesUtil.write("fileNames.txt", resultFileNames);
     }
 
     private void chargeFileNames(){
@@ -131,7 +133,7 @@ public class SegmentationAndClassificationEvaluator {
             inkMlExpression.generateInkML();
             String inkmlTex = inkMlExpression.getInkmlText();
 //            count++;
-            RWFiles.write(EvaluationView.INKML_DIR + inkFileName.substring(0, inkFileName.length() - 6)
+            FilesUtil.write(EvaluationView.INKML_DIR + inkFileName.substring(0, inkFileName.length() - 6)
                     + "-res.inkml", inkmlTex);
 
         return stringResult;

@@ -9,6 +9,7 @@ import br.usp.ime.faguilar.guis.EvaluationView;
 import br.usp.ime.faguilar.util.Util;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,12 +31,16 @@ public class TrainingAndTestDataPartitioner {
         trainingPercentage = 0.7;
     }
 
-    public void partSamples(ArrayList<String> fileNames){
-        chargeFileNames(fileNames);
-        doPartition();
+    public void partFileNamesRandomlyByModels(ArrayList<String> fileNames){
+        chargeFileNamesGroupedByModels(fileNames);
+        doPartitionRandomlyByModels();
     }
 
-    private void chargeFileNames(ArrayList<String> fileNames){
+    public void partFileNamesRandomly(ArrayList<String> fileNames){
+        doPartitionRandmly(fileNames);
+    }
+
+    private void chargeFileNamesGroupedByModels(ArrayList<String> fileNames){
         String modelID;
         for (int i = 0; i < fileNames.size(); i++) {
             ArrayList<String> expressionNames = new ArrayList<String>();
@@ -47,7 +52,7 @@ public class TrainingAndTestDataPartitioner {
         }
     }
 
-    private void doPartition() {
+    private void doPartitionRandomlyByModels() {
         int numberOfTrainingElements;
         for (ArrayList<String> expressionsOfAModel : expressionsPerModel.values()) {
             Util.randomizeInPlaze(expressionsOfAModel);
@@ -58,6 +63,19 @@ public class TrainingAndTestDataPartitioner {
                 else
                     testExpressions.add(expressionsOfAModel.get(i));
             }
+        }
+    }
+
+    private void doPartitionRandmly(ArrayList<String> fileNames) {
+        Util.randomizeInPlaze(fileNames);
+        int numberOfTrainingElements = (int) (trainingPercentage * fileNames.size());
+        int count = 0;
+        for (String name : fileNames) {
+            if(count < numberOfTrainingElements)
+                trainingExpressions.add(name);
+            else
+                testExpressions.add(name);
+            count++;
         }
     }
 
@@ -92,6 +110,4 @@ public class TrainingAndTestDataPartitioner {
     public void setTrainingPercentage(double trainingPercentage) {
         this.trainingPercentage = trainingPercentage;
     }
-
-
 }

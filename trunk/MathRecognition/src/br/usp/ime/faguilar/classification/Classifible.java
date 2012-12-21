@@ -12,6 +12,7 @@ package br.usp.ime.faguilar.classification;
 public class Classifible<T> {
     private T[] features;
     private Object myClass;
+    private Object aditionalFeatures;
 
     public Classifible(T[] features){
         Classifible classifible = new Classifible();
@@ -46,6 +47,14 @@ public class Classifible<T> {
 
     public void setMyClass(Object myClass) {
         this.myClass = myClass;
+    }
+
+    public Object getAditionalFeatures() {
+        return aditionalFeatures;
+    }
+
+    public void setAditionalFeatures(Object aditionalFeatures) {
+        this.aditionalFeatures = aditionalFeatures;
     }
 
 }

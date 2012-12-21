@@ -9,7 +9,7 @@ import DatabaseMathExpressions.ModelExpression;
 import DatabaseMathExpressions.UserExpression;
 import br.usp.ime.faguilar.data.DMathExpression;
 import br.usp.ime.faguilar.graphics.GMathExpression;
-import br.usp.ime.faguilar.util.RWFiles;
+import br.usp.ime.faguilar.util.FilesUtil;
 import java.util.ArrayList;
 
 /**
@@ -144,7 +144,7 @@ public class Exporter {
             inkMlExpression.generateInkML();
             String inkmlTex = inkMlExpression.getInkmlText();
 //            count++;
-            RWFiles.write((getPath() + sample.getModel() + "_" +
+            FilesUtil.write((getPath() + sample.getModel() + "_" +
                     sample.getUser()+".inkml"), inkmlTex);
         }
     }
