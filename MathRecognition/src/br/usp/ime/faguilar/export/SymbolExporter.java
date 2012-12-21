@@ -7,7 +7,7 @@ package br.usp.ime.faguilar.export;
 
 import br.usp.ime.faguilar.data.DMathExpression;
 import br.usp.ime.faguilar.data.DSymbol;
-import br.usp.ime.faguilar.util.RWFiles;
+import br.usp.ime.faguilar.util.FilesUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,9 +51,9 @@ public class SymbolExporter extends Exporter{
             inkMlExpression.generateInkML();
             String inkmlTex = inkMlExpression.getInkmlText();
             count++;
-//                RWFiles.write((getPath() + dSymbol.getLabel() + "_" +
+//                FilesUtil.write((getPath() + dSymbol.getLabel() + "_" +
 //                    sample.getUser()+".inkml"), inkmlTex);
-            RWFiles.write((getPath() + "/"+ sample.getUser()+"/"+sample.getUser() + 
+            FilesUtil.write((getPath() + "/"+ sample.getUser()+"/"+sample.getUser() +
                     "_" + count + ".inkml"), inkmlTex);
         }
     }

@@ -68,8 +68,8 @@ public class ShapeContextStatistics {
                     Point2D.Double[]  classifiblePoints = (Point2D.Double[]) classifiables.get(j).getFeatures();
                     shapeContextTemplate = CostShapeContextInside.calculateShapeContextFromPoints2D(templatePoints);
                     shapeContextClassifible = CostShapeContextInside.calculateShapeContextFromPoints2D(classifiblePoints);
-                    if(diference == 1)
-                        System.out.println("dif is 1");
+//                    if(diference == 1)
+//                        System.out.println("dif is 1");
                     diference = CostShapeContextInside.getCost(shapeContextTemplate, shapeContextClassifible);
                     matchingResults.add(diference);
                 }

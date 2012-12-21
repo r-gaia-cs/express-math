@@ -5,7 +5,7 @@
 
 package br.usp.ime.faguilar.evaluation;
 
-import br.usp.ime.faguilar.util.RWFiles;
+import br.usp.ime.faguilar.util.FilesUtil;
 import java.util.ArrayList;
 
 /**
@@ -21,7 +21,7 @@ public class ShapeContextPerSymbol {
 
     public static ArrayList<ShapeContextPerSymbol> readData(String fileName){
         ArrayList<ShapeContextPerSymbol> data = new ArrayList<ShapeContextPerSymbol>();
-        String contentAsString = RWFiles.getContentAsString(fileName);
+        String contentAsString = FilesUtil.getContentAsString(fileName);
         String[] lines = contentAsString.split("\n");
         String[] symbolLine;
         ShapeContextPerSymbol shapeContextPerSymbol;

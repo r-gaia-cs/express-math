@@ -26,13 +26,15 @@ import br.usp.ime.faguilar.graphics.GraphicalStrokeKruskalMST;
 import br.usp.ime.faguilar.segmentation.Segmentation;
 import br.usp.ime.faguilar.segmentation.SegmentationResult;
 import br.usp.ime.faguilar.segmentation.TreeSearchSegmentation;
-import br.usp.ime.faguilar.util.RWFiles;
+import br.usp.ime.faguilar.util.FilesUtil;
 import br.usp.ime.faguilar.util.SymbolUtil;
 import edu.princeton.cs.algs4.Edge;
 import edu.princeton.cs.algs4.EdgeWeightedGraph;
 import edu.princeton.cs.algs4.KruskalMST;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import javax.swing.DefaultListModel;
 
 /**
@@ -40,10 +42,11 @@ import javax.swing.DefaultListModel;
  * @author frank
  */
 public class EvaluationView extends javax.swing.JPanel {
-    public static final String INKML_DIR = "data/inkml-test/";
+    public static final String INKML_DIR = "data/inkml-complete/";
     public static final String TEMPLATES_DIR = "data/templates/";
 //    public static final String TEMPLATES_FILE = TEMPLATES_DIR + "part-model-symbols_v3.txt";
     public static final String TEMPLATES_FILE = TEMPLATES_DIR + "first-test.txt";//"model-symbols.txt";
+    public static final String TRAINING_FILES = INKML_DIR + "training-training.txt";
     private Segmentation segmentation;
     private String SelectedFileName;
 
@@ -72,20 +75,16 @@ public class EvaluationView extends javax.swing.JPanel {
     }
     
     private void chargeFileNames(){
-        File file = null;
-        try {
-            file = new File (INKML_DIR);
-            File[] files = file.listFiles();
-            DefaultListModel listModel = new DefaultListModel();
-            for (int i = 0; i < files.length; i++) {
-                File file1 = files[i];
-                listModel.addElement(file1.getName());
-            }
-            fileNames.setModel(listModel);
+        String fileContent = FilesUtil.getContentAsString(EvaluationView.TRAINING_FILES);
+        String[] trainingFiles = fileContent.split("\n");
+        ArrayList<String> inkFiles = new  ArrayList();
+        inkFiles.addAll(Arrays.asList(trainingFiles));
+        Collections.sort(inkFiles);
+        DefaultListModel listModel = new DefaultListModel();
+        for (String string : inkFiles) {
+            listModel.addElement(string);
         }
-        catch(Exception e){
-            e.printStackTrace();
-        }
+        fileNames.setModel(listModel);
     }
 
     /** This method is called from within the constructor to
@@ -340,7 +339,7 @@ public class EvaluationView extends javax.swing.JPanel {
 //            inkMlExpression.generateInkML();
 //            String inkmlTex = inkMlExpression.getInkmlText();
 ////            count++;
-//            RWFiles.write(INKML_DIR + SelectedFileName.substring(0, SelectedFileName.length() - 6)
+//            FilesUtil.write(INKML_DIR + SelectedFileName.substring(0, SelectedFileName.length() - 6)
 //                    + "-res.inkml", inkmlTex);
 
         // end to show inkml

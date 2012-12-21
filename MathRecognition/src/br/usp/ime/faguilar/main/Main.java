@@ -20,7 +20,7 @@ import br.usp.ime.faguilar.cost.CostShapeContextInside;
 import br.usp.ime.faguilar.evaluation.SegmentationAndClassificationEvaluator;
 import br.usp.ime.faguilar.evaluation.ShapeContextStatistics;
 import br.usp.ime.faguilar.evaluation.TrainingAndTestDataPartitioner;
-import br.usp.ime.faguilar.util.RWFiles;
+import br.usp.ime.faguilar.util.FilesUtil;
 import br.usp.ime.faguilar.util.SymbolUtil;
 import edu.princeton.cs.algs4.Bag;
 import edu.princeton.cs.algs4.Edge;
@@ -33,6 +33,7 @@ import java.awt.geom.Point2D;
 import java.io.File;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
@@ -51,7 +52,7 @@ public class Main {
 //        args=new String[]{"mediumEWG.txt"};
 
 //        KruskalMST.main(args);
-//        String content = RWFiles.getContentAsString("src/data/65_alfonso.inkml");
+//        String content = FilesUtil.getContentAsString("src/data/65_alfonso.inkml");
 //        System.out.println(content);
 
 //        JGraphT library
@@ -102,25 +103,19 @@ public class Main {
 //        testClassifier();
 //        calculateSymbolStatistics();
 //        testSegmentationAndClassification();
-//        testPartition();
+//        executeFileNamesPartitionFromPath();
+//        executeFileNamesPartitionFromFile();
     }
 
-    public static void testPartition(){
-        ArrayList<String> inkFiles = new ArrayList<String>();
-        File file = null;
-        try {
-            file = new File (EvaluationView.INKML_DIR);
-            File[] files = file.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                File file1 = files[i];
-                inkFiles.add(file1.getName());
-            }
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
+    public static void executeFileNamesPartitionFromPath(){
+        ArrayList<String> inkFiles = FilesUtil.getNotHiddenFileNames(EvaluationView.INKML_DIR);
+        executeFileNamesPartition(inkFiles);
+    }
+
+    public static void executeFileNamesPartition(ArrayList<String> inkFiles){
         TrainingAndTestDataPartitioner partirioner = new TrainingAndTestDataPartitioner();
-        partirioner.partSamples(inkFiles);
+//        partirioner.partFileNamesRandomlyByModels(inkFiles);
+        partirioner.partFileNamesRandomly(inkFiles);
         ArrayList<String> testExpressions = partirioner.getTestExpressions();
         ArrayList<String> trainingExpressions = partirioner.getTrainingExpressions();
 
@@ -137,10 +132,21 @@ public class Main {
         for (String expression : testExpressions) {
             testFileContent += (expression + "\n");
         }
-        RWFiles.write(testFileName, testFileContent);
-        RWFiles.write(trainingFileName, trainingFileContent);
+        System.out.println("test files:");
+        System.out.println(testFileContent);
+        System.out.println("training: ");
+        System.out.println(trainingFileContent);
+        FilesUtil.write(testFileName, testFileContent);
+        FilesUtil.write(trainingFileName, trainingFileContent);
     }
 
+    public static void executeFileNamesPartitionFromFile(){
+        String fileContent = FilesUtil.getContentAsString(EvaluationView.TRAINING_FILES);
+        String[] fileNames = fileContent.split("\n");
+        ArrayList<String> inkFiles = new  ArrayList();
+        inkFiles.addAll(Arrays.asList(fileNames));
+        executeFileNamesPartition(inkFiles);
+    }
     
      private static void calculateSymbolStatistics() {
         ShapeContextStatistics statistics = new ShapeContextStatistics();

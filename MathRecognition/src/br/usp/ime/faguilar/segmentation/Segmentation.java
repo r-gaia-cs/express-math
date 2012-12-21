@@ -55,6 +55,8 @@ public class Segmentation {
 
     protected ShapeContextStatistics symbolStatistics;
     protected EdgeWeightedGraph graph;
+
+    protected ArrayList alreadySegmented;
     
     public void part(DStroke[] strokes){
         myStrokes = strokes;
@@ -71,49 +73,40 @@ public class Segmentation {
     }
     
     protected void initializePartitionData(int numberOfStrokes){
-//        bestGroups = new int[numberOfStrokes];
-//        bestCosts = new double[numberOfStrokes];
-//        
-//        for (int i = 0; i < numberOfStrokes; i++) {
-//            bestGroups[i] = -1;
-//            bestCosts[i] = Double.MAX_VALUE;
-//        }
         segmentationTable =new SegmentationTable(numberOfStrokes);
         symbolStatistics = new ShapeContextStatistics();
         symbolStatistics.readSymbolStatistics(ShapeContextStatistics.STATISTCS_FILE_NAME);
-//        result = new SegmentationResult();
-        
-//        classifier = new ShapeContextClassifier();
+        alreadySegmented = new ArrayList();
     }
 
     protected void doPartition(DStroke[] strokes) {
         numberOfSymbolEvaluations = 0;
         DSymbol dSymol = null;
-//        DStroke[] combinedStrokes = null;
         Point2D[] symbolPoints = null;
         Classifible<Point2D> classifible =new Classifible<Point2D>();//classifible = null;
         ClassificationResult classificationResult = null;
         ClassificationResult bestClassificationResult = null;
         double newCost;
-        double currentMeanCost;
-        double newMeanCost;
-        int numberOfSymbols;
+        double currentBestCost;
         boolean executeClassification;
         int[] vertexIndex;
-//        double exponent = 1;
+        boolean continueCombinations;
+        SymbolFeatures symbolFeatures = null;
         for (int i = 0; i < strokes.length; i++) {
-//            DSdSymol.toArray();troke dStroke = strokes[i];
+            continueCombinations = true;
             for (int j = 1; j <= MAX_NUMBER_OF_STROKES_PER_SYMBOL && 
-                    i - j + 1>= 0; j++) {
+                    i - j + 1>= 0 && continueCombinations; j++) {
                 
                 dSymol = new DSymbol();
                 vertexIndex = new int[j];
+                executeClassification = true;
                 for (int k = 1; k <= j; k++) {
                     dSymol.addCheckingBoundingBox(strokes[i + 1 - k]);
                     vertexIndex[k-1] = i + 1 - k;
+                    if(alreadySegmented.contains(i + 1 -k))
+                        executeClassification = false;
                 }
-//                dSymol = PreprocessingAlgorithms.preprocessDSymbol(dSymol);
-                executeClassification = true;
+                
                 if(truncateByDistance && !goodGroupByDistance(dSymol))
                     executeClassification = false;
                 if(executeClassification && truncateByMST && !goodGroupByMST(vertexIndex))
@@ -122,46 +115,64 @@ public class Segmentation {
                     numberOfSymbolEvaluations++;
                     symbolPoints = PreprocessingAlgorithms.getNPoints(dSymol, DSymbol.NUMBER_OF_POINTS_PER_SYMBOL);
                     classifible.setFeatures(symbolPoints);
+                    symbolFeatures = new SymbolFeatures();
+                    symbolFeatures.setNumberOfStrokes(dSymol.size());
+                    classifible.setAditionalFeatures(symbolFeatures);
                     classificationResult = (ClassificationResult) classifier.classify(classifible);
                     classificationResult.setSymbol(dSymol);
-
                     newCost = classificationResult.getCost(); 
-                    numberOfSymbols = 1;
-                    newMeanCost = newCost;
-                    currentMeanCost = segmentationTable.getLeastCostUnitl(i);
-//                    if(currentMeanCost != Double.MAX_VALUE)
-//                        currentMeanCost = currentMeanCost / segmentationTable.getSymbolcountUntil(i);
-                    if(i - j >= 0){
-                        // TO USE SUM OF COSTS AS MEASURE OF GOOD PARTITIONS
+                    currentBestCost = segmentationTable.getLeastCostUnitl(i);
+
+                    if(isHorizontal(classificationResult)){
+                        if(horizontalIsFraction(i)) {
+                            classificationResult.setMyClass("\\frac");
+                            newCost = 0;
+                            classificationResult.setCost(newCost);
+                            continueCombinations = false;
+                            alreadySegmented.add(i);
+                        }else if(horizontalIsMinus(i)) {
+                            classificationResult.setMyClass("-");
+                            newCost = 0;
+                            classificationResult.setCost(newCost);
+                            continueCombinations = false;
+                            alreadySegmented.add(i);
+                        }else{
+                            ArrayList<ClassificationResult> orderedListOfClasses =
+                                    (ArrayList<ClassificationResult>) classifier.orderedListOfClasses();
+                            newCost = 100;//high cost
+                            classificationResult = getNonFractionNeitherMinus(orderedListOfClasses);
+                            classificationResult.setCost(newCost);
+                            classificationResult.setSymbol(dSymol);
+                        }
+                    }
+                    if(i - j >= 0)
                         newCost += segmentationTable.getLeastCostUnitl(i - j);
-                        //TO USE MAX COST AS MEASURE OF GOOD PARTITIONS
-//                        maxCost = segmentationTable.getLeastCostUnitl(i - j);
-//                        if(newCost > maxCost)
-//                            newCost = maxCost;
-//                        TO USE MEAN OF COSTS AS MEASURE OF GOOD PARTITIONS
-//                        numberOfSymbols += segmentationTable.getSymbolcountUntil(i -j);
-//                        newCost = newCost + segmentationTable.getLeastCostUnitl(i - j);
-//                        newMeanCost = newCost  /
-//                                numberOfSymbols;
-                    }
-                    if(jointTwoStrokes(classificationResult)){
+                    if(jointTwoStrokes(classificationResult)&&!(newCost >= 100)){
+                        ///TODO: prevenir q combinaciones con dos elementos
+                        // junte simbolos fraccion o menos determinados anteriormente
                         segmentationTable.setCostForGroupAt(i, newCost);// classificationResult.getCost();
                         segmentationTable.setBestGroupAt(i, j);
                         bestClassificationResult = classificationResult;
-                        segmentationTable.setSymbolcountAt(i, numberOfSymbols);
                     }
-                    else if(newCost < currentMeanCost) {
+                    else if(newCost < currentBestCost) {
                         segmentationTable.setCostForGroupAt(i, newCost);// classificationResult.getCost();
                         segmentationTable.setBestGroupAt(i, j);
                         bestClassificationResult = classificationResult;
-                        segmentationTable.setSymbolcountAt(i, numberOfSymbols);
                     }
                 }
             }
             segmentationTable.addSymbolHypothesis(bestClassificationResult);
-        }
-//        System.out.println(segmentationTable.getPartitionClassesAsString());
-        
+        }      
+    }
+
+    private ClassificationResult getNonFractionNeitherMinus(ArrayList<ClassificationResult>
+            results){
+        ClassificationResult nonFractonNeighterMinus = null;
+        int i = 1;
+        do{
+            nonFractonNeighterMinus = results.get(i++);
+        }while(isHorizontal(nonFractonNeighterMinus) && i < results.size());
+        return nonFractonNeighterMinus;
     }
 
     private boolean isHorizontal(ClassificationResult result){
@@ -170,8 +181,6 @@ public class Segmentation {
             return true;
         return false;
     }
-
-
 
     public boolean jointTwoStrokes(ClassificationResult classificationResult){
         boolean joint = false;
@@ -276,11 +285,57 @@ public class Segmentation {
         return isInside;
     }
 
-//    private boolean aboveRelation(DStroke stroke1, DStroke stroke2){
-//        boolean above = false;
-//        if()
-//        return above;
-//    }
+    private boolean horizontalIsFraction(int strokeIndex){
+        if(hasStrokeAbove(strokeIndex) && hasStrokeBelow(strokeIndex))
+            return true;
+        return false;
+    }
+
+    private boolean horizontalIsMinus(int strokeIndex){
+        if(!hasStrokeAbove(strokeIndex) && !hasStrokeBelow(strokeIndex))
+            return true;
+        return false;
+    }
+
+    private boolean hasStrokeAbove(int strokeIndex){
+        boolean hasAbove = false;
+        Iterable<Edge> adj = getGraph().adj(strokeIndex);
+        int otherIndex;
+        Point2D otherBoxCenter;
+
+        for (Edge edge : adj) {
+            otherIndex = edge.other(edge.either());
+            if(otherIndex != strokeIndex){
+                otherBoxCenter = myStrokes[otherIndex].getBoundingBoxCenter();
+                if(otherBoxCenter.getY() <= myStrokes[strokeIndex].getBoundingBoxCenter().getY()
+                        && otherBoxCenter.getX() < myStrokes[strokeIndex].getRbPoint().getX() &&
+                        otherBoxCenter.getX() > myStrokes[strokeIndex].getLtPoint().getX()){
+                    hasAbove = true;
+                    break;
+                }
+            }
+        }
+        return hasAbove;
+    }
+
+    private boolean hasStrokeBelow(int strokeIndex){
+        boolean hasAbove = false;
+        Iterable<Edge> adj = getGraph().adj(strokeIndex);
+        int otherIndex;
+        Point2D otherBoxCenter;
+
+        for (Edge edge : adj) {
+            otherIndex = edge.other(edge.either());
+            otherBoxCenter = myStrokes[otherIndex].getBoundingBoxCenter();
+            if(otherBoxCenter.getY() > myStrokes[strokeIndex].getBoundingBoxCenter().getY()
+                    && otherBoxCenter.getX() < myStrokes[strokeIndex].getRbPoint().getX() &&
+                    otherBoxCenter.getX() > myStrokes[strokeIndex].getLtPoint().getX()){
+                hasAbove = true;
+                break;
+            }
+        }
+        return hasAbove;
+    }
 
     public EdgeWeightedGraph getGraph() {
         return graph;
@@ -352,7 +407,8 @@ public class Segmentation {
         int numberOfVertices = ((Queue)mst.edges()).size() + 1;
         graph = new EdgeWeightedGraph(numberOfVertices);
         for (Edge edge : mst.edges()) {
-            graph.addEdge(new Edge(edge.either(), edge.other(edge.either()), edge.weight()));
+            graph.addEdge(edge);
+            graph.addEdge(new Edge(edge.other(edge.either()), edge.either(), edge.weight()));
         }
     }
 
@@ -371,6 +427,4 @@ public class Segmentation {
     public void setNumberOfSymbolEvaluations(int numberOfSymbolEvaluations) {
         this.numberOfSymbolEvaluations = numberOfSymbolEvaluations;
     }
-
-
 }

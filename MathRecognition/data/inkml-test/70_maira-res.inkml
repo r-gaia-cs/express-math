@@ -98,37 +98,41 @@
 		<annotationXML href="x_1"/>
 	</traceGroup>
 	<traceGroup xml:id="25">
-		<annotation type="truth">\sqrt</annotation>
+		<annotation type="truth">\frac</annotation>
 		<traceView traceDataRef="9"/>
+		<annotationXML href="\frac_1"/>
+	</traceGroup>
+	<traceGroup xml:id="26">
+		<annotation type="truth">\sqrt</annotation>
 		<traceView traceDataRef="10"/>
 		<annotationXML href="\sqrt_1"/>
 	</traceGroup>
-	<traceGroup xml:id="26">
-		<annotation type="truth">=</annotation>
-		<traceView traceDataRef="11"/>
-		<annotationXML href="=_2"/>
-	</traceGroup>
 	<traceGroup xml:id="27">
+		<annotation type="truth">o</annotation>
+		<traceView traceDataRef="11"/>
+		<annotationXML href="o_1"/>
+	</traceGroup>
+	<traceGroup xml:id="28">
 		<annotation type="truth">\theta</annotation>
 		<traceView traceDataRef="12"/>
 		<traceView traceDataRef="13"/>
 		<annotationXML href="\theta_3"/>
 	</traceGroup>
-	<traceGroup xml:id="28">
+	<traceGroup xml:id="29">
 		<annotation type="truth">+</annotation>
 		<traceView traceDataRef="14"/>
 		<traceView traceDataRef="15"/>
 		<annotationXML href="+_1"/>
 	</traceGroup>
-	<traceGroup xml:id="29">
+	<traceGroup xml:id="30">
 		<annotation type="truth">y</annotation>
 		<traceView traceDataRef="16"/>
 		<annotationXML href="y_1"/>
 	</traceGroup>
-	<traceGroup xml:id="30">
-		<annotation type="truth">=</annotation>
+	<traceGroup xml:id="31">
+		<annotation type="truth">\theta</annotation>
 		<traceView traceDataRef="17"/>
-		<annotationXML href="=_3"/>
+		<annotationXML href="\theta_4"/>
 	</traceGroup>
 </traceGroup>
 </ink>

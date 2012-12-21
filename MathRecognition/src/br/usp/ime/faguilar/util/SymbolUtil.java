@@ -23,7 +23,7 @@ public class SymbolUtil {
 
 //    public static ArrayList<Classifible> readSymbolData(String fileName){
 //        ArrayList<Classifible> symbolData = new ArrayList<Classifible>();
-//        String fileContent = RWFiles.getContentAsString(fileName);
+//        String fileContent = FilesUtil.getContentAsString(fileName);
 ////        String[] arrayContent = fileContent.split("\n");
 //        Scanner scanner = new Scanner(fileContent);
 ////        for (int i = 0; i < arrayContent.length; i++) {
@@ -64,7 +64,7 @@ public class SymbolUtil {
 
     public static ArrayList<Classifible> readSymbolData(String fileName){
         ArrayList<Classifible> symbolData = new ArrayList<Classifible>();
-        String fileContent = RWFiles.getContentAsString(fileName);
+        String fileContent = FilesUtil.getContentAsString(fileName);
         String[] arrayContent = fileContent.split("\n");
 //        Scanner scanner = new Scanner(fileContent);
         String label = "";

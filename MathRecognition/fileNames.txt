@@ -1,4 +1,5 @@
-.DS_Store, .DS-res.inkml
+.DS-res-res.inkml, .DS-res-res-res.inkml
+.DS-res.inkml, .DS-res-res.inkml
 65_carlos.inkml, 65_carlos-res.inkml
 65_edwin.inkml, 65_edwin-res.inkml
 65_Frank.inkml, 65_Frank-res.inkml

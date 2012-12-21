@@ -10,7 +10,7 @@ import br.usp.ime.faguilar.data.DStroke;
 import br.usp.ime.faguilar.data.TimePoint;
 import br.usp.ime.faguilar.graphics.GStroke;
 import br.usp.ime.faguilar.segmentation.OrderedStroke;
-import br.usp.ime.faguilar.util.RWFiles;
+import br.usp.ime.faguilar.util.FilesUtil;
 import java.util.ArrayList;
 
 /**
@@ -25,12 +25,12 @@ public class InkMLInput {
     }
 
 //    public void readInkMLFile(String fileName){
-//        String content = RWFiles.getContentAsString(fileName);
+//        String content = FilesUtil.getContentAsString(fileName);
 //        ArrayList<DStroke> strokes = getStrokes(content);
 //    }
 
     public ArrayList<DStroke> extractStrokesFromInkMLFile(String fileName){
-        String content = RWFiles.getContentAsString(fileName);
+        String content = FilesUtil.getContentAsString(fileName);
         return getStrokes(content);
     }
 
