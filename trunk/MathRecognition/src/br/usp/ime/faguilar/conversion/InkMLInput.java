@@ -29,6 +29,12 @@ public class InkMLInput {
 //        ArrayList<DStroke> strokes = getStrokes(content);
 //    }
 
+    /**
+     * gets strokes from an inkml file, without considering
+     * timestamp of strokes
+     * @param fileName
+     * @return
+     */
     public ArrayList<DStroke> extractStrokesFromInkMLFile(String fileName){
         String content = FilesUtil.getContentAsString(fileName);
         return getStrokes(content);
@@ -38,13 +44,22 @@ public class InkMLInput {
         ArrayList<DStroke> strokes = new ArrayList();
         String[] lines = inkMLString.split("\n");
         String[] stringNumbers;
-        int numberOfChannels = getNumberOfChannels(lines);
+        int numberOfChannels = 2;//getNumberOfChannels(lines);
 //        int numJumps = numberOfChannels -1;
         
         for (int i = 0; i < lines.length; i++) {
             while(lines[i].contains("<trace id")){
-                i++;
-                stringNumbers = lines[i].split("\\s|,\\s");
+                if(!lines[i].contains("</trace>")){
+                    i++;
+                    stringNumbers = lines[i].split("\\s+|,\\s*|\\n");//("\\s|,\\s");
+                }
+                else{
+                    int first = lines[i].indexOf(">") + 1;
+                    int last = lines[i].lastIndexOf("<");
+                    stringNumbers = lines[i].substring(first, last).split("\\s+|,\\s*|\\n");
+                }
+
+                
                 OrderedStroke newStroke =new OrderedStroke();
                 for (int j = 0; j < stringNumbers.length; j = j + numberOfChannels) {
                     TimePoint timePoint = new TimePoint(Double.valueOf(
@@ -53,7 +68,11 @@ public class InkMLInput {
                 }
                 newStroke.setIndex(strokes.size());
                 strokes.add(newStroke);
-                i = i + 2;
+                if(!lines[i].contains("</trace>"))
+                    i = i + 2;
+                else
+                    i++;
+
 //                if(lines[i].contains("/trace"))
 //                    break;
             }

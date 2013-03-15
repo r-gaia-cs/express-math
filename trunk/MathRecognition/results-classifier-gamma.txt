@@ -1,0 +1,22 @@
+testtestparameters: alpha = 0.0  beta = 1.0  gama = 0.0
+number of good results: 1  number of bad results: 2percentage: 0.07465472191116088
+parameters: alpha = 0.0  beta = 1.0  gama = 0.1
+number of good results: 1  number of bad results: 2percentage: 0.07465472191116088
+parameters: alpha = 0.0  beta = 1.0  gama = 0.2
+number of good results: 1  number of bad results: 2percentage: 0.07465472191116088
+parameters: alpha = 0.0  beta = 1.0  gama = 0.3
+number of good results: 1  number of bad results: 2percentage: 0.07465472191116088
+parameters: alpha = 0.0  beta = 1.0  gama = 0.4
+number of good results: 1  number of bad results: 2percentage: 0.07465472191116088
+parameters: alpha = 0.0  beta = 1.0  gama = 0.5
+number of good results: 1  number of bad results: 2percentage: 0.07465472191116088
+parameters: alpha = 0.0  beta = 1.0  gama = 0.6
+number of good results: 0  number of bad results: 3percentage: 0.11198208286674133
+parameters: alpha = 0.0  beta = 1.0  gama = 0.7
+number of good results: 0  number of bad results: 3percentage: 0.11198208286674133
+parameters: alpha = 0.0  beta = 1.0  gama = 0.8
+number of good results: 0  number of bad results: 3percentage: 0.11198208286674133
+parameters: alpha = 0.0  beta = 1.0  gama = 0.9
+number of good results: 1  number of bad results: 2percentage: 0.07465472191116088
+parameters: alpha = 0.0  beta = 1.0  gama = 1.0
+number of good results: 1  number of bad results: 2percentage: 0.07465472191116088

@@ -5,6 +5,9 @@
 
 package br.usp.ime.faguilar.classification;
 
+import br.usp.ime.faguilar.data.DSymbol;
+import br.usp.ime.faguilar.matching.symbol_matching.UserSymbol;
+
 /**
  *
  * @author frank
@@ -13,6 +16,8 @@ public class Classifible<T> {
     private T[] features;
     private Object myClass;
     private Object aditionalFeatures;
+    private DSymbol symbol;
+    private UserSymbol userSymbol;
 
     public Classifible(T[] features){
         Classifible classifible = new Classifible();
@@ -57,4 +62,19 @@ public class Classifible<T> {
         this.aditionalFeatures = aditionalFeatures;
     }
 
+    public DSymbol getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(DSymbol symbol) {
+        this.symbol = symbol;
+    }
+
+    public UserSymbol getUserSymbol() {
+        return userSymbol;
+    }
+
+    public void setUserSymbol(UserSymbol userSymbol) {
+        this.userSymbol = userSymbol;
+    }
 }

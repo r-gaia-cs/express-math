@@ -21,8 +21,6 @@ import java.awt.Graphics;
  */
 public class DrawingArea extends javax.swing.JPanel {
     private GraphicalStrokeKruskalMST drawingObject;
-//    private DMathExpression mathExpression;
-
     
     /** Creates new form DrawingArea */
     public DrawingArea() {
@@ -67,18 +65,7 @@ public class DrawingArea extends javax.swing.JPanel {
     public void setDrawingObject(GraphicalStrokeKruskalMST drawingObject) {
         this.drawingObject = drawingObject;
     }
-
-    
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
-
-//    public DMathExpression getMathExpression() {
-//        return drawingObject.getMathExpression();
-//    }
-//
-//    public void setMathExpression(DMathExpression mathExpression) {
-//        this.drawingObject.setMathExpression(mathExpression);
-//    }
 
 }

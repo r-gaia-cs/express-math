@@ -18,7 +18,7 @@ public class PreProcessing {
     PreProcessing(Graph model, Graph input) {
         this.model = model;
         this.input = input;
-        this.equalizeScales();      
+        this.equalizeScales();
         this.centralizeGraph();
         /*model.updateShapeContextExpression();
         input.updateShapeContextExpression();*/ 

@@ -5,6 +5,8 @@
 
 package br.usp.ime.faguilar.feature_extraction;
 
+import br.usp.ime.faguilar.cost.CostShapeContextInside;
+import br.usp.ime.faguilar.cost.ShapeContext;
 import br.usp.ime.faguilar.data.DMathExpression;
 import br.usp.ime.faguilar.data.DStroke;
 import br.usp.ime.faguilar.data.DSymbol;
@@ -16,6 +18,7 @@ import br.usp.ime.faguilar.segmentation.OrderedStroke;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  *
@@ -24,12 +27,21 @@ import java.util.ArrayList;
 public class PreprocessingAlgorithms {
     private static final double percentageOfLength=0.9;
     private static final double turningAngleThreashold=(85.0/180)*Math.PI;
-    private static final double alphaForTurningAngles=0.12;
+    private static final double alphaForTurningAngles = 0.12;
 
     public static DMathExpression preprocessDMathExpression(DMathExpression expression){
         DMathExpression newExpression=new GMathExpression();
         for (DSymbol symbol : expression) {
             DSymbol newSymbol=preprocessDSymbol(symbol);
+            newExpression.addCheckingBoundingBox(newSymbol);
+        }
+        return newExpression;
+    }
+
+    public static DMathExpression preprocessDMathExpressionWithOrderedStrokes(DMathExpression expression){
+        DMathExpression newExpression=new GMathExpression();
+        for (DSymbol symbol : expression) {
+            DSymbol newSymbol=preprocessDSymbolWithOrderedStrokes(symbol);
             newExpression.addCheckingBoundingBox(newSymbol);
         }
         return newExpression;
@@ -42,10 +54,12 @@ public class PreprocessingAlgorithms {
                 array =getNotDuplicatedPoints(array);
                 array=equalLengthResampling(array);
                 if(array.size()>=3){
+                    array =getNotDuplicatedPoints(array);
                     array=dehooking(array);
                     array=smooth(array);
                     array=equalLengthResampling(array);
                 }
+                array =getNotDuplicatedPoints(array);
                 DStroke newStroke= new GStroke();
                 for (Point2D point : array) {
                     newStroke.addCheckingBoundingBox(new TimePoint(point.getX(),
@@ -53,6 +67,32 @@ public class PreprocessingAlgorithms {
                 }
                 newSymbol.addCheckingBoundingBox(newStroke);
         }
+        return newSymbol;
+    }
+
+    public static DSymbol preprocessDSymbolWithOrderedStrokes(DSymbol s){
+        DSymbol newSymbol=new GSymbol();
+        for (DStroke stroke : s) {
+                ArrayList<Point2D> array=strokeToArrayList(stroke);
+                array = getNotDuplicatedPoints(array);
+                array=equalLengthResampling(array);
+                
+                if(array.size()>=3){
+                    array = getNotDuplicatedPoints(array);
+                    array=dehooking(array);
+                    array=smooth(array);
+                    array=equalLengthResampling(array);
+                }
+                array =getNotDuplicatedPoints(array);
+                OrderedStroke newStroke= new OrderedStroke();
+                for (Point2D point : array) {
+                    newStroke.addCheckingBoundingBox(new TimePoint(point.getX(),
+                            point.getY(), -1));
+                }
+                newStroke.setIndex(((OrderedStroke)stroke).getIndex());
+                newSymbol.addCheckingBoundingBox(newStroke);
+        }
+        newSymbol.setLabel(s.getLabel());
         return newSymbol;
     }
     
@@ -108,6 +148,19 @@ public class PreprocessingAlgorithms {
         return points;
     }
 
+    public static ShapeContextFeature getNShapeContetxFeatures(DSymbol s,int N){
+        ShapeContextFeature features = new ShapeContextFeature();
+        int[] pointsPerStroke = extractNNumberOfPointsPerStroke(s, N);
+
+        for (int i = 0; i < pointsPerStroke.length; i++) {
+            ArrayList<FeatureGroup> newFeatures = getNShapeContetxFeatures(s, s.get(i), pointsPerStroke[i]);
+            features.addAll(newFeatures);
+        }
+        ShapeContext shapeContext = CostShapeContextInside.calculateShapeContextFromPoints2D(features.getCoords());
+        features.setShapeContext(shapeContext);
+        return features;
+    }
+
     public static int getNumberOfPoints(DSymbol s){
         int numberOfPooints=0;
         for (DStroke stroke : s) {
@@ -130,7 +183,7 @@ public class PreprocessingAlgorithms {
                 numberOfPoints[index]=(int) Math.floor(exactNumber);
             index++;
         }
-       int suma=sum(numberOfPoints);
+       int suma = sum(numberOfPoints);
        while(suma!=N){
            int max=numberOfPoints[0];
            int posMax=0;
@@ -148,7 +201,7 @@ public class PreprocessingAlgorithms {
                suma--;
            }
        }
-        return numberOfPoints;
+       return numberOfPoints;
     }
 
     public static int sum(int[] numbers){
@@ -180,11 +233,32 @@ public class PreprocessingAlgorithms {
         return points;
     }
 
+    private static ArrayList<FeatureGroup> getNShapeContetxFeatures(DSymbol symbol, DStroke stroke, int N) {
+        ArrayList<FeatureGroup> features = new ArrayList<FeatureGroup>();
+        if(N > stroke.size())
+            completePoints(symbol, features, stroke, N);
+        else{
+            double pos=0;
+            double distance = (double) stroke.size()/N;
+            for (int i = 0; i < N; i++) {
+                if(pos>=stroke.size())
+                    features.add(newFeatureFromPoint(symbol, stroke, stroke.size()-1));
+                else{
+                    features.add(newFeatureFromPoint(symbol, stroke, (int)Math.round(pos)));
+                    pos+=distance;
+                }
+            }
+        }
+        return features;
+    }
 
     public static void completePoints(ArrayList<Point2D> points,int N){
         int diference=N-points.size();
         for (int i = 0; i <diference; i++) {
-            interpolateAPoint(points);
+            if(points.size() == 1)
+                points.add(points.get(0));
+            else
+                interpolateAPoint(points);
         }
     }
 
@@ -350,31 +424,74 @@ public class PreprocessingAlgorithms {
      * @return
      */
     public static ArrayList<Double> turningAngles(ArrayList<Point2D> s){
-
         ArrayList<Double> tAngles=new ArrayList<Double>(s.size()-2);
-
-        for (int i=1;i<s.size()-1;i++) {
-
-            double dx1=s.get(i).getX()-s.get(i-1).getX();
-            double dy1=s.get(i).getY()-s.get(i-1).getY();
-            double dx2=s.get(i+1).getX()-s.get(i).getX();
-            double dy2=s.get(i+1).getY()-s.get(i).getY();
-            double turningAngle=angleBetween2Lines(new Line2D.Double(0,0,dx1,dy1),
+        for (int i = 1; i < s.size()-1; i++) {
+            double dx1 = s.get(i).getX() - s.get(i-1).getX();
+            double dy1 = s.get(i).getY() - s.get(i-1).getY();
+            double dx2 = s.get(i+1).getX() - s.get(i).getX();
+            double dy2 = s.get(i+1).getY() - s.get(i).getY();
+//            if((dx1 == 0 && dy1 == 0) || (dx2 == 0 && dy2 == 0))
+//                System.out.println("zero");
+            double turningAngle = angleBetween2Lines(new Line2D.Double(0,0,dx1,dy1),
                     new Line2D.Double(0,0,dx2,dy2));
+//            if(turningAngle == Math.PI){
+//                System.out.println("pi");
+//                angleBetween2Lines(new Line2D.Double(0,0,dx1,dy1),
+//                    new Line2D.Double(0,0,dx2,dy2));
+//            }
             tAngles.add(turningAngle);
         }
         return tAngles;
     }
 
+    public static ArrayList<Double> turningAngleDiferences(ArrayList<Point2D> s){
+        ArrayList<Double> tAngles = turningAngles(s);
+//        ArrayList<Double> tAngleDiferences = new ArrayList<Double>(s.size() -1);
+//        for (int i = 1; i < tAngles.size(); i++) {
+//            tAngleDiferences.add(Math.abs(tAngles.get(i) - tAngles.get(i - 1)));
+//        }
+        
+        return tAngles;
+    }
+
+    public static float shapeComplexity(DSymbol symbol){
+        float complexity = 0;
+        float mean, sum;
+        for (DStroke stroke : symbol) {
+            if(stroke.size() > 3){
+//                ArrayList<Point2D> points = new ArrayList<Point2D>(stroke.size());
+//                for (Point2D point2D : stroke) {
+//                    points.add(point2D);
+//                }
+                //                points = PreprocessingAlgorithms.getNotDuplicatedPoints(points);
+                ArrayList<Point2D> points = PreprocessingAlgorithms.getNPoints(stroke, 20);
+                ArrayList<Double> turningAngleDiferences = turningAngleDiferences(points);
+//                TO USE MEAN AS COMPLEXITY
+//                sum = (float) 0.;
+//                for (Double angle : turningAngleDiferences)
+//                    sum += angle;
+//                mean  = (float) (sum / (turningAngleDiferences.size() * Math.PI));
+//                complexity += mean;
+//              TO USE MEDIAN AS COMPLEXITY
+                Collections.sort(turningAngleDiferences);
+                double median = turningAngleDiferences.get((int) Math.round(turningAngleDiferences.size() / 2.));
+                complexity += median;
+            }
+//            complexity *= symbol.size();
+        }
+        complexity *= symbol.size();
+        return complexity;
+    }
+
     public static double angleBetween2Lines(Line2D line1, Line2D line2)
     {
-//        double angle1 = Math.atan2(line1.getY2() - line1.getY1(),
-//                                   line1.getX2() - line1.getX1());
-//        double angle2 = Math.atan2(line2.getY2() - line2.getY1(),
-//                                   line2.getX2() - line2.getX1());
-        double angle1 = angle(line1);
-        double angle2 = angle(line2);
-        return Math.abs(angle1-angle2);
+        double angle1 = Math.atan2(line1.getY2() - line1.getY1(),
+                                   line1.getX2() - line1.getX1());
+        double angle2 = Math.atan2(line2.getY2() - line2.getY1(),
+                                   line2.getX2() - line2.getX1());
+//        double angle1 = angle(line1);
+//        double angle2 = angle(line2);
+        return Math.abs(angle1 - angle2);
     }
 
     public static double angle(Line2D l){
@@ -393,13 +510,16 @@ public class PreprocessingAlgorithms {
 //                if (dy > 0){
 //                    theta = 2.0f*(float)Math.PI - theta;
 //                }
+//        if(Double.isNaN(angle)){
+//            System.out.println("nan");
+//        }
         return angle;
     }
 
     public static ArrayList<Point2D> strokeToArrayList(DStroke stroke){
         ArrayList<Point2D> arrayList=new ArrayList<Point2D>();
         for (Point2D point2D : stroke) {
-            arrayList.add(point2D);
+            arrayList.add(new Point2D.Double(point2D.getX(), point2D.getY()));
         }
         return arrayList;
     }
@@ -516,4 +636,102 @@ public class PreprocessingAlgorithms {
         return distance;
     }
 
+    private static void completePoints(DSymbol symbol, ArrayList<FeatureGroup> features, DStroke stroke, int N) {
+        for (int i = 0; i < stroke.size(); i++)
+            features.add(newFeatureFromPoint(symbol, stroke, i));
+        int diference = N - stroke.size();
+        for (int i = 0; i < diference; i++) {
+            if(stroke.size() == 1){
+                FeatureGroup featureGroup = new FeatureGroup();
+                featureGroup.setCoord(stroke.get(0));
+                featureGroup.setAngle(0);
+                features.add(featureGroup);
+            }
+            else
+                interpolateAPoint(symbol, features, stroke);
+        }
+    }
+
+    private static FeatureGroup newFeatureFromPoint(DSymbol symbol, DStroke stroke, int i) {
+        FeatureGroup feature = new FeatureGroup();
+        feature.setCoord(stroke.get(i));
+        feature.setAngle(calculateAngle(symbol, stroke, i));
+        return feature;
+    }
+
+    private static float calculateAngle(DSymbol symbol, DStroke stroke, int i) {
+        float angle = -1;
+//        to use turning angles
+//        if(i == 0 || i == (stroke.size() -1))
+//            if(stroke.size() == 1)
+//                angle = 0;
+//            else
+//                angle = terminalAngle(stroke, i);
+//        else
+//            angle = centralAngle(stroke, i);
+
+//        TO USE ANGLE FROM CENTER OF BOUNDING BOX TO THE POINT i
+        angle  = angleFromCentroidToPoint(symbol, stroke, i);
+        
+        return angle;
+    }
+
+    private static float terminalAngle(DStroke stroke, int i) {
+        Line2D axis = new Line2D.Float(0, 0, 1, 0);
+        Point2D referencePoint = null;
+        if(i == 0)
+            referencePoint = stroke.get(1);
+        else if(i == stroke.size() -1)
+            referencePoint = stroke.get(i - 1);
+        Line2D lineToReferencePoint = new Line2D.Float(stroke.get(i), referencePoint);
+        float angle = (float) angleBetween2Lines(axis, lineToReferencePoint);
+        return angle;
+    }
+
+    private static float centralAngle(DStroke stroke, int i) {
+        float angle = -1;
+//        double dx1 = stroke.get(i).getX() - stroke.get(i-1).getX();
+//        double dy1 = stroke.get(i).getY() - stroke.get(i-1).getY();
+//        double dx2 = stroke.get(i+1).getX() - stroke.get(i).getX();
+//        double dy2 = stroke.get(i+1).getY() - stroke.get(i).getY();
+//            if((dx1 == 0 && dy1 == 0) || (dx2 == 0 && dy2 == 0))
+//                System.out.println("zero");
+//        angle = (float) angleBetween2Lines(new Line2D.Double(0,0,dx1,dy1),
+//                new Line2D.Double(0,0,dx2,dy2));
+        angle = (float) angleBetween2Lines(new Line2D.Double(stroke.get(i - 1),
+                stroke.get(i)),
+                new Line2D.Double(stroke.get(i), stroke.get(i + 1)));
+        return angle;
+    }
+
+    private static float angleFromCentroidToPoint(DSymbol symbol,DStroke stroke, int i) {
+        float angle = -1;
+        Point2D center = symbol.getBoundingBoxCenter();
+        Line2D horizontal = new Line2D.Double(center, new Point2D.Double(center.getX() - 1, center.getY()));
+        Line2D centerToPoint = new Line2D.Double(center, stroke.get(i));
+        angle = (float) angleBetween2Lines(horizontal, centerToPoint);
+        return angle;
+    }
+
+    //CHECKAR CLONE
+    private static void interpolateAPoint(DSymbol symbol, ArrayList<FeatureGroup> features, DStroke stroke) {
+        int pos = getPosMaxDistance(strokeToArrayList(stroke));
+        int startPoint = pos;
+        int finalPoint = pos + 1;
+        double distance = stroke.get(startPoint).distance(stroke.get(finalPoint));
+        Point2D newPoint = getNewPoint(stroke.get(startPoint), stroke.get(finalPoint),
+                distance / 2.);
+        FeatureGroup newFeature = new FeatureGroup();
+        newFeature.setCoord(newPoint);
+        DStroke strokeCopy = (DStroke) stroke.clone();
+        strokeCopy.add(pos + 1, new TimePoint(newPoint.getX(), newPoint.getY(), -1));
+        float angle;//calculateAngle(strokeCopy, pos + 1);
+//        TO USE TURNING ANGLES
+//        angle = 0;
+//        newFeature.setAngle(angle);
+//        TO USE ANGLE FROM CENTER TO THE NEW POINT
+        angle = calculateAngle(symbol, strokeCopy, pos + 1);
+        newFeature.setAngle(angle);
+        features.add(pos + 1, newFeature);
+    }
 }

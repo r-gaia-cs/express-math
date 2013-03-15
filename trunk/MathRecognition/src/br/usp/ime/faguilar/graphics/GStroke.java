@@ -36,7 +36,7 @@ public class GStroke extends DStroke{
 
         //To make lines thicker
         g2D.setStroke(new BasicStroke(3.0f));
-
+//        g2D.setStroke(new BasicStroke(1.5f));
 
         Point2D pAux1,pAux2;
         int i;
@@ -57,7 +57,7 @@ public class GStroke extends DStroke{
         g2D.setStroke(str);
          
 //        TO DRAW JUST POINTS
-        drawPoints(s, g);
+//        drawPoints(s, g);
     }
 
     public static void drawPoints(DStroke s,Graphics g){

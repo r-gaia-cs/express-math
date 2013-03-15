@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 /**
  *
@@ -28,7 +29,7 @@ public class TrainingAndTestDataPartitioner {
         expressionsPerModel = new HashMap<String, ArrayList<String>>();
         trainingExpressions = new ArrayList<String>();
         testExpressions = new ArrayList<String>();
-        trainingPercentage = 0.7;
+        trainingPercentage = 0.5;
     }
 
     public void partFileNamesRandomlyByModels(ArrayList<String> fileNames){
@@ -53,10 +54,17 @@ public class TrainingAndTestDataPartitioner {
     }
 
     private void doPartitionRandomlyByModels() {
-        int numberOfTrainingElements;
+        long numberOfTrainingElements;
+        boolean applyFloor =  true;
+        Random r = new Random();
         for (ArrayList<String> expressionsOfAModel : expressionsPerModel.values()) {
             Util.randomizeInPlaze(expressionsOfAModel);
-            numberOfTrainingElements = (int) (expressionsOfAModel.size() * trainingPercentage);
+            applyFloor = r.nextBoolean();
+            if (applyFloor)
+                numberOfTrainingElements = (long)Math.floor(expressionsOfAModel.size() * trainingPercentage);
+            else
+                numberOfTrainingElements = (long)Math.ceil(expressionsOfAModel.size() * trainingPercentage);
+//            numberOfTrainingElements = Math.round(expressionsOfAModel.size() * trainingPercentage);
             for (int i = 0; i < expressionsOfAModel.size(); i++) {
                 if(i < numberOfTrainingElements)
                     trainingExpressions.add(expressionsOfAModel.get(i));

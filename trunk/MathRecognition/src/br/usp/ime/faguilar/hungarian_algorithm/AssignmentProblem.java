@@ -19,7 +19,7 @@ public class AssignmentProblem {
         costMatrix = aCostMatrix;
     }
 
-    private float[][] copyOfMatrix() {
+    public float[][] copyOfMatrix() {
         // make a copy of the passed array
         float[][] retval = new float[costMatrix.length][];
         for (int i = 0; i < costMatrix.length; i++) {
@@ -33,7 +33,15 @@ public class AssignmentProblem {
     public int[][] solve(AssignmentAlgorithm anAlgorithm) {
 
         float[][] copyMatrix = copyOfMatrix();
-        return anAlgorithm.computeAssignments(copyMatrix);
+        int [][] matching = anAlgorithm.computeAssignments(copyMatrix);
+//        float[][] costs = copyOfMatrix();
+//        double cost = 0;
+//        for (int i = 0; i < matching.length; i++) {
+//            cost += costs[matching[i][0]][matching[i][1]];
+//        }
+//        System.out.println((float)cost);
+        return matching;
+//        return anAlgorithm.computeAssignments(copyMatrix);
 
     }
 

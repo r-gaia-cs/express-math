@@ -58,7 +58,7 @@ public class FilesUtil {
          br = new BufferedReader(fr);
       }
       catch(Exception e){
-         e.printStackTrace();
+          System.out.println(e);
       }
       return br;
     }
@@ -103,5 +103,4 @@ public class FilesUtil {
         }
         return fileNames;
     }
-
 }

@@ -15,10 +15,9 @@ import java.util.Map;
 public class SymbolFeatures {
     public static final int UNDEFINED_NUMBER_OF_STROKES = -1;
     private static Map<String, Integer> numberOfStrokesPerSymbol;
-
-
-
     private int numberOfStrokes;
+    private double height;
+    private double width;
 
     public SymbolFeatures() {
         setDefaultFeatureValues();
@@ -26,6 +25,8 @@ public class SymbolFeatures {
 
     public final void setDefaultFeatureValues(){
         setNumberOfStrokes(UNDEFINED_NUMBER_OF_STROKES);
+        setHeight(0);
+        setWidth(0);
     }
 
     public static void setUpNumberOfStrokesPerSymbol(){
@@ -36,7 +37,6 @@ public class SymbolFeatures {
         numberOfStrokesPerSymbol.put("||", 2);
         numberOfStrokesPerSymbol.put("i", 2);
         numberOfStrokesPerSymbol.put("j", 2);
-
         numberOfStrokesPerSymbol.put("!", 2);
         numberOfStrokesPerSymbol.put("t", 2);
 
@@ -44,6 +44,7 @@ public class SymbolFeatures {
         numberOfStrokesPerSymbol.put("\\neq", 3);
         numberOfStrokesPerSymbol.put("\\pi", 3);
         numberOfStrokesPerSymbol.put("\\pm", 3);
+        numberOfStrokesPerSymbol.put("\\cdots", 3);
     }
 
     public static int getNumberOfStrokesForSymbol(String symbol){
@@ -59,4 +60,21 @@ public class SymbolFeatures {
     public void setNumberOfStrokes(int numberOfStrokes) {
         this.numberOfStrokes = numberOfStrokes;
     }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public void setWidth(double width) {
+        this.width = width;
+    }
+
 }

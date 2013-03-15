@@ -11,6 +11,9 @@ import br.usp.ime.faguilar.hungarian_algorithm.HungarianAlgorithm;
 public class HungarianMatching extends GraphMatching {
 
     EdgeBuilder edgeBuilder;
+    private float[][] myCalculatedCostMatrix;
+    
+
 
     public HungarianMatching(){
         super();
@@ -32,6 +35,7 @@ public class HungarianMatching extends GraphMatching {
 
     public int[][] getMatch() {
         AssignmentProblem ap = new AssignmentProblem(this.getCostMatrix());
+//        myCalculatedCostMatrix = ap.copyOfMatrix();
         return ap.solve(new HungarianAlgorithm());
         /*int result[] = new int[match.length];
         for (int i = 0; i < result.length; i++) {
@@ -46,8 +50,13 @@ public class HungarianMatching extends GraphMatching {
         medianY = (int) this.median(inputVertex, modelVertex, match, false);*/
     }
 
+    public float[][] getMyCalculatedCostMatrix() {
+        return myCalculatedCostMatrix;
+    }
 
-
+    public void setMyCalculatedCostMatrix(float[][] myCostMatrix) {
+        this.myCalculatedCostMatrix = myCostMatrix;
+    }
     /*
     private float median(Vertex[] inputVertex, Vertex[] modelVertex, int[][] match, boolean isXDistance) {
         float mediana[] = new float[modelVertex.length];
@@ -88,4 +97,6 @@ public class HungarianMatching extends GraphMatching {
     private double distanceY(Vertex input, Vertex model) {
         return input.getY() - model.getY();
     }*/
+
+
 }
