@@ -27,11 +27,11 @@ public class MathExpressionGraph {
             for(j = i+1; j < strokes.size(); j++){
 //                TO CALCULATE WEIGHT AS DISTANCE BETWEEN
 //                STROKES' BOUNDING BOX CENTERS
-//                boundingBox_i = strokes.get(i).getBBox();
-//                boundingBox_j = strokes.get(j).getBBox();
-//                weight = Point2D.distance(boundingBox_i.getCenterX(), boundingBox_i.getCenterY(),
-//                        boundingBox_j.getCenterX(), boundingBox_j.getCenterY());
-//                graph.addEdge(new Edge(i, j, weight));
+                boundingBox_i = strokes.get(i).getBBox();
+                boundingBox_j = strokes.get(j).getBBox();
+                weight = Point2D.distance(boundingBox_i.getCenterX(), boundingBox_i.getCenterY(),
+                        boundingBox_j.getCenterX(), boundingBox_j.getCenterY());
+                graph.addEdge(new Edge(i, j, weight));
                 
 //                TO CALCULATE WEIGHT AS MINIMUM DISTANCE BETWEEN STROKES
 //                weight = strokes.get(i).minDistance(strokes.get(j));
@@ -40,9 +40,9 @@ public class MathExpressionGraph {
 
 //                TO CALCULATE DISTANCE BETWEEN POINT NEAREST TO BOUNDING BOX OF STROKES
 
-                weight = strokes.get(i).getNearestPointToBoundingBoxCenter().distance(
-                        strokes.get(j).getNearestPointToBoundingBoxCenter());
-                graph.addEdge(new Edge(i, j, weight));
+//                weight = strokes.get(i).getNearestPointToBoundingBoxCenter().distance(
+//                        strokes.get(j).getNearestPointToBoundingBoxCenter());
+//                graph.addEdge(new Edge(i, j, weight));
             }
         return graph;
     }

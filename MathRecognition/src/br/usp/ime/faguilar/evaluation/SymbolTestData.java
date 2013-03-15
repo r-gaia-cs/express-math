@@ -38,9 +38,16 @@ public class SymbolTestData {
         map.put(classifible.getMyClass(), list);
     }
 
-    public static String getFrequencies(){
+    public static String getTrainingFrequencies(){
         // Initialize frequency table from command line
-        ArrayList<Classifible> allSymbols = SymbolUtil.readSymbolData(EvaluationView.TEMPLATES_FILE);
+//        ArrayList<Classifible> allSymbols = SymbolUtil.readSymbolData(EvaluationView.TEMPLATES_FILE);
+        ArrayList<Classifible> allSymbols = SymbolUtil.readTemplatesFromInkmlFiles();//SymbolUtil.readTemplates();
+        return getFrequencies(allSymbols);
+    }
+
+    public static String getFrequencies(ArrayList<Classifible> allSymbols){
+        // Initialize frequency table from command line
+//        ArrayList<Classifible> allSymbols = SymbolUtil.readSymbolData(EvaluationView.TEMPLATES_FILE);
         Map<String, Integer> map = new HashMap<String, Integer>();
         for (Classifible a : allSymbols) {
             Integer freq = map.get((String) a.getMyClass());
@@ -51,8 +58,6 @@ public class SymbolTestData {
 //        System.out.println(map);
         return map.toString().replaceAll(",\\s", "\n");
     }
-
-    
 
     public ArrayList<Classifible> getClassifiebles() {
         return classifiebles;

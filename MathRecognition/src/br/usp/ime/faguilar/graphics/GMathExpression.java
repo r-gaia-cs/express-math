@@ -32,7 +32,7 @@ public class GMathExpression extends DMathExpression
     }
 
     public Dimension getSize(){
-        return getBBox().getSize();
+        return new Dimension((int)getBBox().getWidth(),(int) getBBox().getHeight());
     }
 
     public int containsPoint(Point2D p){

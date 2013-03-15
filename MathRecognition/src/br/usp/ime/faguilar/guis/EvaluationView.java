@@ -18,6 +18,7 @@ import br.usp.ime.faguilar.classification.ShapeContextClassifier;
 import br.usp.ime.faguilar.conversion.InkMLInput;
 import br.usp.ime.faguilar.conversion.MathExpressionGraph;
 import br.usp.ime.faguilar.data.DStroke;
+import br.usp.ime.faguilar.data.TimePoint;
 import br.usp.ime.faguilar.export.InkMLExpression;
 import br.usp.ime.faguilar.export.MathExpressionSample;
 import br.usp.ime.faguilar.feature_extraction.PreprocessingAlgorithms;
@@ -31,6 +32,7 @@ import br.usp.ime.faguilar.util.SymbolUtil;
 import edu.princeton.cs.algs4.Edge;
 import edu.princeton.cs.algs4.EdgeWeightedGraph;
 import edu.princeton.cs.algs4.KruskalMST;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,10 +45,18 @@ import javax.swing.DefaultListModel;
  */
 public class EvaluationView extends javax.swing.JPanel {
     public static final String INKML_DIR = "data/inkml-complete/";
+
+    public static final String INKML_CROHME_2012_TRAIN_DIR = "data/CROHME/2012/trainData/";
+    public static final String INKML_CROHME_2012_TEST_DIR = "data/CROHME/2012/testDataGT/";
+    public static final String TRAINING_FILES_CROHME =  "files/training_crohme.txt";//"training-training.txt";//"trainingFiles.txt";
+    public static final String TEST_FILES_CROHME = "files/test_crohme.txt";//"training-test.txt";//"testFiles.txt";
+
     public static final String TEMPLATES_DIR = "data/templates/";
+    public static final String TEMPLATES_PER_EXPRESSION_DIR = TEMPLATES_DIR + "symbols/";
 //    public static final String TEMPLATES_FILE = TEMPLATES_DIR + "part-model-symbols_v3.txt";
-    public static final String TEMPLATES_FILE = TEMPLATES_DIR + "first-test.txt";//"model-symbols.txt";
-    public static final String TRAINING_FILES = INKML_DIR + "training-training.txt";
+    public static final String TEMPLATES_FILE = TEMPLATES_DIR + "all-symbols.txt";//"first-test.txt";//"model-symbols.txt";
+    public static final String TRAINING_FILES = INKML_DIR + "training-training.txt";//"training-training.txt";//"trainingFiles.txt";
+    public static final String TEST_FILES = INKML_DIR + "training-test.txt";//"training-test.txt";//"testFiles.txt";
     private Segmentation segmentation;
     private String SelectedFileName;
 
@@ -65,7 +75,7 @@ public class EvaluationView extends javax.swing.JPanel {
 
     private void localInitialization() {
         chargeFileNames();
-        ArrayList<Classifible> classifibles = SymbolUtil.readSymbolData(TEMPLATES_FILE);
+        ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles();//SymbolUtil.readTemplatesWithStrokesInfo();//SymbolUtil.readTemplates();//SymbolUtil.readSymbolData(TEMPLATES_FILE);
         classifier = new ShapeContextClassifier();
         classifier.setTrainingData(classifibles);
         classifier.train();
@@ -75,10 +85,10 @@ public class EvaluationView extends javax.swing.JPanel {
     }
     
     private void chargeFileNames(){
-        String fileContent = FilesUtil.getContentAsString(EvaluationView.TRAINING_FILES);
-        String[] trainingFiles = fileContent.split("\n");
+        String[] files = SymbolUtil.readFilesNamesInAFile(EvaluationView.TEST_FILES);
+//        String[] files = SymbolUtil.readFilesNamesInAFile(EvaluationView.TEST_FILES_CROHME);
         ArrayList<String> inkFiles = new  ArrayList();
-        inkFiles.addAll(Arrays.asList(trainingFiles));
+        inkFiles.addAll(Arrays.asList(files));
         Collections.sort(inkFiles);
         DefaultListModel listModel = new DefaultListModel();
         for (String string : inkFiles) {
@@ -302,19 +312,18 @@ public class EvaluationView extends javax.swing.JPanel {
     private void executeSegmentationAndClassification(){
         double meandistance = 0;
         double filterMaxDistance;
-        double alpha = 0.8;
+        double alpha = .9;
         double beta = 0.6;
         for(Edge e: mst.edges())
             meandistance += e.weight();
         meandistance = meandistance / (StrokeSetToEdgeWeightedGraph.V() - 1);
         filterMaxDistance = alpha * meandistance;
         double mindistance = beta * meandistance;
-        if(useTree.isSelected()){
+        if(useTree.isSelected())
             segmentation =  new TreeSearchSegmentation();
-            ((TreeSearchSegmentation) segmentation).setMinDist(mindistance);
-        }
         else
-            segmentation =  new Segmentation();            
+            segmentation =  new Segmentation();
+        segmentation.setMinDist(mindistance);
         segmentation.setClassifier(classifier);
         boolean filterByDistance = distanceFilter.isSelected();
         segmentation.setTruncateByDistance(filterByDistance);
@@ -334,17 +343,19 @@ public class EvaluationView extends javax.swing.JPanel {
 //        sample.setCategory("cat");
 //
 //        InkMLExpression inkMlExpression = new InkMLExpression();
-//            inkMlExpression.setGroundTruthExpression(sample.getTextualRepresentation());
-//            inkMlExpression.setSampleExpression(sample);
-//            inkMlExpression.generateInkML();
-//            String inkmlTex = inkMlExpression.getInkmlText();
+//        inkMlExpression.setGroundTruthExpression(sample.getTextualRepresentation());
+//        inkMlExpression.setSampleExpression(sample);
+//        inkMlExpression.setTimeStampIncluded(false);
+//        inkMlExpression.generateInkML();
+//
+//        String inkmlTex = inkMlExpression.getInkmlText();
 ////            count++;
-//            FilesUtil.write(INKML_DIR + SelectedFileName.substring(0, SelectedFileName.length() - 6)
-//                    + "-res.inkml", inkmlTex);
+//        FilesUtil.write(INKML_DIR + SelectedFileName.substring(0, SelectedFileName.length() - 6)
+//                + "-res.inkml", inkmlTex);
+////        FilesUtil.write(EvaluationView.INKML_CROHME_2012_TEST_DIR + SelectedFileName.substring(0, SelectedFileName.length() - 6)
+////                + "-res.inkml", inkmlTex);
 
         // end to show inkml
-
-
         expression.setDrawnWithBBox(true);
         expression.setDrawnWithLabels(true);
         drawingArea2.getDrawingObject().setMathExpression(expression);
@@ -368,7 +379,17 @@ public class EvaluationView extends javax.swing.JPanel {
         InkMLInput inkMlInput = new InkMLInput();
         strokes = inkMlInput.extractStrokesFromInkMLFile(
                 INKML_DIR + inkmlFileName);
+//        strokes = inkMlInput.extractStrokesFromInkMLFile(
+//                EvaluationView.INKML_CROHME_2012_TEST_DIR + inkmlFileName);
         strokes = PreprocessingAlgorithms.preprocessStrokes(strokes);
+//        for (DStroke dStroke : strokes) {
+//            ArrayList<Point2D> nPoints = PreprocessingAlgorithms.getNPoints(dStroke, 10);
+//            dStroke.clear();
+//            for (Point2D point2D : nPoints) {
+//                dStroke.addCheckingBoundingBox(new TimePoint(point2D.getX()
+//                        , point2D.getY(), -1) );
+//            }
+//        }
         StrokeSetToEdgeWeightedGraph =
             MathExpressionGraph.StrokeSetToEdgeWeightedGraph(strokes);
         

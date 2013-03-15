@@ -23,6 +23,7 @@ public class GraphicalStrokeKruskalMST{
     private KruskalMST mst;
     public static final int DRAW_TYPE_STROKES = 1;
     public static final int DRAW_TYPE_EXPRESSION = 2;
+    private static final int VERTEXWIDTH = 8;
     private int drawType;
     private boolean drawGraph;
 
@@ -35,16 +36,116 @@ public class GraphicalStrokeKruskalMST{
     }
 
     public void draw(Graphics g){
+        if(drawGraph)
+            drawGraphEdges(g);
+//            drawGraph(g);
         if(getDrawType() == DRAW_TYPE_STROKES)
             drawStrokes(g);
         else if(getDrawType() == DRAW_TYPE_EXPRESSION)
             drawMathExpression(g);
         if(drawGraph)
-            drawGraph(g);
+            drawGraphVertices(g);
     }
     
     public void drawMathExpression(Graphics g){
         ((GMathExpression)mathExpression).draw(g);
+    }
+
+    public void drawGraphEdges(Graphics g){
+        if(mst!= null){
+//            mst.edges();
+            Color currentColor = g.getColor();
+            Color newColor = Color.GRAY;
+            g.setColor(newColor);
+            Graphics2D g2D = (Graphics2D) g;
+            Stroke str= g2D.getStroke();
+
+            //To make lines thicker
+            g2D.setStroke(new BasicStroke(2.5f));
+            // TO SET CONTROL RENDERING QUALITY
+//            RenderingHints rh = new RenderingHints(
+//             RenderingHints.KEY_STROKE_CONTROL,
+//             RenderingHints.VALUE_STROKE_NORMALIZE);
+//            g2D.setRenderingHints(rh);
+
+//            for (Edge e : mst.edges()) {
+//                g.drawLine(
+//                        (int) strokes.get(e.either()).getNearestPointToBoundingBoxCenter().getX(),
+//                        (int) strokes.get(e.either()).getNearestPointToBoundingBoxCenter().getY(),
+//                        (int) strokes.get(e.other(e.either())).getNearestPointToBoundingBoxCenter().getX(),
+//                        (int) strokes.get(e.other(e.either())).getNearestPointToBoundingBoxCenter().getY());
+//            }
+            for (Edge e : mst.edges()) {
+                g.drawLine(
+                        (int) strokes.get(e.either()).getBoundingBoxCenter().getX(),
+                        (int) strokes.get(e.either()).getBoundingBoxCenter().getY(),
+                        (int) strokes.get(e.other(e.either())).getBoundingBoxCenter().getX(),
+                        (int) strokes.get(e.other(e.either())).getBoundingBoxCenter().getY());
+            }
+            g2D.setStroke(str);
+            g.setColor(currentColor);
+        }
+    }
+
+    public void drawGraphVertices(Graphics g){
+        if(mst!= null){
+//            mst.edges();
+            Color currentColor = g.getColor();
+            Color newColor = Color.GRAY;
+            g.setColor(newColor);
+            Graphics2D g2D = (Graphics2D) g;
+            Stroke str= g2D.getStroke();
+
+            //To make lines thicker
+            g2D.setStroke(new BasicStroke(2.5f));
+//            for (Edge e : mst.edges()) {
+//                g.fillOval((int) (strokes.get(e.either()).getCentroid().getX() -VERTEXWIDTH / 2),
+//                        (int) (strokes.get(e.either()).getCentroid().getY() -VERTEXWIDTH/2), VERTEXWIDTH, VERTEXWIDTH);
+//                g.fillOval((int) (strokes.get(e.other(e.either())).getCentroid().getX() -VERTEXWIDTH / 2),
+//                        (int) (strokes.get(e.other(e.either())).getCentroid().getY() -VERTEXWIDTH/2), VERTEXWIDTH, VERTEXWIDTH);
+//            }
+//            g.setColor(Color.DARK_GRAY);
+//            g2D.setStroke(new BasicStroke(1.5f));
+//            for (Edge e : mst.edges()) {
+//                g.drawOval((int) (strokes.get(e.either()).getCentroid().getX() - VERTEXWIDTH / 2),
+//                        (int) (strokes.get(e.either()).getCentroid().getY() - VERTEXWIDTH / 2), VERTEXWIDTH, VERTEXWIDTH);
+//                g.drawOval((int) (strokes.get(e.other(e.either())).getCentroid().getX() -VERTEXWIDTH / 2),
+//                        (int) (strokes.get(e.other(e.either())).getCentroid().getY() -VERTEXWIDTH / 2), VERTEXWIDTH, VERTEXWIDTH);
+//            }
+
+            for (Edge e : mst.edges()) {
+                g.fillOval((int) (strokes.get(e.either()).getBoundingBoxCenter().getX() -VERTEXWIDTH / 2),
+                        (int) (strokes.get(e.either()).getBoundingBoxCenter().getY() -VERTEXWIDTH/2), VERTEXWIDTH, VERTEXWIDTH);
+                g.fillOval((int) (strokes.get(e.other(e.either())).getBoundingBoxCenter().getX() -VERTEXWIDTH / 2),
+                        (int) (strokes.get(e.other(e.either())).getBoundingBoxCenter().getY() -VERTEXWIDTH/2), VERTEXWIDTH, VERTEXWIDTH);
+            }
+            g.setColor(Color.DARK_GRAY);
+            g2D.setStroke(new BasicStroke(1.5f));
+            for (Edge e : mst.edges()) {
+                g.drawOval((int) (strokes.get(e.either()).getBoundingBoxCenter().getX() - VERTEXWIDTH / 2),
+                        (int) (strokes.get(e.either()).getBoundingBoxCenter().getY() - VERTEXWIDTH / 2), VERTEXWIDTH, VERTEXWIDTH);
+                g.drawOval((int) (strokes.get(e.other(e.either())).getBoundingBoxCenter().getX() -VERTEXWIDTH / 2),
+                        (int) (strokes.get(e.other(e.either())).getBoundingBoxCenter().getY() -VERTEXWIDTH / 2), VERTEXWIDTH, VERTEXWIDTH);
+            }
+
+//            for (Edge e : mst.edges()) {
+//                g.fillOval((int) (strokes.get(e.either()).getNearestPointToBoundingBoxCenter().getX() -VERTEXWIDTH / 2),
+//                        (int) (strokes.get(e.either()).getNearestPointToBoundingBoxCenter().getY() -VERTEXWIDTH/2), VERTEXWIDTH, VERTEXWIDTH);
+//                g.fillOval((int) (strokes.get(e.other(e.either())).getNearestPointToBoundingBoxCenter().getX() -VERTEXWIDTH / 2),
+//                        (int) (strokes.get(e.other(e.either())).getNearestPointToBoundingBoxCenter().getY() -VERTEXWIDTH/2), VERTEXWIDTH, VERTEXWIDTH);
+//            }
+//            g.setColor(Color.DARK_GRAY);
+//            g2D.setStroke(new BasicStroke(1.5f));
+//            for (Edge e : mst.edges()) {
+//                g.drawOval((int) (strokes.get(e.either()).getNearestPointToBoundingBoxCenter().getX() - VERTEXWIDTH / 2),
+//                        (int) (strokes.get(e.either()).getNearestPointToBoundingBoxCenter().getY() - VERTEXWIDTH / 2), VERTEXWIDTH, VERTEXWIDTH);
+//                g.drawOval((int) (strokes.get(e.other(e.either())).getNearestPointToBoundingBoxCenter().getX() -VERTEXWIDTH / 2),
+//                        (int) (strokes.get(e.other(e.either())).getNearestPointToBoundingBoxCenter().getY() -VERTEXWIDTH / 2), VERTEXWIDTH, VERTEXWIDTH);
+//            }
+
+            g2D.setStroke(str);
+            g.setColor(currentColor);
+        }
     }
 
     public void drawGraph(Graphics g){
@@ -94,10 +195,13 @@ public class GraphicalStrokeKruskalMST{
 
     public void drawStrokes(Graphics g){
         int index = 0;
+//        Graphics2D g2D = (Graphics2D) g;
+//                    g2D.scale(2.5, 2.5);
+
         for (DStroke dStroke : strokes) {
             ((GStroke) dStroke).drawStroke(g);
             //to DRAW ORDER OF STROKES
-            g.drawString(String.valueOf(index++), (int) ((GStroke) dStroke).getLtPoint().getX(), 
+            g.drawString(String.valueOf(index++), (int) ((GStroke) dStroke).getLtPoint().getX(),
                     (int) (((GStroke) dStroke).getLtPoint().getY()-6));
         }
     }

@@ -23,7 +23,7 @@ import java.util.*;
 public class TreeSearchSegmentation extends Segmentation{
     private SegmentationTree segmentationTree;
     private Map<Integer, List<SegmentationNode>> strokeAmbiguities;
-    private double minDist;
+    
 
     @Override
     protected void initializePartitionData(int numberOfStrokes){
@@ -93,7 +93,7 @@ public class TreeSearchSegmentation extends Segmentation{
                     strokeIndex - j + 1 >= 0; j++) {
                     dSymol = lastJStrokesAsDSymbol(strokeIndex, j, strokesToProcess);
                     executeClassification = true;
-                    if(truncateByDistance && !goodGroupByDistance(dSymol))
+                    if(truncateByDistance && !goodGroupByDistance(dSymol, getMaxDistanceBetweenStrokes()))
                         executeClassification = false;
                     if(executeClassification) {
                         numberOfSymbolEvaluations++;
@@ -245,7 +245,7 @@ public class TreeSearchSegmentation extends Segmentation{
                     dStroke2 = myStrokes[j];
                     dist = dStroke1.getNearestPointToBoundingBoxCenter().distance(
                             dStroke2.getNearestPointToBoundingBoxCenter());
-                    if(dist < minDist){
+                    if(dist < getMinDist()){
                         if(nearStrokes.containsKey(i))
                             currentList = nearStrokes.get(i);
                         else
@@ -325,14 +325,6 @@ public class TreeSearchSegmentation extends Segmentation{
             }
         }
         return bestClasificationResult;
-    }
-    
-    public double getMinDist() {
-        return minDist;
-    }
-
-    public void setMinDist(double minDist) {
-        this.minDist = minDist;
     }
 
     /**

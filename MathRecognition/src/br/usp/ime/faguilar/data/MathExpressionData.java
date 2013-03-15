@@ -7,6 +7,7 @@ package br.usp.ime.faguilar.data;
 
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 /**
@@ -49,15 +50,15 @@ public abstract class MathExpressionData<T extends
      * Calculates and returns the bounding box (as an instance of Rectangle) of this symbol
      * @return a Rectangle which is the bounding box of this symbol
      */
-    public Rectangle getBBox(){
-        Rectangle r=null;
+    public Rectangle2D getBBox(){
+        Rectangle2D r=null;
         if(rbPoint!=null && ltPoint!=null)
-            r=new Rectangle((int)ltPoint.getX(),(int)ltPoint.getY() ,(int)this.getWidth(),(int)this.getHeight());
+            r=new Rectangle2D.Double(ltPoint.getX(),ltPoint.getY() ,this.getWidthAsDouble(),this.getHeightAsDouble());
         return r;
     }
 
     public Point2D getBoundingBoxCenter(){
-        Rectangle boundingBox = getBBox();
+        Rectangle2D boundingBox = getBBox();
         Point2D.Double boundingBoxCenter = null;
         if(boundingBox != null)
             boundingBoxCenter = new Point2D.Double(boundingBox.getCenterX(),
@@ -74,12 +75,20 @@ public abstract class MathExpressionData<T extends
         return (int)(rbPoint.getY()-ltPoint.getY());
     }
 
+    public double getHeightAsDouble(){
+        return (rbPoint.getY()-ltPoint.getY());
+    }
+
     /**
      * determines the width of the bounding box of this symbol
      * @return height of symbol
      */
     public int getWidth(){
         return (int)(rbPoint.getX()-ltPoint.getX());
+    }
+
+    public double getWidthAsDouble(){
+        return (rbPoint.getX()-ltPoint.getX());
     }
 
     /**

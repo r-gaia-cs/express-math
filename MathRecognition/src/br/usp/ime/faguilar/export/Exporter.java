@@ -25,6 +25,7 @@ public class Exporter {
     private int maxSizeOfExpression;
     private ArrayList<String> categories;
     private ArrayList<String> userNickNames;
+    protected boolean timeStampIncluded;
 
     private String path; // path where files will be saved
 
@@ -38,6 +39,7 @@ public class Exporter {
         setFilterByExpressionSize(false);
         setFilterByUserNickName(false);
         setIncludeModels(false);
+        timeStampIncluded = true;
     }
 
     public void exportDatasetToInkML(){
@@ -141,6 +143,7 @@ public class Exporter {
             InkMLExpression inkMlExpression = new InkMLExpression();
             inkMlExpression.setGroundTruthExpression(sample.getTextualRepresentation());
             inkMlExpression.setSampleExpression(sample);
+            inkMlExpression.setTimeStampIncluded(isTimeStampIncluded());
             inkMlExpression.generateInkML();
             String inkmlTex = inkMlExpression.getInkmlText();
 //            count++;
@@ -272,6 +275,14 @@ public class Exporter {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public boolean isTimeStampIncluded() {
+        return timeStampIncluded;
+    }
+
+    public void setTimeStampIncluded(boolean timeStampIncluded) {
+        this.timeStampIncluded = timeStampIncluded;
     }
 
 }

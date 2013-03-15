@@ -83,6 +83,16 @@ public class DStroke extends MathExpressionData<TimePoint>
         return nearestPoint;
     }
 
-
+    public Point2D getCentroid(){
+        Point2D centroid = new Point2D.Double();
+        double sumX = 0;
+        double sumY = 0;
+        for (TimePoint point : this) {
+            sumX += point.getX();
+            sumY += point.getY();
+        }
+        centroid.setLocation(sumX / this.size(), sumY / this.size());
+        return centroid;
+    }
 
 }

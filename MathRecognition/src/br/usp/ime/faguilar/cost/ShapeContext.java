@@ -14,6 +14,7 @@ package br.usp.ime.faguilar.cost;
 import br.usp.ime.faguilar.graph.Graph;
 import br.usp.ime.faguilar.graph.Vertex;
 import br.usp.ime.faguilar.graphics.GMathExpression;
+import java.awt.geom.Point2D;
 import java.util.*;
 
 public class ShapeContext {
@@ -26,6 +27,10 @@ public class ShapeContext {
     private double[][] sc; // Shape Context
 
     private GMathExpression gmathExpression;
+
+    private double[] centerShapeContext;
+
+    private Vertex centerVertex;
 
     public double[][] getSC() {
         return sc;
@@ -52,7 +57,7 @@ public class ShapeContext {
                 vt[i] = vt[i] - (float)Math.PI / 4.0f;
             }
         }
-            float base = 2.0f;
+        float base = 2.0f;
         float max = (float)Math.pow(base,tot_r);
         float multiplica = raioSC/max;
         float[] vr = new float[tot_r];
@@ -79,7 +84,9 @@ public class ShapeContext {
             for (int k = 0; k < totSC; k++)
                 sc[i][k] = 0.0;
 
-
+        centerShapeContext = new double[totSC];
+        for (int k = 0; k < totSC; k++)
+            centerShapeContext[k] = 0.;
         ////////////////////////////////////////////////////////////////////////
 
 
@@ -90,6 +97,12 @@ public class ShapeContext {
                 dist[i][j] = (float)this.euclideanDistance(vertexList[i], vertexList[j]);
             }
 
+        float[]distCenter = new float[totPoints];
+        Point2D center = graph.getCentroid();
+        centerVertex = new Vertex(-1, center.getX(), center.getY());
+        for (int j = 0; j < totPoints; j++) {
+                distCenter[j] = (float)this.euclideanDistance(centerVertex, vertexList[j]);
+        }
         //cria lista de pontos dentro do disco, para cada ponto
         LinkedList[] ldisc = new LinkedList[totPoints];
         for (int i = 0; i < totPoints; i++) {
@@ -100,6 +113,11 @@ public class ShapeContext {
             }
         }
 
+        LinkedList ldiscCenter = new LinkedList();
+        for (int j = 0; j < totPoints; j++) {
+                if (distCenter[j] <= raioSC && distCenter[j] > 0)
+                    ldiscCenter.addLast(j);
+        }
         ////////////////////////////////////////////////////////////////////////
 
         /*
@@ -128,10 +146,11 @@ se (dy < 0) entao theta:= 2PI - theta
                 float dy = (float)(vertexList[j].getY() - vertexList[i].getY());
                 float modv = dist[i][j]; //(float)fe.euclideanDistance(x1,y1, x2,y2);
                 float cos_theta = dx / modv; //adjacente/hipotenusa
-                float theta = (float)Math.acos(cos_theta);
-                if (dy > 0){
-                    theta = 2.0f*(float)Math.PI - theta;
-                }
+//                float theta = (float)Math.acos(cos_theta);
+                float theta = (float) (Math.atan2(dy, dx) + Math.PI);
+//                if (dy > 0){
+//                    theta = 2.0f*(float)Math.PI - theta;
+//                }
 
                 float raio = modv;
                 //tenho raio e theta, agora localiza 'bin' por angulo e raio
@@ -173,14 +192,80 @@ se (dy < 0) entao theta:= 2PI - theta
             vertexList[i].setShapeContextExpression(sc[i]);
         }
 
+        //////////////////////
+        int total = ldiscCenter.size();
+        Iterator it = ldiscCenter.iterator();
+        while(it.hasNext()) {
+            int j = ((Integer)it.next()).intValue();
+            //cos theta
+            float dx = (float)(vertexList[j].getX() - center.getX());
+            float dy = (float)(vertexList[j].getY() - center.getY());
+            float modv = distCenter[j]; //(float)fe.euclideanDistance(x1,y1, x2,y2);
+            float cos_theta = dx / modv; //adjacente/hipotenusa
+            float theta = (float)Math.acos(cos_theta);
+//            CAMBIAR PARA MATH.ATAN2?
+            if (dy > 0){
+                theta = 2.0f*(float)Math.PI - theta;
+            }
+
+            float raio = modv;
+            //tenho raio e theta, agora localiza 'bin' por angulo e raio
+            int id_r=0, id_t=0;
+            for (int ii = 0; ii < tot_r; ii++){
+                if (raio <= vr[ii]) {
+                    id_r = ii;
+                    break;
+                }
+            }
+            for (int jj = 0; jj < tot_t; jj++){
+                if (theta <= vt[jj]) {
+                    id_t = jj;
+                    break;
+                }
+            }
+            if (rotation && theta > vt[tot_t - 1]){
+                id_t = 0;
+            }
+            //System.out.println(i + ">> (" + x1 + ";" + y1 + ") vs. (" + x2 + ";" + y2 + "):\t"+ id_t);
+            //identificador do bin
+            int id_bin = id_t*tot_r+id_r;
+            centerShapeContext[id_bin] += 1.0f;
+        }
+//            GUIForShapeContext.showGUI(vertexList, vt, vr,(int)this.raioSC , i,gmathExpression);
+        if (total > 0)
+            for (int ii=0; ii < totSC; ii++)
+                centerShapeContext[ii] = centerShapeContext[ii] / (float)total;
+        centerVertex.setShapeContextExpression(centerShapeContext);
+
+
+        ////////////////////
+
     }
 
-	private double euclideanDistance(Vertex p1, Vertex p2) {
-		double d1 = p1.getX() - p2.getX();
-		double d2 = p1.getY() - p2.getY();
-		double res = Math.sqrt(d1*d1 + d2*d2);
-		return res;
-	}
+    public double[] getCenterShapeContext() {
+        return centerShapeContext;
+    }
+
+    public void setCenterShapeContext(double[] centerShapeContext) {
+        this.centerShapeContext = centerShapeContext;
+    }
+
+    public Vertex getCenterVertex() {
+        return centerVertex;
+    }
+
+    public void setCenterVertex(Vertex centerVertex) {
+        this.centerVertex = centerVertex;
+    }
+
+    
+
+    private double euclideanDistance(Vertex p1, Vertex p2) {
+            double d1 = p1.getX() - p2.getX();
+            double d2 = p1.getY() - p2.getY();
+            double res = Math.sqrt(d1*d1 + d2*d2);
+            return res;
+    }
 
 }
 

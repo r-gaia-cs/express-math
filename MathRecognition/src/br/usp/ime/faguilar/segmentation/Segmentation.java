@@ -7,6 +7,7 @@ package br.usp.ime.faguilar.segmentation;
 import br.usp.ime.faguilar.classification.Classifible;
 import br.usp.ime.faguilar.classification.ClassificationResult;
 import br.usp.ime.faguilar.classification.Classifier;
+import br.usp.ime.faguilar.classification.ShapeContextClassifier;
 import br.usp.ime.faguilar.data.DMathExpression;
 import br.usp.ime.faguilar.data.DStroke;
 import br.usp.ime.faguilar.data.DSymbol;
@@ -24,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import edu.princeton.cs.algs4.Queue;
+import java.awt.geom.Line2D;
+import java.util.List;
 
 /**
  *
@@ -57,9 +60,19 @@ public class Segmentation {
     protected EdgeWeightedGraph graph;
 
     protected ArrayList alreadySegmented;
-    
+
+    boolean continueCombinations;
+
+
+    public static double[] bestCostAt;
+
+    private double minDist;
+
+    private DSymbol dSymol;
+
     public void part(DStroke[] strokes){
         myStrokes = strokes;
+        Segmentation.bestCostAt = new double[strokes.length];
         initializePartitionData(strokes.length);
         doPartition(strokes);
     }
@@ -77,11 +90,12 @@ public class Segmentation {
         symbolStatistics = new ShapeContextStatistics();
         symbolStatistics.readSymbolStatistics(ShapeContextStatistics.STATISTCS_FILE_NAME);
         alreadySegmented = new ArrayList();
+        ShapeContextStatistics.readShapeContextstatistics();
     }
 
     protected void doPartition(DStroke[] strokes) {
         numberOfSymbolEvaluations = 0;
-        DSymbol dSymol = null;
+//        DSymbol dSymol = null;
         Point2D[] symbolPoints = null;
         Classifible<Point2D> classifible =new Classifible<Point2D>();//classifible = null;
         ClassificationResult classificationResult = null;
@@ -90,7 +104,7 @@ public class Segmentation {
         double currentBestCost;
         boolean executeClassification;
         int[] vertexIndex;
-        boolean continueCombinations;
+//        boolean continueCombinations;
         SymbolFeatures symbolFeatures = null;
         for (int i = 0; i < strokes.length; i++) {
             continueCombinations = true;
@@ -107,62 +121,97 @@ public class Segmentation {
                         executeClassification = false;
                 }
                 
-                if(truncateByDistance && !goodGroupByDistance(dSymol))
+                if(truncateByDistance && !goodGroupByDistance(dSymol, maxDistanceBetweenStrokes))
                     executeClassification = false;
                 if(executeClassification && truncateByMST && !goodGroupByMST(vertexIndex))
                     executeClassification = false;
-                if(executeClassification){
+                if(executeClassification) {
                     numberOfSymbolEvaluations++;
-                    symbolPoints = PreprocessingAlgorithms.getNPoints(dSymol, DSymbol.NUMBER_OF_POINTS_PER_SYMBOL);
-                    classifible.setFeatures(symbolPoints);
-                    symbolFeatures = new SymbolFeatures();
-                    symbolFeatures.setNumberOfStrokes(dSymol.size());
-                    classifible.setAditionalFeatures(symbolFeatures);
-                    classificationResult = (ClassificationResult) classifier.classify(classifible);
-                    classificationResult.setSymbol(dSymol);
-                    newCost = classificationResult.getCost(); 
-                    currentBestCost = segmentationTable.getLeastCostUnitl(i);
-
-                    if(isHorizontal(classificationResult)){
-                        if(horizontalIsFraction(i)) {
-                            classificationResult.setMyClass("\\frac");
-                            newCost = 0;
-                            classificationResult.setCost(newCost);
-                            continueCombinations = false;
-                            alreadySegmented.add(i);
-                        }else if(horizontalIsMinus(i)) {
-                            classificationResult.setMyClass("-");
-                            newCost = 0;
-                            classificationResult.setCost(newCost);
-                            continueCombinations = false;
-                            alreadySegmented.add(i);
-                        }else{
-                            ArrayList<ClassificationResult> orderedListOfClasses =
-                                    (ArrayList<ClassificationResult>) classifier.orderedListOfClasses();
-                            newCost = 100;//high cost
-                            classificationResult = getNonFractionNeitherMinus(orderedListOfClasses);
-                            classificationResult.setCost(newCost);
-                            classificationResult.setSymbol(dSymol);
+//                    symbolPoints = PreprocessingAlgorithms.getNPoints(dSymol, DSymbol.NUMBER_OF_POINTS_PER_SYMBOL);
+//                    classifible.setFeatures(symbolPoints);
+//                    symbolFeatures = new SymbolFeatures();
+//                    symbolFeatures.setNumberOfStrokes(dSymol.size());
+//                    symbolFeatures.setWidth(dSymol.getWidth());
+//                    classifible.setAditionalFeatures(symbolFeatures);
+                    classificationResult = (ClassificationResult) classify(classifible, i);
+                    if (classificationResult != null){
+                        newCost = classificationResult.getCost();
+                        currentBestCost = segmentationTable.getLeastCostUnitl(i);
+                        if(i - j >= 0)
+                            newCost += segmentationTable.getLeastCostUnitl(i - j);
+    //                    if(jointTwoStrokes(classificationResult)&&!(newCost >= 100)){
+    //                        ///TODO: prevenir q combinaciones con dos elementos
+    //                        // junte simbolos fraccion o menos determinados anteriormente
+    //                        segmentationTable.setCostForGroupAt(i, newCost);// classificationResult.getCost();
+    //                        segmentationTable.setBestGroupAt(i, j);
+    //                        bestClassificationResult = classificationResult;
+    //                    }
+    //                    else
+                        if(newCost < currentBestCost) {
+                            segmentationTable.setCostForGroupAt(i, newCost);// classificationResult.getCost();
+                            segmentationTable.setBestGroupAt(i, j);
+                            bestClassificationResult = classificationResult;
+    //                        Segmentation.bestCostAt[i] = classificationResult.getCost();
                         }
-                    }
-                    if(i - j >= 0)
-                        newCost += segmentationTable.getLeastCostUnitl(i - j);
-                    if(jointTwoStrokes(classificationResult)&&!(newCost >= 100)){
-                        ///TODO: prevenir q combinaciones con dos elementos
-                        // junte simbolos fraccion o menos determinados anteriormente
-                        segmentationTable.setCostForGroupAt(i, newCost);// classificationResult.getCost();
-                        segmentationTable.setBestGroupAt(i, j);
-                        bestClassificationResult = classificationResult;
-                    }
-                    else if(newCost < currentBestCost) {
-                        segmentationTable.setCostForGroupAt(i, newCost);// classificationResult.getCost();
-                        segmentationTable.setBestGroupAt(i, j);
-                        bestClassificationResult = classificationResult;
                     }
                 }
             }
             segmentationTable.addSymbolHypothesis(bestClassificationResult);
         }      
+    }
+
+
+    protected ClassificationResult classify(Classifible<Point2D> classifible, int
+            posSegmentation){
+        classifible.setSymbol(dSymol);
+        ClassificationResult classificationResult = (ClassificationResult) classifier.classify(classifible);
+        if (classificationResult != null){
+            classificationResult.setSymbol(dSymol);
+            double newCost;
+            if(isPiOrProd((String) classificationResult.getMyClass())){
+                if(dSymol.size() == 3){
+    //                if(hasStrokeAbove(posSegmentation) && hasStrokeBelow(strokeIndex))
+                }
+            }
+            else if(isHorizontal(classificationResult))
+            {
+                if(horizontalIsFraction(posSegmentation)) {
+    //                classificationResult.setMyClass("-");
+                    classificationResult.setMyClass("\\frac");
+    //                newCost = 0;
+    //                classificationResult.setCost(newCost);
+    //                continueCombinations = false;
+    //                alreadySegmented.add(posSegmentation);
+                }else if(horizontalIsMinus(posSegmentation)) {
+                    classificationResult.setMyClass("-");
+    //                newCost = 0;
+    //                classificationResult.setCost(newCost);
+    //                continueCombinations = false;
+    //                alreadySegmented.add(posSegmentation);
+                }
+    //            else{
+    //                ArrayList<ClassificationResult> orderedListOfClasses =
+    //                        (ArrayList<ClassificationResult>) classifier.orderedListOfClasses();
+    //                newCost = 100;//high cost
+    //                classificationResult = getNonFractionNeitherMinus(orderedListOfClasses);
+    //                classificationResult.setCost(newCost);
+    //                classificationResult.setSymbol(dSymol);
+    //            }
+            }
+        }
+        return classificationResult;
+    }
+
+    private boolean isPiOrProd(String label){
+        if(label.equals("\\pi") || label.equals("\\prod"))
+            return true;
+        return false;
+    }
+
+    private boolean isVertical(String label){
+        if(label.equals("|") || label.equals("1"))
+            return true;
+        return false;
     }
 
     private ClassificationResult getNonFractionNeitherMinus(ArrayList<ClassificationResult>
@@ -225,25 +274,87 @@ public class Segmentation {
         }
         return mathExpression;
     }
-    
-    protected boolean goodGroupByDistance(DSymbol symbol){
+
+    public boolean goodGroupByDistance(DSymbol symbol, double maxDistance){
         boolean goodGroup = true;
+//        test if there is a good distance between all strokes
+//        for (int i = 0; i < symbol.size() -1; i++) {
+//            for (int j = i + 1; j < symbol.size(); j++) {
+//                if(symbol.get(i).getNearestPointToBoundingBoxCenter().distance(
+//                        symbol.get(j).getNearestPointToBoundingBoxCenter()) > maxDistanceBetweenStrokes){
+//                    goodGroup = false;
+//                    break;
+//                }
+//            }
+//        }
+
+//        test if there is conected subraph whose edges are small
+        List edges = new ArrayList<Edge>();
         for (int i = 0; i < symbol.size() -1; i++) {
             for (int j = i + 1; j < symbol.size(); j++) {
-                if(symbol.get(i).getNearestPointToBoundingBoxCenter().distance(
-                        symbol.get(j).getNearestPointToBoundingBoxCenter()) > maxDistanceBetweenStrokes){
-                    goodGroup = false;
-                    break;
-                }
+                if(symbol.get(i).getBoundingBoxCenter().distance(
+                        symbol.get(j).getBoundingBoxCenter()) <= maxDistance)
+                    edges.add(new Edge(i, j, 0));
             }
         }
-        if(!goodGroup && symbol.size() == 2)
-            if(SymbolUtil.nearEnds(symbol.get(0), symbol.get(1)))
-                    goodGroup = true;
+        if(symbol.size() > 1 && !edgesFormAConectedGraph(edges, symbol.size()))
+            goodGroup = false;
+
+//        test if for each stroke there is another one that is "near"
+//        if(symbol.size()>1){
+//            boolean hasFarStroke = true;
+//            for (int i = 0; i < symbol.size(); i++) {
+//                hasFarStroke = true;
+//                for (int j = 0; j < symbol.size(); j++) {
+////                    if((i != j) && (symbol.get(i).getNearestPointToBoundingBoxCenter().distance(
+////                            symbol.get(j).getNearestPointToBoundingBoxCenter()) <= maxDistanceBetweenStrokes)){
+//                    if((i != j) && (symbol.get(i).getBoundingBoxCenter().distance(
+//                            symbol.get(j).getBoundingBoxCenter()) <= maxDistanceBetweenStrokes)){
+//                        hasFarStroke = false;
+//                        break;
+//                    }
+//                }
+//                if(hasFarStroke){
+//                    goodGroup = false;
+//                    break;
+//                }
+//            }
+//        }
+//        if(!goodGroup && symbol.size() == 2)
+//            if(SymbolUtil.nearEnds(symbol.get(0), symbol.get(1), minDist))
+////            if(SymbolUtil.nearEnds(symbol.get(0), symbol.get(1)))
+//                    goodGroup = true;
 //        if(!goodGroup && symbol.size() == 2)
 //            if(symbol.get(0).getBBox().intersects(symbol.get(1).getBBox()))
 //                    goodGroup = true;
         return goodGroup;
+    }
+
+
+    /**
+     *
+     * @param edges
+     * @param numIndexes less or equal to 4
+     * @return
+     */
+    private boolean edgesFormAConectedGraph(List<Edge> edges,int numIndexes){
+        boolean isConnectedGraph = true;
+        boolean vertexInEdge;
+        if(edges.size() >= numIndexes -1)
+            for (int i = 0; i < numIndexes; i++) {
+                vertexInEdge = false;
+                for (Edge edge : edges) {
+                    if (edge.either() == i || edge.other(edge.either()) == i)
+                        vertexInEdge = true;
+                }
+                if(!vertexInEdge){
+                    isConnectedGraph = false;
+                    break;
+                }
+            }
+        else
+            isConnectedGraph = false;
+        return isConnectedGraph;
     }
 
 
@@ -286,50 +397,171 @@ public class Segmentation {
     }
 
     private boolean horizontalIsFraction(int strokeIndex){
-        if(hasStrokeAbove(strokeIndex) && hasStrokeBelow(strokeIndex))
+        if(!hasTwoNearVerticalStrokesBelow(strokeIndex) &&
+                hasStrokeAbove(strokeIndex) && hasStrokeBelow(strokeIndex)){
+            numberOfSymbolEvaluations++;
+            Iterable<Edge> adj = getGraph().adj(strokeIndex);
+           int strokeAboveIndex = getStrokeAbove(strokeIndex);
+           int strokeBelowIndex = getAjacentStrokeBelow(strokeIndex);
+           DStroke strokeAbove = myStrokes[strokeAboveIndex];
+           DStroke strokeBelow = myStrokes[strokeBelowIndex];
+           DStroke selectedStroke = myStrokes[strokeIndex];
+           DSymbol newSymbol = new DSymbol();
+           newSymbol.addCheckingBoundingBox(strokeAbove);
+           newSymbol.addCheckingBoundingBox(selectedStroke);
+           newSymbol.addCheckingBoundingBox(strokeBelow);
+
+           Classifible<Point2D> classifible =new Classifible<Point2D>();
+           Point2D[] symbolPoints = PreprocessingAlgorithms.getNPoints(newSymbol, DSymbol.NUMBER_OF_POINTS_PER_SYMBOL);
+            classifible.setFeatures(symbolPoints);
+           SymbolFeatures symbolFeatures = new SymbolFeatures();
+            symbolFeatures.setNumberOfStrokes(newSymbol.size());
+            classifible.setAditionalFeatures(symbolFeatures);
+            classifible.setSymbol(newSymbol);
+            ClassificationResult classificationResult = (ClassificationResult) classifier.classify(classifible);
+            if(classificationResult != null && classificationResult.getMyClass().equals("\\equiv"))
+                return false;
             return true;
+        }
+        return false;
+    }
+
+    private boolean hasTwoNearVerticalStrokesBelow(int strokeIndex){
+        boolean hasbelow = false;
+        int count = 0;
+        ArrayList<Integer> ajacentStrokesBelow = getAjacentStrokesBelow(strokeIndex);
+        for (Integer aStrokeBelow : ajacentStrokesBelow) {
+            if(strokeIsVertical(aStrokeBelow)){
+                count++;
+            }
+            Iterable<Edge> adj = getGraph().adj(aStrokeBelow);
+            for (Edge edge : adj) {
+                if(strokeIndex != edge.other(aStrokeBelow) &&
+                        strokeBelow(strokeIndex, edge.other(aStrokeBelow))){
+                    if(strokeIsVertical(edge.other(aStrokeBelow))){
+                        count++;
+                        if(count >= 2)
+                            break;
+                    }
+                }
+            }
+            if(count >= 2)
+                break;
+        }
+        if(count >= 2)
+            hasbelow = true;
+        return hasbelow;
+    }
+    
+    private boolean strokeIsVertical(Integer aStrokeBelow) {
+        DStroke stroke = myStrokes[aStrokeBelow];
+        if(stroke.size() > 1){
+//            Line2D line = new Line2D.Double(stroke.get(0).getX(), stroke.get(0).getY(),
+//                    stroke.get(stroke.size() - 1).getX(), stroke.get(stroke.size() - 1).getY());
+//            double angleWithHorizontal = line.
+            double rate = stroke.getWidthAsDouble() / stroke.getHeightAsDouble();
+            if(rate <= 0.3)
+                return true;
+        }
         return false;
     }
 
     private boolean horizontalIsMinus(int strokeIndex){
-        if(!hasStrokeAbove(strokeIndex) && !hasStrokeBelow(strokeIndex))
+        if((!hasStrokeAbove(strokeIndex) && !hasStrokeBelow(strokeIndex)))// &&
+                //!hasStrokeMuchNear(strokeIndex))
             return true;
         return false;
+    }
+
+    private boolean hasStrokeMuchNear(int strokeIndex){
+        boolean hasNearStroke = false;
+        Iterable<Edge> adj = getGraph().adj(strokeIndex);
+        int otherIndex;
+        Point2D otherBoxCenter;
+        for (Edge edge : adj) {
+            otherIndex = edge.other(strokeIndex);
+            otherBoxCenter = myStrokes[otherIndex].getBoundingBoxCenter();
+            if(otherBoxCenter.distance(myStrokes[strokeIndex].getBoundingBoxCenter()) <
+                    getMinDist()){//USE OTHER LOWER TREASHOLD?
+                hasNearStroke = true;
+                break;
+            }
+        }
+        return hasNearStroke;
     }
 
     private boolean hasStrokeAbove(int strokeIndex){
         boolean hasAbove = false;
         Iterable<Edge> adj = getGraph().adj(strokeIndex);
         int otherIndex;
-        Point2D otherBoxCenter;
-
         for (Edge edge : adj) {
-            otherIndex = edge.other(edge.either());
-            if(otherIndex != strokeIndex){
-                otherBoxCenter = myStrokes[otherIndex].getBoundingBoxCenter();
-                if(otherBoxCenter.getY() <= myStrokes[strokeIndex].getBoundingBoxCenter().getY()
-                        && otherBoxCenter.getX() < myStrokes[strokeIndex].getRbPoint().getX() &&
-                        otherBoxCenter.getX() > myStrokes[strokeIndex].getLtPoint().getX()){
-                    hasAbove = true;
-                    break;
-                }
+            otherIndex = edge.other(strokeIndex);
+            if(strokeAbove(strokeIndex, otherIndex)){
+                hasAbove = true;
+                break;
             }
         }
         return hasAbove;
+    }
+
+    private int getStrokeAbove(int strokeIndex){
+        int aboveStroke = -1;
+        Iterable<Edge> adj = getGraph().adj(strokeIndex);
+        int otherIndex;
+        for (Edge edge : adj) {
+            otherIndex = edge.other(strokeIndex);
+            if(strokeAbove(strokeIndex, otherIndex)){
+                aboveStroke = otherIndex;
+                break;
+            }
+        }
+        return aboveStroke;
+    }
+
+    private boolean strokeBelow(int aStrokeIndex, int posibleStrokeBelowIndex){
+        Point2D otherBoxCenter = myStrokes[posibleStrokeBelowIndex].getBoundingBoxCenter();
+        if(otherBoxCenter.getY() >= myStrokes[aStrokeIndex].getBoundingBoxCenter().getY()
+                && otherBoxCenter.getX() <= myStrokes[aStrokeIndex].getRbPoint().getX() &&
+                otherBoxCenter.getX() >= myStrokes[aStrokeIndex].getLtPoint().getX()){
+            return true;
+        }
+        return false;
+    }
+
+    private int getAjacentStrokeBelow(int strokeIndex){
+        int belowStroke = -1;
+        Iterable<Edge> adj = getGraph().adj(strokeIndex);
+        int otherIndex;
+        for (Edge edge : adj) {
+            otherIndex = edge.other(strokeIndex);
+            if(strokeBelow(strokeIndex, otherIndex)){
+                belowStroke = otherIndex;
+                break;
+            }
+        }
+        return belowStroke;
+    }
+
+    private ArrayList<Integer> getAjacentStrokesBelow(int strokeIndex){
+        ArrayList<Integer> strokesBelow = new ArrayList<Integer>();
+        Iterable<Edge> adj = getGraph().adj(strokeIndex);
+        int otherIndex;
+        for (Edge edge : adj) {
+            otherIndex = edge.other(strokeIndex);
+            if(strokeBelow(strokeIndex, otherIndex)){
+                strokesBelow.add(otherIndex);
+            }
+        }
+        return strokesBelow;
     }
 
     private boolean hasStrokeBelow(int strokeIndex){
         boolean hasAbove = false;
         Iterable<Edge> adj = getGraph().adj(strokeIndex);
         int otherIndex;
-        Point2D otherBoxCenter;
-
         for (Edge edge : adj) {
-            otherIndex = edge.other(edge.either());
-            otherBoxCenter = myStrokes[otherIndex].getBoundingBoxCenter();
-            if(otherBoxCenter.getY() > myStrokes[strokeIndex].getBoundingBoxCenter().getY()
-                    && otherBoxCenter.getX() < myStrokes[strokeIndex].getRbPoint().getX() &&
-                    otherBoxCenter.getX() > myStrokes[strokeIndex].getLtPoint().getX()){
+            otherIndex = edge.other(strokeIndex);
+            if(strokeBelow(strokeIndex, otherIndex)){
                 hasAbove = true;
                 break;
             }
@@ -368,6 +600,7 @@ public class Segmentation {
 
     public void setClassifier(Classifier classifier) {
         this.classifier = classifier;
+        ((ShapeContextClassifier)this.classifier).setSegmentationAlgorithm(this);
     }
 
     public double getMaxDistanceBetweenStrokes() {
@@ -408,7 +641,7 @@ public class Segmentation {
         graph = new EdgeWeightedGraph(numberOfVertices);
         for (Edge edge : mst.edges()) {
             graph.addEdge(edge);
-            graph.addEdge(new Edge(edge.other(edge.either()), edge.either(), edge.weight()));
+//            graph.addEdge(new Edge(edge.other(edge.either()), edge.either(), edge.weight()));
         }
     }
 
@@ -427,4 +660,25 @@ public class Segmentation {
     public void setNumberOfSymbolEvaluations(int numberOfSymbolEvaluations) {
         this.numberOfSymbolEvaluations = numberOfSymbolEvaluations;
     }
+
+
+    public double getMinDist() {
+        return minDist;
+    }
+
+    public void setMinDist(double minDist) {
+        this.minDist = minDist;
+    }
+
+    private boolean strokeAbove(int strokeIndex, int otherIndex) {
+        Point2D otherBoxCenter = myStrokes[otherIndex].getBoundingBoxCenter();
+        if(otherBoxCenter.getY() <= myStrokes[strokeIndex].getBoundingBoxCenter().getY()
+                && otherBoxCenter.getX() <= myStrokes[strokeIndex].getRbPoint().getX() &&
+                otherBoxCenter.getX() >= myStrokes[strokeIndex].getLtPoint().getX()){
+            return true;
+        }
+        return false;
+    }
+
+
 }

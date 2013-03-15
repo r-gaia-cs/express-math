@@ -32,7 +32,19 @@ public class MatchingParameters {
 
     public static int angularLocalRegions=10;
 
-    public static int numberOfPointPerSymbol=30;
+    public static int numberOfPointPerSymbol = 30;
+
+    public static void setUpParametersForSegmentationCost(){
+        LogPolarLocalRegions = 4;
+        angularLocalRegions = 10;
+        numberOfPointPerSymbol = 70;
+    }
+
+    public static void setDefaultSymbolParameters(){
+        LogPolarLocalRegions = 4;
+        angularLocalRegions = 10;
+        numberOfPointPerSymbol = 30;
+    }
 
     public static ArrayList<MatchingParameters> readParameters(String filePath){
         ArrayList<MatchingParameters> matchingParameterses=new ArrayList<MatchingParameters>();
