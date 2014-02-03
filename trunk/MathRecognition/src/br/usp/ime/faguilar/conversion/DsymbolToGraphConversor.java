@@ -43,8 +43,10 @@ public class DsymbolToGraphConversor {
     }
 
     public static void calculateShapeContextExpression(Graph g) {
-        float diagonal = (float)Math.sqrt(Math.pow(g.getHeight(), 2)
-                    + Math.pow(g.getWidth(), 2));
+        double height = g.getHeight();
+        double width = g.getWidth();
+        float diagonal = (float)Math.sqrt(height * height
+                    + width * width);
         ShapeContext sc = new ShapeContext(diagonal, g, MatchingParameters.LogPolarGlobalRegions,
                 MatchingParameters.angularGlobalRegions, true, null);
     }

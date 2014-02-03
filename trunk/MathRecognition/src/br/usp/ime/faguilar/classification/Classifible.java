@@ -7,12 +7,14 @@ package br.usp.ime.faguilar.classification;
 
 import br.usp.ime.faguilar.data.DSymbol;
 import br.usp.ime.faguilar.matching.symbol_matching.UserSymbol;
+import java.io.Serializable;
 
 /**
  *
  * @author frank
  */
-public class Classifible<T> {
+public class Classifible<T> implements Serializable{
+    static final long serialVersionUID = -8563085518696891422L;
     private T[] features;
     private Object myClass;
     private Object aditionalFeatures;
@@ -37,6 +39,9 @@ public class Classifible<T> {
     public Classifible(){
         features = null;
         myClass = null;
+        symbol = null;
+        aditionalFeatures = null;
+        userSymbol = null;
     }
     public T[] getFeatures() {
         return features;

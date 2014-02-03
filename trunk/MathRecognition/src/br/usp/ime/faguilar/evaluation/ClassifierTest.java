@@ -8,8 +8,10 @@ package br.usp.ime.faguilar.evaluation;
 import br.usp.ime.faguilar.classification.Classifier;
 import br.usp.ime.faguilar.classification.Classifible;
 import br.usp.ime.faguilar.classification.ShapeContextClassifier;
+import br.usp.ime.faguilar.directories.MathRecognitionFiles;
 import br.usp.ime.faguilar.guis.EvaluationView;
 import br.usp.ime.faguilar.matching.GraphMatching;
+import br.usp.ime.faguilar.matching.MatchingParameters;
 import br.usp.ime.faguilar.matching.symbol_matching.UserSymbol;
 import br.usp.ime.faguilar.util.FilesUtil;
 import br.usp.ime.faguilar.util.SymbolUtil;
@@ -33,7 +35,6 @@ public class ClassifierTest {
     private SymbolTestData symbolData;
     private ArrayList<Classifible> trainData;
     private ArrayList<Classifible> testData;
-    private ArrayList selectedClasses;
     private double trainningPercent;
     private ArrayList<Classifible> goodResults;
     private ArrayList<Classifible> badResults;
@@ -45,16 +46,17 @@ public class ClassifierTest {
 
     public ClassifierTest(){
         symbolData = new SymbolTestData();
-        selectedClasses = null;
         goodResults = new ArrayList<Classifible>();
         badResults = new ArrayList<Classifible>();
         trainData = new ArrayList<Classifible>();
         testData = new ArrayList<Classifible>();
+        trainningPercent = 0.7;
     }
 
     public void readData(){
 //        ArrayList<Classifible> classifibles = SymbolUtil.readSymbolData(EvaluationView.TEMPLATES_FILE);
-        ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles();//SymbolUtil.readTemplatesFromInkmlFiles();//SymbolUtil.readTemplatesWithStrokesInfo();//SymbolUtil.readTemplates();
+        ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles(MathRecognitionFiles.TRAINING_FILES_CROHME,
+                MathRecognitionFiles.INKML_CROHME_2012_TRAIN_DIR);//SymbolUtil.readTemplatesFromInkmlFiles();//SymbolUtil.readTemplatesWithStrokesInfo();//SymbolUtil.readTemplates();
         HashMap<UserSymbol, Integer> map = new HashMap<UserSymbol, Integer>();
         for (Classifible classifible : classifibles){
 //            if(!selectedClasses.isEmpty()){
@@ -83,33 +85,56 @@ public class ClassifierTest {
         classifier.train();
     }
 
+    public void setTestData(ArrayList<Classifible> newTest){
+        testData = newTest;
+    }
+
+    public ArrayList<Classifible> getTrainData() {
+        return trainData;
+    }
+
+    public ArrayList<Classifible> getTestData() {
+        return testData;
+    }
+
     public void testClassifier(){
         FileWriter fileWritter = null;
         try {
             Classifible clasResult = null;
             int count = 0;
+            int tens = 0;
+            FilesUtil.append("classifiedSymbols.txt", "0\n");
             for (Classifible classifible : testData) {
                 clasResult = (Classifible) classifier.classify(classifible);
                 //            System.out.println("classified : " + count++);
 //                FilesUtil.write("counter.txt", "classified : " + count++);
-
+                count++;
                 if (clasResult != null && goodClass((String) classifible.getMyClass(), (String) clasResult.getMyClass())) {
                     goodResults.add(classifible);
                 } else {
                     badResults.add(classifible);
+                }
+                if(count >= 10){
+                    tens++;
+                    double percentageGood = goodResults.size() / (double) (goodResults.size() + badResults.size());
+                    FilesUtil.append("classifiedSymbols.txt", "number classified: " +
+                            tens * count + " percentage good: " + percentageGood + "\n");
+                    count = 0;
                 }
             }
             //        System.out.println("number of good results: "+ goodResults.size());
             //        System.out.println("number of bad results: "+ badResults.size());
 //            String results = "parameters: alpha = " + getAlpha() + "  beta = " + getBeta() +
 //                    "  gama = " + getGama() + "\n";
-            String results = "parameters: theta = " + GraphMatching.ANGLE_WEIGHT + "  beta = " + getBeta() +
-                    "  gama = " + getGama() + "\n";
-            
+//            String results = "parameters: numOFPoints = " + MatchingParameters.numberOfPointPerSymbol + "  beta = " + getBeta() +
+//                    "  gama = " + getGama() + "\n";
+            String results = "parameters: numOFPoints = " + MatchingParameters.numberOfPointPerSymbol + "  num reg angulares = " + 
+                    MatchingParameters.angularLocalRegions+
+                    "  num reg. radial = " + MatchingParameters.LogPolarLocalRegions + "\n";
             results += "number of good results: " + goodResults.size() + "  number of bad results: " +
                     badResults.size() + " percentage: " + ((badResults.size() * 100.) / testData.size() ) + "\n";
 //            FilesUtil.write("results.txt", results);
-            File file = new File("results_scontext_angle_modification2.txt");
+            File file = new File("results-classificationChrome2012Test.txt");
             //if file doesnt exists, then create it
             if (!file.exists()) {
                 file.createNewFile();
@@ -179,10 +204,6 @@ public class ClassifierTest {
         this.classifier = classifier;
     }
 
-    public void setSelectedClasses(ArrayList selectedClasses) {
-        this.selectedClasses = selectedClasses;
-    }
-
     public SymbolTestData getSymbolData() {
         return symbolData;
     }
@@ -191,9 +212,6 @@ public class ClassifierTest {
         this.symbolData = symbolData;
     }
 
-    public ArrayList getSelectedClasses() {
-        return selectedClasses;
-    }
 
 
     public double getTrainningPercent() {

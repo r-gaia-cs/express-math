@@ -7,6 +7,7 @@ package br.usp.ime.faguilar.feature_extraction;
 
 import br.usp.ime.faguilar.cost.CostShapeContextInside;
 import br.usp.ime.faguilar.cost.ShapeContext;
+import br.usp.ime.faguilar.cost.ShapeContextVector;
 import br.usp.ime.faguilar.data.DMathExpression;
 import br.usp.ime.faguilar.data.DStroke;
 import br.usp.ime.faguilar.data.DSymbol;
@@ -157,6 +158,37 @@ public class PreprocessingAlgorithms {
             features.addAll(newFeatures);
         }
         ShapeContext shapeContext = CostShapeContextInside.calculateShapeContextFromPoints2D(features.getCoords());
+        features.setShapeContext(shapeContext);
+        return features;
+    }
+    
+    public static ShapeContextFeature getNGeneralizedShapeContetxFeatures(DSymbol s,int N){
+        ShapeContextFeature features = new ShapeContextFeature();
+        int[] pointsPerStroke = extractNNumberOfPointsPerStroke(s, N);
+
+        for (int i = 0; i < pointsPerStroke.length; i++) {
+            ArrayList<FeatureGroup> newFeatures = getNShapeContetxFeatures(s, s.get(i), pointsPerStroke[i]);
+            features.addAll(newFeatures);
+        }
+        ShapeContext shapeContext = CostShapeContextInside.calculateGeneralizedShapeContextFromPoints2DAndVectors(features.getCoords(), 
+                features.getVectors());
+        
+//        Point2D[] nPoints = PreprocessingAlgorithms.getNPoints(s, N);
+//        ShapeContext shapeContext = CostShapeContextInside.calculateGeneralizedShapeContextFromPoints2D(nPoints);
+        
+        features.setShapeContext(shapeContext);
+        return features;
+    }
+    
+    public static ShapeContextFeature getFuzzyShapeContetxFeatures(DSymbol s,int N){
+        ShapeContextFeature features = new ShapeContextFeature();
+        int[] pointsPerStroke = extractNNumberOfPointsPerStroke(s, N);
+
+        for (int i = 0; i < pointsPerStroke.length; i++) {
+            ArrayList<FeatureGroup> newFeatures = getNShapeContetxFeatures(s, s.get(i), pointsPerStroke[i]);
+            features.addAll(newFeatures);
+        }
+        ShapeContext shapeContext = CostShapeContextInside.calculateFuzzyShapeContextFromPoints2D(features.getCoords());
         features.setShapeContext(shapeContext);
         return features;
     }
@@ -645,6 +677,7 @@ public class PreprocessingAlgorithms {
                 FeatureGroup featureGroup = new FeatureGroup();
                 featureGroup.setCoord(stroke.get(0));
                 featureGroup.setAngle(0);
+                featureGroup.setVector(new ShapeContextVector((float) 0.5, 0));
                 features.add(featureGroup);
             }
             else
@@ -656,6 +689,7 @@ public class PreprocessingAlgorithms {
         FeatureGroup feature = new FeatureGroup();
         feature.setCoord(stroke.get(i));
         feature.setAngle(calculateAngle(symbol, stroke, i));
+        feature.setVector(vectorAtPoint( stroke, i));
         return feature;
     }
 
@@ -674,6 +708,24 @@ public class PreprocessingAlgorithms {
         angle  = angleFromCentroidToPoint(symbol, stroke, i);
         
         return angle;
+    }
+    
+    
+    
+    public static ShapeContextVector vectorAtPoint(DStroke stroke, int position){
+        if(stroke.size() >= 3){
+            if(position <= 0)
+                return vectorAtPoint(stroke, position + 1);
+            if(position >= stroke.size() - 1)
+                return vectorAtPoint(stroke, position - 1);
+            float dx = (float) (stroke.get(position + 1).getX() - stroke.get(position - 1).getX());
+            float dy = (float) (stroke.get(position + 1).getY() - stroke.get(position - 1).getY());
+            if(dx == 0 && dy == 0)
+                return new ShapeContextVector(0, 0);
+            float dist = (float) stroke.get(position + 1).distance(stroke.get(position - 1));
+            return new ShapeContextVector(dx / dist, dy / dist);
+        }
+        return new ShapeContextVector((float) 0.5, 0);
     }
 
     private static float terminalAngle(DStroke stroke, int i) {
@@ -732,6 +784,7 @@ public class PreprocessingAlgorithms {
 //        TO USE ANGLE FROM CENTER TO THE NEW POINT
         angle = calculateAngle(symbol, strokeCopy, pos + 1);
         newFeature.setAngle(angle);
+        newFeature.setVector(vectorAtPoint(strokeCopy, pos +1));
         features.add(pos + 1, newFeature);
     }
 }

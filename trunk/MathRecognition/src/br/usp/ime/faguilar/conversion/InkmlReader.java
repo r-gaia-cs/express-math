@@ -66,10 +66,13 @@ public class InkmlReader {
         } catch (FileNotFoundException e) {
           e.printStackTrace();
         } catch (XMLStreamException e) {
-          e.printStackTrace();
-        } catch (Exception e){
+//          e.printStackTrace();
+            System.out.println("problem reading " + fileName);
+        } 
+        catch (Exception e){
 //            System.out.println(fileName);
-            e.printStackTrace();
+            System.out.println("problem reading " + fileName);
+//            e.printStackTrace();
         }
     }
 
@@ -150,10 +153,16 @@ public class InkmlReader {
         Trace trace = new Trace();
         stringPoints = stringPoints.trim();
         String[] stringArrayOfPoints = stringPoints.split("\\s+|,\\s*|\\n");
-//        int numberOfChannels = getMathExpression().getTraceFormat().getChannels().size();
-        int numberOfChannels = 2;//getMathExpression().getTraceFormat().getChannels().size();
+        TraceFormat traceFormat = getMathExpression().getTraceFormat();
+        int numberOfChannels;
+        if(traceFormat != null)
+            numberOfChannels = getMathExpression().getTraceFormat().getChannels().size();
+        else
+            numberOfChannels = 2;
+//        int numberOfChannels = 2;//getMathExpression().getTraceFormat().getChannels().size();
         ArrayList<Point2D> points = new ArrayList<Point2D>();
         Point2D point;
+//        System.out.println("channels: "+ numberOfChannels);
         for (int j = 0; j < stringArrayOfPoints.length; j = j + numberOfChannels) {
             point = new Point2D.Float(Float.valueOf(
                     stringArrayOfPoints[j]), Float.valueOf(stringArrayOfPoints[j+1]));
@@ -170,7 +179,7 @@ public class InkmlReader {
         Attribute attribute = attributes.next();
         TraceGroup traceGroup = new TraceGroup();
         TraceGroup newTraceGroup;
-        traceGroup.setId(Integer.valueOf(attribute.getValue()));
+        traceGroup.setId(attribute.getValue());
         boolean addTRaceGroupt = true;
 
         eventReader.nextEvent();
@@ -203,7 +212,7 @@ public class InkmlReader {
         StartElement startElement = event.asStartElement();
         Iterator<Attribute> attributes = startElement.getAttributes();
         Attribute attribute = attributes.next();
-        traceGroup.setId(Integer.valueOf(attribute.getValue()));
+        traceGroup.setId(attribute.getValue());
 
         eventReader.nextEvent();
         event = eventReader.nextEvent();

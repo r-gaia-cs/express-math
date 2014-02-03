@@ -5,20 +5,26 @@
 
 package br.usp.ime.faguilar.feature_extraction;
 
+import br.usp.ime.faguilar.cost.ShapeContextVector;
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 
 /**
  *
  * @author frank
  */
-public class FeatureGroup {
+public class FeatureGroup implements Serializable{
+    
+    static final long serialVersionUID = -8563085518696891422L;
     private Point2D coord;
     private Point2D normalizedCoord;
     private float angle;
+    private ShapeContextVector vector;
 
     public FeatureGroup(){
         angle = 0;
         coord = new Point2D.Double(0, 0);
+        vector = new ShapeContextVector(0, 0);
     }
 
     public float getAngle() {
@@ -43,6 +49,14 @@ public class FeatureGroup {
 
     public void setNormalizedCoord(Point2D normalizedCoord) {
         this.normalizedCoord = normalizedCoord;
+    }
+
+    public ShapeContextVector getVector() {
+        return vector;
+    }
+
+    public void setVector(ShapeContextVector vector) {
+        this.vector = vector;
     }
     
 }

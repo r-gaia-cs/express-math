@@ -27,6 +27,32 @@ public class FilesUtil {
         try
         {
             fichero = new FileWriter(fileName);
+            
+            pw = new PrintWriter(fichero);
+            
+            pw.print(str);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+           try {
+           
+           if (null != fichero)
+              fichero.close();
+           } catch (Exception e2) {
+              e2.printStackTrace();
+           }
+        }
+    }
+
+     public static void append(String fileName,String str){
+
+        FileWriter fichero = null;
+        PrintWriter pw = null;
+        try
+        {
+            fichero = new FileWriter(fileName, true);
+
             pw = new PrintWriter(fichero);
 
             pw.print(str);
@@ -35,7 +61,7 @@ public class FilesUtil {
             e.printStackTrace();
         } finally {
            try {
-           
+
            if (null != fichero)
               fichero.close();
            } catch (Exception e2) {
@@ -84,7 +110,34 @@ public class FilesUtil {
 
 
     }
-
+    
+    public static double[][] readNumbersInMatrix(String filePath, String separator){
+        BufferedReader bufferedReader = getBufferedReader(filePath);
+        ArrayList<String> lines =  new ArrayList<String>();
+        String line;
+        try {
+             while(bufferedReader.ready()){
+                 line = bufferedReader.readLine();
+                 if(!line.isEmpty())
+                    lines.add(line);
+             }} catch (IOException ex) {
+             Logger.getLogger(FilesUtil.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        int numberOfNumbersPerLine = 0;
+        if(!lines.isEmpty())
+            numberOfNumbersPerLine =  lines.get(0).split(separator).length;
+        double[][] numbers = new double[lines.size()][numberOfNumbersPerLine];
+        String[] stringArrayLine;
+        for (int i = 0; i < lines.size(); i++) {
+            stringArrayLine = lines.get(i).split(separator);
+            for (int j = 0; j < stringArrayLine.length; j++) {
+                 numbers[i][j] = Double.valueOf(stringArrayLine[j]);
+            }
+        }
+        
+        return numbers;
+    }
+    
     public static ArrayList<String> getNotHiddenFileNames(String path){
         ArrayList<String> fileNames = new ArrayList<String>();
         File file = null;

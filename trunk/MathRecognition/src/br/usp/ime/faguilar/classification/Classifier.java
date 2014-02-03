@@ -11,9 +11,9 @@ import java.util.ArrayList;
  *
  * @author frank
  */
-public interface Classifier {
-    public void setTrainingData(ArrayList<Classifible> classifiables);
-    public void train();
-    public Object classify(Classifible classifible);
-    public Object orderedListOfClasses();
+public abstract class Classifier {
+    public abstract void setTrainingData(ArrayList<Classifible> classifiables);
+    public abstract void train();
+    public abstract Object classify(Classifible classifible);
+    public abstract Object orderedListOfClasses();
 }

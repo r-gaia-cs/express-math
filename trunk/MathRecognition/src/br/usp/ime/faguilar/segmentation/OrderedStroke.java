@@ -10,9 +10,11 @@ import br.usp.ime.faguilar.graphics.GStroke;
  *
  * @author frank.aguilar
  */
-public class OrderedStroke extends GStroke{
+public class OrderedStroke extends GStroke implements Comparable{
     private int index;
 
+    
+    
     public int getIndex() {
         return index;
     }
@@ -20,4 +22,9 @@ public class OrderedStroke extends GStroke{
     public void setIndex(int index) {
         this.index = index;
     }
+
+    public int compareTo(Object o) {
+        return getIndex() - ((OrderedStroke) o).getIndex();
+    }
+
 }

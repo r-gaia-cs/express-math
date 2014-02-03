@@ -12,11 +12,14 @@ import br.usp.ime.faguilar.data.DMathExpression;
 import br.usp.ime.faguilar.data.DStroke;
 import br.usp.ime.faguilar.data.DSymbol;
 import br.usp.ime.faguilar.data.TimePoint;
+import br.usp.ime.faguilar.directories.MathRecognitionFiles;
 import br.usp.ime.faguilar.feature_extraction.PreprocessingAlgorithms;
+import br.usp.ime.faguilar.feature_extraction.ShapeContextFeature;
 import br.usp.ime.faguilar.guis.EvaluationView;
 import br.usp.ime.faguilar.matching.MatchingParameters;
 import br.usp.ime.faguilar.matching.symbol_matching.UserSymbol;
 import br.usp.ime.faguilar.segmentation.SymbolFeatures;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -77,6 +80,12 @@ public class SymbolUtil {
 
     public static double MIN_WIDTH = Double.MAX_VALUE;
     public static double COUNT = 0;
+    
+    public static String DIR_COMPLEMENT = MathRecognitionFiles.INKML_DIR;
+
+    public static String FILES_FOLDER = "";
+    public static String FILES = "";
+
     public static ArrayList<Classifible> readSymbolData(String fileName){
         ArrayList<Classifible> symbolData = new ArrayList<Classifible>();
         String fileContent = FilesUtil.getContentAsString(fileName);
@@ -103,6 +112,19 @@ public class SymbolUtil {
             }
         }
         return symbolData;
+    }
+    
+    public static boolean intersect(DStroke s1, DStroke s2){
+        for (int i = 0; i < s1.size() - 1; i++) {
+            for (int j = 0; j < s2.size() -1; j++) {
+                if(Line2D.linesIntersect(s1.get(i).getX(), s1.get(i).getY(), 
+                        s1.get(i + 1).getX(), s1.get(i + 1).getY(), s2.get(j).getX(), s2.get(j).getY(), 
+                        s2.get(j + 1).getX(), s2.get(j + 1).getY())){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     
     public static double minDistanceBetweenStrokeCentroids(DSymbol symbol){
@@ -173,7 +195,7 @@ public class SymbolUtil {
         ArrayList<Classifible> symbolData = new ArrayList<Classifible>();
         ArrayList<Classifible> symbolsOfAFile;
         for (String aFileName: fileNames) {
-            symbolsOfAFile = readSymbolData(EvaluationView.TEMPLATES_PER_EXPRESSION_DIR+aFileName);
+            symbolsOfAFile = readSymbolData(MathRecognitionFiles.TEMPLATES_PER_EXPRESSION_DIR+aFileName);
             symbolData.addAll(symbolsOfAFile);
         }
         return symbolData;
@@ -185,7 +207,7 @@ public class SymbolUtil {
         for (String aFileName: fileNames) {
             if(!aFileName.contains("hirata") && !aFileName.contains("Nina")
                     && !aFileName.contains("fujita")){
-                symbolsOfAFile = readSymbolDataWithStrokesInfo(EvaluationView.TEMPLATES_PER_EXPRESSION_DIR+aFileName);
+                symbolsOfAFile = readSymbolDataWithStrokesInfo(MathRecognitionFiles.TEMPLATES_PER_EXPRESSION_DIR+aFileName);
                 symbolData.addAll(symbolsOfAFile);
             }
         }
@@ -202,22 +224,42 @@ public class SymbolUtil {
         return fileNames;
     }
 
-    public static String[] readFilesNamesInAFile(String file){
-        String fileContesnt = FilesUtil.getContentAsString(file);
+    public static String[] readFilesNamesInAFile(){
+        String fileContesnt = FilesUtil.getContentAsString(FILES);
         String[] fileNames = fileContesnt.split("\n");
         return fileNames;
     }
 
     public static ArrayList<Classifible> readTemplates(){
         ArrayList<Classifible> symbolData = new ArrayList<Classifible>();
-        String[] fileNames = readAndTransforToInkmlFilesNamesInAFile(EvaluationView.TRAINING_FILES);
+        String[] fileNames = readAndTransforToInkmlFilesNamesInAFile(MathRecognitionFiles.TRAINING_FILES);
         symbolData = readSymbolData(fileNames);
         return symbolData;
     }
 
-    public static ArrayList<Classifible> readTemplatesFromInkmlFiles(){
+    public static ArrayList<Classifible> readTemplatesFromInkmlFiles(String filesToRead, String folder){
+        FILES = filesToRead;
+        FILES_FOLDER = folder;
+
         ArrayList<Classifible> symbolData = new ArrayList<Classifible>();
-        String[] fileNames = readFilesNamesInAFile(EvaluationView.TRAINING_FILES);
+//        String[] fileNames = readFilesNamesInAFile(EvaluationView.INKML_CROHME_2013_TRAIN_FILES);
+        String[] fileNames = readFilesNamesInAFile();
+//        String[] fileNames = readFilesNamesInAFile(MathRecognitionFiles.TEST_FILES_CROHME); //readFilesNamesInAFile(MathRecognitionFiles.TRAINING_FILES);
+//        String[] fileNames = readFilesNamesInAFile(EvaluationView.TRAINING_FILES_CROHME);
+
+//        ArrayList<String> notHiddenFileNames = FilesUtil.getNotHiddenFileNames(EvaluationView.INKML_CROHME_2012_TRAIN_DIR);
+//        String[] fileNames = new String[notHiddenFileNames.size()];
+//        for (int i = 0; i < notHiddenFileNames.size(); i++) {
+//            fileNames[i] = notHiddenFileNames.get(i);
+//        }
+        symbolData = readClassifiblesFromInkmlFiles(fileNames);
+        return symbolData;
+    }
+    
+    public static ArrayList<Classifible> readTemplatesFromInkmlFiles(String files){
+        ArrayList<Classifible> symbolData = new ArrayList<Classifible>();
+        FILES  = files;
+        String[] fileNames = readFilesNamesInAFile();
 //        String[] fileNames = readFilesNamesInAFile(EvaluationView.TRAINING_FILES_CROHME);
 
 //        ArrayList<String> notHiddenFileNames = FilesUtil.getNotHiddenFileNames(EvaluationView.INKML_CROHME_2012_TRAIN_DIR);
@@ -233,10 +275,13 @@ public class SymbolUtil {
         ArrayList<Classifible> classifibles = new ArrayList<Classifible>();
         ArrayList<Classifible> symbolsOfAFile;
         for (String aFileName: fileNames) {
-            if(!aFileName.contains("hirata") && !aFileName.contains("Nina")
+            if(aFileName.contains(".inkml") && !aFileName.contains("hirata") && !aFileName.contains("Nina")
                     && !aFileName.contains("fujita")){
-                symbolsOfAFile = readInkmlClassifibles(EvaluationView.INKML_DIR + aFileName);
-//                symbolsOfAFile = readInkmlClassifibles(EvaluationView.INKML_CROHME_2012_TRAIN_DIR + aFileName);
+//                symbolsOfAFile = readInkmlClassifibles(DIR_COMPLEMENT+ aFileName);
+                symbolsOfAFile = readInkmlClassifibles(FILES_FOLDER + aFileName);
+//readInkmlClassifibles(MathRecognitionFiles.INKML_CROHME_2012_TRAIN_DIR + aFileName);
+                
+//                symbolsOfAFile = readInkmlClassifibles(EvaluationView.INKML_CHROME_2013_DIR + aFileName);
                 classifibles.addAll(symbolsOfAFile);
             }
         }
@@ -244,6 +289,14 @@ public class SymbolUtil {
         return classifibles;
     }
 
+    public static ArrayList<Classifible> readTemplatesFromObjectFile(String file){
+        ReadObjectInFile reader = new ReadObjectInFile();
+        reader.setFileName(file);
+        reader.openFile();
+        ArrayList<Classifible> readRecords = (ArrayList<Classifible>) reader.readRecords();
+        return readRecords;
+    }
+    
     private static ArrayList<Classifible> readInkmlClassifibles(String fileName){
 
         ArrayList<Classifible> symbolData = new ArrayList<Classifible>();
@@ -262,6 +315,16 @@ public class SymbolUtil {
                     userName, newSymbol.getLabel()));
             newClassifible.setSymbol(newSymbol);
             newClassifible.setMyClass(newSymbol.getLabel());
+//            ShapeContextFeature inputFeatures = PreprocessingAlgorithms.getNShapeContetxFeatures(newSymbol, 
+//                MatchingParameters.numberOfPointPerSymbol);
+
+//            TO CALCULATE NGENERALIZED SHAPE CONTEXTS
+            ShapeContextFeature inputFeatures = PreprocessingAlgorithms.getNGeneralizedShapeContetxFeatures(newSymbol,
+                MatchingParameters.numberOfPointPerSymbol);
+            newClassifible.setAditionalFeatures(inputFeatures);
+//
+//            END- TO CALCULATE NGENERALIZED SHAPE CONTEXTS
+
             symbolData.add(newClassifible);
 //            if(symbol.getWidthAsDouble() < 0)
 //                System.out.println("less than zero");
@@ -285,7 +348,7 @@ public class SymbolUtil {
 
     public static ArrayList<Classifible> readTemplatesWithStrokesInfo(){
         ArrayList<Classifible> symbolData = new ArrayList<Classifible>();
-        String[] fileNames = readAndTransforToInkmlFilesNamesInAFile(EvaluationView.TRAINING_FILES);
+        String[] fileNames = readAndTransforToInkmlFilesNamesInAFile(MathRecognitionFiles.TRAINING_FILES);
         symbolData = readSymbolDataWithStrokesInfo(fileNames);
         return symbolData;
     }

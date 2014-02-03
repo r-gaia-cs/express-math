@@ -17,7 +17,7 @@ public abstract class GraphMatching {
     private Point2D[] inputPoints;
     
 
-    public static float ANGLE_WEIGHT = (float) 0.6;
+    public static float ANGLE_WEIGHT = (float) 0.;
 
     public GraphMatching() {
         this(null, null);
@@ -38,6 +38,7 @@ public abstract class GraphMatching {
         float[][] costMatrix = new float[tamanho][tamanho];
         Vertex[] modelVertex = model.getIndexedVertexes();
         Vertex[] inputVertex = input.getIndexedVertexes();
+        double divisor = Math.sqrt(2);
         for (int i = 0; i < tamanho; i++) {
             for (int j = 0; j < tamanho; j++) {
                 if (i < modelVertex.length && j < inputVertex.length) {
@@ -46,11 +47,12 @@ public abstract class GraphMatching {
                     //to consider angles
 //                    float anglesDiference = (float) (0.5 * (1 - Math.cos(getAnglesModel()[i] - getAnglesInput()[j])));
 //                    float anglesDiference = (float)((Math.abs(getAnglesModel()[i] - getAnglesInput()[j]))/ (2 * Math.PI));
-                    float anglesDiference = (float)((modelPoints[i].distance(inputPoints[j]))/ Math.sqrt(2));
+//                    float anglesDiference = (float)((modelPoints[i].distance(inputPoints[j]))/ divisor);
 //                    float anglesDiference = (float)((Math.abs(modelPoints[i].distance(inputPoints[j])))/ 2);
                     float shapeContextDistance = this.cost.getCost(modelVertex[i], inputVertex[j]);
-                    costMatrix[i][j] = (1 - ANGLE_WEIGHT) *  shapeContextDistance +
-                            ANGLE_WEIGHT * anglesDiference;
+//                    costMatrix[i][j] = (1 - ANGLE_WEIGHT) *  shapeContextDistance +
+//                            ANGLE_WEIGHT * anglesDiference;
+                     costMatrix[i][j] = shapeContextDistance;
                 } else {
                     costMatrix[i][j] = Float.MAX_VALUE;
                 }

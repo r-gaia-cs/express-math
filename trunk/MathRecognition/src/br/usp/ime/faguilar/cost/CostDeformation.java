@@ -25,8 +25,10 @@ public class CostDeformation extends Cost {
         this.model = model;
         this.ladj = model.getNeighboursList();
 //        this.mxdst = this.calculateLargestDifference(input);
-        this.mxdst = (float)Math.sqrt(Math.pow(model.getHeight(), 2)
-                    + Math.pow(model.getWidth(), 2));
+        double height = model.getHeight();
+        double width = model.getWidth();
+        this.mxdst = (float) Math.sqrt(height * height
+                    + width * width);
     }
 
 

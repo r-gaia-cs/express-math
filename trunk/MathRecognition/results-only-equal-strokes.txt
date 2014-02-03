@@ -1,2 +1,0 @@
-number of good results: 2092
- number of bad results: 588
