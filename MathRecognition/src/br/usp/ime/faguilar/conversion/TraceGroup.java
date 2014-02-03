@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * @author frank
  */
 public class TraceGroup {
-    private int id;
+    private String id;
     private Annotation annotation;
     private ArrayList<Integer> traceDataRef;
     private ArrayList<TraceGroup> traceGroups;
@@ -30,11 +30,11 @@ public class TraceGroup {
         this.annotation = annotation;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

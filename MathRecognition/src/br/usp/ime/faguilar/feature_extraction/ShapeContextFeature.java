@@ -6,8 +6,10 @@
 package br.usp.ime.faguilar.feature_extraction;
 
 import br.usp.ime.faguilar.cost.ShapeContext;
+import br.usp.ime.faguilar.cost.ShapeContextVector;
 import br.usp.ime.faguilar.data.DSymbol;
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,7 +19,8 @@ import java.util.List;
  *
  * @author frank
  */
-public class ShapeContextFeature {
+public class ShapeContextFeature implements Serializable{
+    static final long serialVersionUID = -8563085518696891422L;
 
     private List<FeatureGroup> features;
     private ShapeContext shapeContext;
@@ -32,6 +35,14 @@ public class ShapeContextFeature {
             points[i] = features.get(i).getCoord();
         }
         return points;
+    }
+    
+    public ShapeContextVector[] getVectors(){
+        ShapeContextVector[] vectors = new ShapeContextVector[features.size()];
+        for (int i = 0; i < vectors.length; i++) {
+            vectors[i] = features.get(i).getVector();
+        }
+        return vectors;
     }
 
 //    CHEKAR COORDENADAS DE matching[][]

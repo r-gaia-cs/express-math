@@ -27,20 +27,22 @@ public class InkmlMathExpression {
 
     public DMathExpression asDMathExpression(){
         DMathExpression mathExpression = new DMathExpression();
-        ArrayList<TraceGroup> traceGroups = traceGroup.getTraceGroups();
-        ArrayList<Integer> traceDataRef;
-        DSymbol symbol;
-        OrderedStroke traceAsStroke;
-        for (TraceGroup aTraceGroup : traceGroups) {
-            symbol = new GSymbol();
-            traceDataRef = aTraceGroup.getTraceDataRef();
-            for (Integer traceRef : traceDataRef) {
-                traceAsStroke = getTraceAsStroke(traceRef);
-                traceAsStroke.setIndex(traceRef);
-                symbol.addCheckingBoundingBox(traceAsStroke);
+        if(traceGroup != null){
+            ArrayList<TraceGroup> traceGroups = traceGroup.getTraceGroups();
+            ArrayList<Integer> traceDataRef;
+            DSymbol symbol;
+            OrderedStroke traceAsStroke;
+            for (TraceGroup aTraceGroup : traceGroups) {
+                symbol = new GSymbol();
+                traceDataRef = aTraceGroup.getTraceDataRef();
+                for (Integer traceRef : traceDataRef) {
+                    traceAsStroke = getTraceAsStroke(traceRef);
+                    traceAsStroke.setIndex(traceRef);
+                    symbol.addCheckingBoundingBox(traceAsStroke);
+                }
+                symbol.setLabel(aTraceGroup.getAnnotation().getValue());
+                mathExpression.addCheckingBoundingBox(symbol);
             }
-            symbol.setLabel(aTraceGroup.getAnnotation().getValue());
-            mathExpression.addCheckingBoundingBox(symbol);
         }
         return mathExpression;
     }

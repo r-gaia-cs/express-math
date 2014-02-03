@@ -15,27 +15,32 @@ import br.usp.ime.faguilar.graph.Graph;
 import br.usp.ime.faguilar.graph.Vertex;
 import br.usp.ime.faguilar.graphics.GMathExpression;
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 import java.util.*;
 
-public class ShapeContext {
+public class ShapeContext implements Serializable{
+    static final long serialVersionUID = -8563085518696891422L;
 
-    private float raioSC;
-    private int tot_r; //Total of radius bins
-    private int tot_t; //Total of angle region bins
-    private int totSC;
+    protected float raioSC;
+    protected int tot_r; //Total of radius bins
+    protected int tot_t; //Total of angle region bins
+    protected int totSC;
 
-    private double[][] sc; // Shape Context
+    protected double[][] sc; // Shape Context
 
     private GMathExpression gmathExpression;
 
-    private double[] centerShapeContext;
+    protected double[] centerShapeContext;
 
-    private Vertex centerVertex;
+    protected Vertex centerVertex;
 
-    public double[][] getSC() {
-        return sc;
+
+    public ShapeContext(){
+        gmathExpression = null;
+        centerShapeContext = null;
+        centerVertex = null;
+        sc = null;
     }
-
     public ShapeContext(float raioSC, Graph graph, int tot_r, int tot_t,
             boolean rotation,GMathExpression mathExpression) {
         this.tot_r = tot_r;
@@ -45,7 +50,7 @@ public class ShapeContext {
         this.init(raioSC, graph, rotation);
     }
 
-    public void init(float raioSC, Graph graph, boolean rotation) {
+    protected void init(float raioSC, Graph graph, boolean rotation) {
 
         this.raioSC = raioSC;
         Vertex [] vertexList = graph.getIndexedVertexes();
@@ -88,7 +93,6 @@ public class ShapeContext {
         for (int k = 0; k < totSC; k++)
             centerShapeContext[k] = 0.;
         ////////////////////////////////////////////////////////////////////////
-
 
         //matriz de distancias
         float[][] dist = new float[totPoints][totPoints];
@@ -145,7 +149,7 @@ se (dy < 0) entao theta:= 2PI - theta
                 float dx = (float)(vertexList[j].getX() - vertexList[i].getX());
                 float dy = (float)(vertexList[j].getY() - vertexList[i].getY());
                 float modv = dist[i][j]; //(float)fe.euclideanDistance(x1,y1, x2,y2);
-                float cos_theta = dx / modv; //adjacente/hipotenusa
+//                float cos_theta = dx / modv; //adjacente/hipotenusa
 //                float theta = (float)Math.acos(cos_theta);
                 float theta = (float) (Math.atan2(dy, dx) + Math.PI);
 //                if (dy > 0){
@@ -260,12 +264,13 @@ se (dy < 0) entao theta:= 2PI - theta
 
     
 
-    private double euclideanDistance(Vertex p1, Vertex p2) {
+    protected double euclideanDistance(Vertex p1, Vertex p2) {
             double d1 = p1.getX() - p2.getX();
             double d2 = p1.getY() - p2.getY();
             double res = Math.sqrt(d1*d1 + d2*d2);
             return res;
     }
-
+    public double[][] getSC() {
+        return sc;
+    }
 }
-

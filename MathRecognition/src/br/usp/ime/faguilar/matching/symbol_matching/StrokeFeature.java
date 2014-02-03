@@ -57,8 +57,10 @@ public class StrokeFeature {
     public float distance(StrokeFeature otherStrokeFeature){
         float distance = 0;
         double coordsDistance =  getNormalizedCentroid().distance(otherStrokeFeature.getNormalizedCentroid());
-        double dimensionsDistance =  Math.sqrt(Math.pow(getNormalizedHeight() - otherStrokeFeature.getNormalizedHeight()
-                , 2) + Math.pow(getNormalizedWidth() - otherStrokeFeature.getNormalizedWidth(), 2));
+        double heightDistance = getNormalizedHeight() - otherStrokeFeature.getNormalizedHeight();
+        double widthDistance = getNormalizedWidth() - otherStrokeFeature.getNormalizedWidth();
+        double dimensionsDistance =  Math.sqrt(heightDistance * heightDistance + 
+                widthDistance * widthDistance);
         distance = (float) (gama * coordsDistance + (1 - gama) * dimensionsDistance);
 //        double dimensionsDistance =  (Math.abs(getNormalizedHeight() - otherStrokeFeature.getNormalizedHeight())
 //                + Math.abs(getNormalizedWidth() - otherStrokeFeature.getNormalizedWidth())) / 2;

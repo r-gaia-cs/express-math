@@ -1,0 +1,2 @@
+parameters: numOFPoints = 30  num reg angulares = 10  num reg. radial = 4
+number of good results: 4668  number of bad results: 453 percentage: 8.845928529584066

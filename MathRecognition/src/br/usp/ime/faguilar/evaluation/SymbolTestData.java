@@ -6,6 +6,7 @@
 package br.usp.ime.faguilar.evaluation;
 
 import br.usp.ime.faguilar.classification.Classifible;
+import br.usp.ime.faguilar.directories.MathRecognitionFiles;
 import br.usp.ime.faguilar.guis.EvaluationView;
 import br.usp.ime.faguilar.util.SymbolUtil;
 import java.util.ArrayList;
@@ -18,9 +19,7 @@ import java.util.Map;
  * @author frank
  */
 public class SymbolTestData {
-    private ArrayList<Classifible> classifiebles;
     private Map<Object, List<Classifible>> map;
-
     public SymbolTestData(){
         map = new HashMap<Object, List<Classifible>>();
     }
@@ -32,8 +31,6 @@ public class SymbolTestData {
                     new ArrayList<Classifible>());
             list = map.get(classifible.getMyClass());
         }
-//        TO LIMIT NUMBER OF SAMPLES PER CLASSIFIBLE CLASS
-//        if(list.size() < 30)
         list.add(classifible);
         map.put(classifible.getMyClass(), list);
     }
@@ -41,7 +38,9 @@ public class SymbolTestData {
     public static String getTrainingFrequencies(){
         // Initialize frequency table from command line
 //        ArrayList<Classifible> allSymbols = SymbolUtil.readSymbolData(EvaluationView.TEMPLATES_FILE);
-        ArrayList<Classifible> allSymbols = SymbolUtil.readTemplatesFromInkmlFiles();//SymbolUtil.readTemplates();
+        ArrayList<Classifible> allSymbols = SymbolUtil.readTemplatesFromInkmlFiles(
+                MathRecognitionFiles.TRAINING_FILES, 
+                MathRecognitionFiles.INKML_CROHME_2012_TRAIN_DIR);//SymbolUtil.readTemplates();
         return getFrequencies(allSymbols);
     }
 
@@ -55,16 +54,7 @@ public class SymbolTestData {
         }
         System.out.println(map.size() + " distinct words:");
         System.out.println(allSymbols.size() + " templates");
-//        System.out.println(map);
         return map.toString().replaceAll(",\\s", "\n");
-    }
-
-    public ArrayList<Classifible> getClassifiebles() {
-        return classifiebles;
-    }
-
-    public void setClassifiebles(ArrayList<Classifible> classifiebles) {
-        this.classifiebles = classifiebles;
     }
 
     public Map<Object, List<Classifible>> getMap() {
@@ -75,13 +65,11 @@ public class SymbolTestData {
         this.map = map;
     }
 
-
-//
-//    public Map<String, Integer> getMap() {
-//        return map;
-//    }
-//
-//    public void setMap(Map<String, Integer> map) {
-//        this.map = map;
-//    }
+    public ArrayList<Classifible> getAllSymbolsAsArrayList(){
+        ArrayList<Classifible> symbols = new ArrayList<Classifible>();
+        for (List classifibles : map.values()) {
+            symbols.addAll(classifibles);
+        }
+        return symbols;
+    }
 }

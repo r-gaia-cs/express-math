@@ -28,9 +28,9 @@ public class MatchingParameters {
     
     public static int angularGlobalRegions=4;
 
-    public static  int LogPolarLocalRegions=4;
+    public static  int LogPolarLocalRegions = 3;
 
-    public static int angularLocalRegions=10;
+    public static int angularLocalRegions = 6;
 
     public static int numberOfPointPerSymbol = 30;
 

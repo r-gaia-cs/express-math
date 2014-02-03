@@ -69,6 +69,8 @@ public class Segmentation {
     private double minDist;
 
     private DSymbol dSymol;
+    
+    public Map<Integer, String> classesForSegmentedStrokes;
 
     public void part(DStroke[] strokes){
         myStrokes = strokes;
@@ -97,6 +99,7 @@ public class Segmentation {
         numberOfSymbolEvaluations = 0;
 //        DSymbol dSymol = null;
         Point2D[] symbolPoints = null;
+        classesForSegmentedStrokes = new HashMap<Integer, String>();
         Classifible<Point2D> classifible =new Classifible<Point2D>();//classifible = null;
         ClassificationResult classificationResult = null;
         ClassificationResult bestClassificationResult = null;
@@ -108,13 +111,13 @@ public class Segmentation {
         SymbolFeatures symbolFeatures = null;
         for (int i = 0; i < strokes.length; i++) {
             continueCombinations = true;
-            for (int j = 1; j <= MAX_NUMBER_OF_STROKES_PER_SYMBOL && 
-                    i - j + 1>= 0 && continueCombinations; j++) {
+            for (int numberOFStrokes = 1; numberOFStrokes <= MAX_NUMBER_OF_STROKES_PER_SYMBOL && 
+                    i - numberOFStrokes + 1>= 0 && continueCombinations; numberOFStrokes++) {
                 
                 dSymol = new DSymbol();
-                vertexIndex = new int[j];
+                vertexIndex = new int[numberOFStrokes];
                 executeClassification = true;
-                for (int k = 1; k <= j; k++) {
+                for (int k = 1; k <= numberOFStrokes; k++) {
                     dSymol.addCheckingBoundingBox(strokes[i + 1 - k]);
                     vertexIndex[k-1] = i + 1 - k;
                     if(alreadySegmented.contains(i + 1 -k))
@@ -135,10 +138,12 @@ public class Segmentation {
 //                    classifible.setAditionalFeatures(symbolFeatures);
                     classificationResult = (ClassificationResult) classify(classifible, i);
                     if (classificationResult != null){
+                        if(numberOFStrokes == 1)
+                            classesForSegmentedStrokes.put(i, (String) classificationResult.getMyClass());
                         newCost = classificationResult.getCost();
                         currentBestCost = segmentationTable.getLeastCostUnitl(i);
-                        if(i - j >= 0)
-                            newCost += segmentationTable.getLeastCostUnitl(i - j);
+                        if(i - numberOFStrokes >= 0)
+                            newCost += segmentationTable.getLeastCostUnitl(i - numberOFStrokes);
     //                    if(jointTwoStrokes(classificationResult)&&!(newCost >= 100)){
     //                        ///TODO: prevenir q combinaciones con dos elementos
     //                        // junte simbolos fraccion o menos determinados anteriormente
@@ -149,7 +154,7 @@ public class Segmentation {
     //                    else
                         if(newCost < currentBestCost) {
                             segmentationTable.setCostForGroupAt(i, newCost);// classificationResult.getCost();
-                            segmentationTable.setBestGroupAt(i, j);
+                            segmentationTable.setBestGroupAt(i, numberOFStrokes);
                             bestClassificationResult = classificationResult;
     //                        Segmentation.bestCostAt[i] = classificationResult.getCost();
                         }
@@ -176,8 +181,8 @@ public class Segmentation {
             else if(isHorizontal(classificationResult))
             {
                 if(horizontalIsFraction(posSegmentation)) {
-    //                classificationResult.setMyClass("-");
-                    classificationResult.setMyClass("\\frac");
+                    classificationResult.setMyClass("-");
+//                    classificationResult.setMyClass("\\frac");
     //                newCost = 0;
     //                classificationResult.setCost(newCost);
     //                continueCombinations = false;
@@ -274,6 +279,34 @@ public class Segmentation {
         }
         return mathExpression;
     }
+    
+    public List<DSymbol> getPartitionAsSymbolList(){
+        List<DSymbol> symbols = new ArrayList<DSymbol>();
+        ArrayList<Integer> groups = segmentationTable.getBestPartitionGroups();
+        ArrayList<String> partitionSymbolClasses = segmentationTable.getPartitionSymbolClasses();
+        GSymbol symbol;
+        int count = 0;
+        int numberOfelements;
+        int indexOfLabel;
+        Map<String, Integer> labelsMap = new HashMap();
+        for (int index = 0; index < groups.size();index ++) {
+            numberOfelements = groups.get(index);
+            
+            symbol = new GSymbol();
+            for(int i = 0; i < numberOfelements; i++){
+                symbol.addCheckingBoundingBox(myStrokes[count++]);
+            }
+            indexOfLabel = 0;
+            if(labelsMap.containsKey(partitionSymbolClasses.get(index)))
+                indexOfLabel = labelsMap.get(partitionSymbolClasses.get(index));
+            indexOfLabel++;
+            symbol.setLabel(partitionSymbolClasses.get(index));
+            symbol.setId(indexOfLabel);
+            labelsMap.put(partitionSymbolClasses.get(index), indexOfLabel);
+            symbols.add(symbol);
+        }
+        return symbols;
+    }
 
     public boolean goodGroupByDistance(DSymbol symbol, double maxDistance){
         boolean goodGroup = true;
@@ -290,10 +323,18 @@ public class Segmentation {
 
 //        test if there is conected subraph whose edges are small
         List edges = new ArrayList<Edge>();
+        Point2D point_i, point_j;
         for (int i = 0; i < symbol.size() -1; i++) {
             for (int j = i + 1; j < symbol.size(); j++) {
-                if(symbol.get(i).getBoundingBoxCenter().distance(
-                        symbol.get(j).getBoundingBoxCenter()) <= maxDistance)
+                if(classesForSegmentedStrokes.containsKey(((OrderedStroke)symbol.get(i)).getIndex()))
+                    point_i = relativePointAcordingToSymbolClass((OrderedStroke) symbol.get(i));
+                else
+                    point_i = symbol.get(i).getBoundingBoxCenter();
+                if(classesForSegmentedStrokes.containsKey(((OrderedStroke)symbol.get(j)).getIndex()))
+                    point_j = relativePointAcordingToSymbolClass((OrderedStroke) symbol.get(j));
+                else
+                    point_j = symbol.get(j).getBoundingBoxCenter();
+                if(point_i.distance(point_j) <= maxDistance)
                     edges.add(new Edge(i, j, 0));
             }
         }
@@ -329,8 +370,34 @@ public class Segmentation {
 //                    goodGroup = true;
         return goodGroup;
     }
+    
+    
+    public Point2D relativePointAcordingToSymbolClass(OrderedStroke stroke){
+        Point2D point;
+        String label = classesForSegmentedStrokes.get(stroke.getIndex());
+        if(label.equals("(") || label.equals(")") || label.equals("C") || label.equals("c"))
+            point = stroke.getLtPoint();//stroke.getNearestPointToBoundingBoxCenter();//stroke.getLtPoint();
+        else if(label.equals("\\sqrt"))
+            point = stroke.getRbPoint();//stroke.getRbPoint();//stroke.getNearestPointToBoundingBoxCenter();
+        else if((label.equals("1") || label.equals("|") || label.equals("[") || label.equals("]") ) 
+                && !intersectsNeighboors(stroke))
+            point = stroke.getLtPoint();
+        else
+            point = stroke.getBoundingBoxCenter();
+        return point;
+    }
 
-
+    private boolean intersectsNeighboors(OrderedStroke stroke) {
+        Iterable<Edge> adj = getGraph().adj(stroke.getIndex());
+        int otherIndex;
+        for (Edge edge : adj) {
+            otherIndex = edge.other(stroke.getIndex());
+            if(SymbolUtil.intersect(stroke, (OrderedStroke) myStrokes[otherIndex]))
+                return true;
+        }
+        return false;
+    }
+    
     /**
      *
      * @param edges
@@ -679,6 +746,4 @@ public class Segmentation {
         }
         return false;
     }
-
-
 }

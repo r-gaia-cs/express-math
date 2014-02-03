@@ -7,6 +7,7 @@ package br.usp.ime.faguilar.util.results;
 
 import br.usp.ime.faguilar.conversion.InkmlReader;
 import br.usp.ime.faguilar.data.DMathExpression;
+import br.usp.ime.faguilar.directories.MathRecognitionFiles;
 import br.usp.ime.faguilar.guis.EvaluationView;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,8 +17,8 @@ import java.util.HashMap;
  * @author frank
  */
 public class results {
-    public static final String resultsFile = EvaluationView.INKML_DIR + "results-perl.txt";
-    public static final String pairFileNames = EvaluationView.INKML_DIR + "fileNames.txt";
+    public static final String resultsFile = MathRecognitionFiles.INKML_DIR + "results-perl.txt";
+    public static final String pairFileNames = MathRecognitionFiles.INKML_DIR + "fileNames.txt";
     public static void main(String[] args){
         printResultsWithExpressionSizes();
 
@@ -40,7 +41,7 @@ public class results {
         InkmlReader reader = new InkmlReader();
         for (InputOutputFiles outputFiles : readPairFiles) {
             reader = new InkmlReader();
-            reader.read(EvaluationView.INKML_DIR + outputFiles.getInputFile());
+            reader.read(MathRecognitionFiles.INKML_DIR + outputFiles.getInputFile());
             DMathExpression asDMathExpression = reader.getMathExpression().asDMathExpression();
             fileNameVsSize.put(outputFiles.getOutputFile(), asDMathExpression.size());
         }

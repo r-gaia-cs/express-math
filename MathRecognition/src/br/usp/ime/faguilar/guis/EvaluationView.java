@@ -19,11 +19,13 @@ import br.usp.ime.faguilar.conversion.InkMLInput;
 import br.usp.ime.faguilar.conversion.MathExpressionGraph;
 import br.usp.ime.faguilar.data.DStroke;
 import br.usp.ime.faguilar.data.TimePoint;
+import br.usp.ime.faguilar.directories.MathRecognitionFiles;
 import br.usp.ime.faguilar.export.InkMLExpression;
 import br.usp.ime.faguilar.export.MathExpressionSample;
 import br.usp.ime.faguilar.feature_extraction.PreprocessingAlgorithms;
 import br.usp.ime.faguilar.graphics.GMathExpression;
 import br.usp.ime.faguilar.graphics.GraphicalStrokeKruskalMST;
+import br.usp.ime.faguilar.parser.BSTBuilder;
 import br.usp.ime.faguilar.segmentation.Segmentation;
 import br.usp.ime.faguilar.segmentation.SegmentationResult;
 import br.usp.ime.faguilar.segmentation.TreeSearchSegmentation;
@@ -44,19 +46,7 @@ import javax.swing.DefaultListModel;
  * @author frank
  */
 public class EvaluationView extends javax.swing.JPanel {
-    public static final String INKML_DIR = "data/inkml-complete/";
 
-    public static final String INKML_CROHME_2012_TRAIN_DIR = "data/CROHME/2012/trainData/";
-    public static final String INKML_CROHME_2012_TEST_DIR = "data/CROHME/2012/testDataGT/";
-    public static final String TRAINING_FILES_CROHME =  "files/training_crohme.txt";//"training-training.txt";//"trainingFiles.txt";
-    public static final String TEST_FILES_CROHME = "files/test_crohme.txt";//"training-test.txt";//"testFiles.txt";
-
-    public static final String TEMPLATES_DIR = "data/templates/";
-    public static final String TEMPLATES_PER_EXPRESSION_DIR = TEMPLATES_DIR + "symbols/";
-//    public static final String TEMPLATES_FILE = TEMPLATES_DIR + "part-model-symbols_v3.txt";
-    public static final String TEMPLATES_FILE = TEMPLATES_DIR + "all-symbols.txt";//"first-test.txt";//"model-symbols.txt";
-    public static final String TRAINING_FILES = INKML_DIR + "training-training.txt";//"training-training.txt";//"trainingFiles.txt";
-    public static final String TEST_FILES = INKML_DIR + "training-test.txt";//"training-test.txt";//"testFiles.txt";
     private Segmentation segmentation;
     private String SelectedFileName;
 
@@ -75,7 +65,11 @@ public class EvaluationView extends javax.swing.JPanel {
 
     private void localInitialization() {
         chargeFileNames();
-        ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles();//SymbolUtil.readTemplatesWithStrokesInfo();//SymbolUtil.readTemplates();//SymbolUtil.readSymbolData(TEMPLATES_FILE);
+        ArrayList<Classifible> classifibles = 
+//                SymbolUtil.readTemplatesFromObjectFile("data/train_crohme_2012");
+        SymbolUtil.readTemplatesFromInkmlFiles(
+                MathRecognitionFiles.TRAINING_FILES_CROHME,
+                MathRecognitionFiles.INKML_CROHME_2012_TRAIN_DIR);//SymbolUtil.readTemplatesWithStrokesInfo();//SymbolUtil.readTemplates();//SymbolUtil.readSymbolData(TEMPLATES_FILE);
         classifier = new ShapeContextClassifier();
         classifier.setTrainingData(classifibles);
         classifier.train();
@@ -85,7 +79,10 @@ public class EvaluationView extends javax.swing.JPanel {
     }
     
     private void chargeFileNames(){
-        String[] files = SymbolUtil.readFilesNamesInAFile(EvaluationView.TEST_FILES);
+        SymbolUtil.FILES = MathRecognitionFiles.TEST_FILES_CROHME;
+        SymbolUtil.FILES_FOLDER = MathRecognitionFiles.INKML_CROHME_2012_TEST_DIR;
+        String[] files = SymbolUtil.readFilesNamesInAFile();
+//                EvaluationView.TEST_FILES_CROHME);
 //        String[] files = SymbolUtil.readFilesNamesInAFile(EvaluationView.TEST_FILES_CROHME);
         ArrayList<String> inkFiles = new  ArrayList();
         inkFiles.addAll(Arrays.asList(files));
@@ -108,18 +105,20 @@ public class EvaluationView extends javax.swing.JPanel {
 
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel2 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        log = new javax.swing.JTextArea();
+        jPanel5 = new javax.swing.JPanel();
+        jSplitPane2 = new javax.swing.JSplitPane();
+        jPanel6 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         distanceFilter = new javax.swing.JCheckBox();
         mstFilter = new javax.swing.JCheckBox();
         showMST = new javax.swing.JCheckBox();
         useTree = new javax.swing.JCheckBox();
-        jPanel5 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         drawingArea2 = new br.usp.ime.faguilar.guis.DrawingArea();
+        jPanel3 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        log = new javax.swing.JTextArea();
         jScrollPane1 = new javax.swing.JScrollPane();
         fileNames = new javax.swing.JList();
 
@@ -129,30 +128,12 @@ public class EvaluationView extends javax.swing.JPanel {
 
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Results"));
+        jPanel5.setLayout(new java.awt.BorderLayout());
 
-        log.setColumns(20);
-        log.setRows(5);
-        jScrollPane2.setViewportView(log);
+        jSplitPane2.setDividerLocation(500);
+        jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-        org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-
-        jPanel2.add(jPanel3, java.awt.BorderLayout.SOUTH);
+        jPanel6.setLayout(new java.awt.BorderLayout());
 
         jButton1.setText("run");
         jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -187,7 +168,7 @@ public class EvaluationView extends javax.swing.JPanel {
                 .add(showMST)
                 .add(44, 44, 44)
                 .add(useTree)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 130, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 189, Short.MAX_VALUE)
                 .add(jButton1)
                 .add(21, 21, 21))
         );
@@ -204,29 +185,46 @@ public class EvaluationView extends javax.swing.JPanel {
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel2.add(jPanel4, java.awt.BorderLayout.NORTH);
-
-        jPanel5.setLayout(new java.awt.BorderLayout());
+        jPanel6.add(jPanel4, java.awt.BorderLayout.NORTH);
 
         org.jdesktop.layout.GroupLayout drawingArea2Layout = new org.jdesktop.layout.GroupLayout(drawingArea2);
         drawingArea2.setLayout(drawingArea2Layout);
         drawingArea2Layout.setHorizontalGroup(
             drawingArea2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 2200, Short.MAX_VALUE)
+            .add(0, 3630, Short.MAX_VALUE)
         );
         drawingArea2Layout.setVerticalGroup(
             drawingArea2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 385, Short.MAX_VALUE)
+            .add(0, 468, Short.MAX_VALUE)
         );
 
         jScrollPane3.setViewportView(drawingArea2);
 
-        jPanel5.add(jScrollPane3, java.awt.BorderLayout.CENTER);
+        jPanel6.add(jScrollPane3, java.awt.BorderLayout.CENTER);
+
+        jSplitPane2.setTopComponent(jPanel6);
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Results"));
+        jPanel3.setLayout(new java.awt.BorderLayout());
+
+        log.setBackground(new java.awt.Color(0, 0, 0));
+        log.setColumns(20);
+        log.setForeground(new java.awt.Color(255, 255, 255));
+        log.setRows(5);
+        jScrollPane2.setViewportView(log);
+
+        jPanel3.add(jScrollPane2, java.awt.BorderLayout.CENTER);
+
+        jSplitPane2.setBottomComponent(jPanel3);
+
+        jPanel5.add(jSplitPane2, java.awt.BorderLayout.CENTER);
 
         jPanel2.add(jPanel5, java.awt.BorderLayout.CENTER);
 
         jSplitPane1.setRightComponent(jPanel2);
 
+        fileNames.setBackground(new java.awt.Color(0, 0, 0));
+        fileNames.setForeground(new java.awt.Color(255, 255, 255));
         fileNames.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 fileNamesValueChanged(evt);
@@ -312,8 +310,8 @@ public class EvaluationView extends javax.swing.JPanel {
     private void executeSegmentationAndClassification(){
         double meandistance = 0;
         double filterMaxDistance;
-        double alpha = .9;
-        double beta = 0.6;
+        double alpha = .7;
+        double beta = 0.5;
         for(Edge e: mst.edges())
             meandistance += e.weight();
         meandistance = meandistance / (StrokeSetToEdgeWeightedGraph.V() - 1);
@@ -364,6 +362,16 @@ public class EvaluationView extends javax.swing.JPanel {
         String logResult = "Number of symbol evaluations: " +
         String.valueOf(segmentation.getNumberOfSymbolEvaluations());
         addResultToLog(logResult);
+        
+//        TO DO STRUCTURAL ANALISYS
+        BSTBuilder parser = new BSTBuilder();
+        
+        parser.buildBST(expression, classifier);
+        addResultToLog(parser.treeString());
+        addResultToLog(parser.labelGraph());
+//        System.out.println(parser.treeString());
+//        System.out.println(parser.labelGraph());
+//        ENS STRUCTURAL ANALISYS
     }
 
     private void showMathExpression(){
@@ -378,7 +386,8 @@ public class EvaluationView extends javax.swing.JPanel {
         }
         InkMLInput inkMlInput = new InkMLInput();
         strokes = inkMlInput.extractStrokesFromInkMLFile(
-                INKML_DIR + inkmlFileName);
+                MathRecognitionFiles.INKML_DIR + inkmlFileName);
+//                INKML_CROHME_2012_TEST_DIR + inkmlFileName);
 //        strokes = inkMlInput.extractStrokesFromInkMLFile(
 //                EvaluationView.INKML_CROHME_2012_TEST_DIR + inkmlFileName);
         strokes = PreprocessingAlgorithms.preprocessStrokes(strokes);
@@ -431,10 +440,12 @@ public class EvaluationView extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JTextArea log;
     private javax.swing.JCheckBox mstFilter;
     private javax.swing.JCheckBox showMST;

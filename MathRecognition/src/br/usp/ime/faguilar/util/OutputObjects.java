@@ -43,6 +43,7 @@ public class OutputObjects {
             output.writeObject(o);
         } catch (IOException ex) {
             ex.printStackTrace();
+            System.out.println(ex);
             System.err.println( "Error writing to file." );
             return;        
         }

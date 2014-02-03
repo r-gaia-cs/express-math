@@ -29,7 +29,7 @@ public class SymbolFeatures {
         setWidth(0);
     }
 
-    public static void setUpNumberOfStrokesPerSymbol(){
+    public static void setUpMinimumNumberOfStrokesPerSymbol(){
         numberOfStrokesPerSymbol = new HashMap<String, Integer>();
         numberOfStrokesPerSymbol.put("=", 2);
         numberOfStrokesPerSymbol.put("+", 2);
@@ -39,15 +39,28 @@ public class SymbolFeatures {
         numberOfStrokesPerSymbol.put("j", 2);
         numberOfStrokesPerSymbol.put("!", 2);
         numberOfStrokesPerSymbol.put("t", 2);
+        numberOfStrokesPerSymbol.put("F", 2);
+        numberOfStrokesPerSymbol.put("\\forall", 2);
+        numberOfStrokesPerSymbol.put("\\geq", 2);
+        numberOfStrokesPerSymbol.put("\\in", 2);
+        numberOfStrokesPerSymbol.put("\\exists", 2);
+        numberOfStrokesPerSymbol.put("\\sin", 2);
+        numberOfStrokesPerSymbol.put("\\tan", 2);
+        numberOfStrokesPerSymbol.put("\\times", 2);
 
         numberOfStrokesPerSymbol.put("\\equiv", 3);
         numberOfStrokesPerSymbol.put("\\neq", 3);
         numberOfStrokesPerSymbol.put("\\pi", 3);
         numberOfStrokesPerSymbol.put("\\pm", 3);
+        numberOfStrokesPerSymbol.put("\\prod", 3);
         numberOfStrokesPerSymbol.put("\\cdots", 3);
+        numberOfStrokesPerSymbol.put("\\div", 3);
+        numberOfStrokesPerSymbol.put("\\ldots", 3);
+        numberOfStrokesPerSymbol.put("\\neq", 3);
+        numberOfStrokesPerSymbol.put("\\rightarrow", 3);
     }
 
-    public static int getNumberOfStrokesForSymbol(String symbol){
+    public static int getMinimumNumberOfStrokesForSymbol(String symbol){
         if(numberOfStrokesPerSymbol.containsKey(symbol))
             return numberOfStrokesPerSymbol.get(symbol);
         return UNDEFINED_NUMBER_OF_STROKES;

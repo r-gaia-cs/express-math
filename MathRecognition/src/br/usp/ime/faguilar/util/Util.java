@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -37,6 +38,31 @@ public class Util {
          for (int i = listToBeRandomized.size() - 1; i >=0 ; i--) {
              Collections.swap(listToBeRandomized, i, random.nextInt(i + 1));
          }
+     }
+     
+     public static int[] randomNumbers(int numberOfElements, int from, int to){
+         List numbers = new ArrayList<Integer>(to - from + 1); 
+         for (int i = from; i <= to; i++) 
+             numbers.add(i);
+         randomizeInPlaze(numbers);
+         int[] arrayOfNumbers = new int[numberOfElements];
+         for (int i = 0; i < numberOfElements; i++)
+             arrayOfNumbers[i] = (Integer) numbers.get(i);
+         return arrayOfNumbers;
+     }
+     
+     public static int[] sampleNumbers(int numberOfElements, int from, int to){
+         float ratio = (to - from + 1) / numberOfElements;
+         float pos = 0;
+         List numbers = new ArrayList<Integer>(to - from + 1); 
+         for (int i = from; i <= to; i++) 
+             numbers.add(i);
+         int[] arrayOfNumbers = new int[numberOfElements];
+         for (int i = 0; i < numberOfElements; i++) {
+             arrayOfNumbers[i] = (Integer)numbers.get(Math.round(pos));
+             pos += ratio;
+         }
+         return arrayOfNumbers;
      }
 
      public static Object[] toObjectArray(List<?> l){
@@ -118,7 +144,7 @@ public class Util {
          for (int i = 0; i < m.length; i++) {
              T[] ts = m[i];
              for (int j = 0; j < ts.length; j++) {
-                 System.out.print(ts[j]);
+                 System.out.print(ts[j] + " ");
 
              }
              System.out.println("");

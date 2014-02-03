@@ -5,6 +5,7 @@
 package br.usp.ime.faguilar.classification;
 
 import br.usp.ime.faguilar.data.DSymbol;
+import java.util.ArrayList;
 
 /**
  *
@@ -14,6 +15,7 @@ public class ClassificationResult extends Classifible {
     private double cost;
     private DSymbol symbol;
     
+    private ArrayList<ClassificationHypothesis> hypothesis;
     public double getCost() {
         return cost;
     }
@@ -29,4 +31,14 @@ public class ClassificationResult extends Classifible {
     public void setSymbol(DSymbol symbol) {
         this.symbol = symbol;
     }
+
+    public ArrayList<ClassificationHypothesis> getHypothesis() {
+        return hypothesis;
+    }
+
+    public void setHypothesis(ArrayList<ClassificationHypothesis> hypothesis) {
+        this.hypothesis = hypothesis;
+    }
+    
+    
 }

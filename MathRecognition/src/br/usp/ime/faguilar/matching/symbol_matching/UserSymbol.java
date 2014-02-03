@@ -5,11 +5,14 @@
 
 package br.usp.ime.faguilar.matching.symbol_matching;
 
+import java.io.Serializable;
+
 /**
  *
  * @author frank
  */
-public class UserSymbol {
+public class UserSymbol implements Serializable{
+    static final long serialVersionUID = -8563085518696891422L;
     private String userNickName;
     private String symbolLabel;
 
