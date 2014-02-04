@@ -25,11 +25,8 @@ public class IndexedValue implements Comparable{
     @Override
     public int compareTo(Object other) {
         IndexedValue otherValueIndex = (IndexedValue) other;
-        if(getValue() < otherValueIndex.getValue())
-            return -1;
-        else if(getValue() < otherValueIndex.getValue())
-            return 1;
-        return 0;
+        return Double.compare(getValue(), otherValueIndex.getValue());
+        
     }
 
     public int getIndex() {

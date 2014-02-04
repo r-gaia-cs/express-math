@@ -12,6 +12,7 @@ import br.usp.ime.faguilar.data.DMathExpression;
 import br.usp.ime.faguilar.data.DStroke;
 import br.usp.ime.faguilar.data.DSymbol;
 import br.usp.ime.faguilar.directories.MathRecognitionFiles;
+import br.usp.ime.faguilar.feature_extraction.PreprocessingAlgorithms;
 import br.usp.ime.faguilar.segmentation.OrderedStroke;
 import br.usp.ime.faguilar.util.FilesUtil;
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ public class PartitionTreeEvaluator {
             correctLabels = 0;
             reader.read(MathRecognitionFiles.INKML_CROHME_2012_TEST_DIR + aFile);
             mathExpression = reader.getMathExpression().asDMathExpression();
+            mathExpression = PreprocessingAlgorithms.preprocessDMathExpressionWithOrderedStrokes(mathExpression);
             ArrayList strokes = extractStrokes(mathExpression);
 //            PARTITION TREE DOES NOT FINISHES FOR SECOND EXPRESSION OF CROME2012_TEST 
 //            partitionGenerator.generateTree(strokes);
@@ -62,7 +64,7 @@ public class PartitionTreeEvaluator {
             totalCorrectLbels += correctLabels;
         }
         System.out.println("total correct segmentations: " + (float) totalCorrectSegmentations / totalSymbols +
-                "\t" + (float) totalCorrectLbels / totalSymbols );
+                "\t" + (float) totalCorrectLbels / totalCorrectSegmentations );
     }
     
     public static ArrayList extractStrokes(DMathExpression expression){

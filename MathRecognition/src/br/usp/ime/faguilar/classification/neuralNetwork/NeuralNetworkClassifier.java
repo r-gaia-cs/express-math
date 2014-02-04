@@ -28,7 +28,7 @@ public class NeuralNetworkClassifier extends Classifier{
 
     public NeuralNetworkClassifier() {
         neuralNetwork = NeuralNetwork.load(NEURAL_NETWORK_PATH);
-        numberofPossibleClasses = 5;
+        numberofPossibleClasses = 1;
         if(SymbolLabels.getSymbolLabels() == null)
             SymbolLabels.readClassesFromFile();
     }
@@ -94,7 +94,7 @@ public class NeuralNetworkClassifier extends Classifier{
         ArrayList<String> labels = new ArrayList<>();
         for (int i = 0; i < numberofPossibleClasses; i++) {
             labels.add(SymbolLabels.getLabelOfSymbolByIndex(indexedValues.get(
-                    indexedValues.size() - i -1).getIndex()));          
+                    indexedValues.size() - i - 1).getIndex()));          
         }
         return labels;
     }
