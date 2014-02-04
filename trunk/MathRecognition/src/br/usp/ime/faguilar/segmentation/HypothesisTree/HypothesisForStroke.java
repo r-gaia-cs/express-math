@@ -21,8 +21,8 @@ public class HypothesisForStroke {
     
     public ArrayList<SymbolHypothesis> combine(OrderedStroke stroke, 
             OrderedStroke[] otherStrokes){
-        hypothesis = new ArrayList<SymbolHypothesis>();
-        ArrayList<ArrayList<OrderedStroke>> combinations = new ArrayList<ArrayList<OrderedStroke>>();
+        hypothesis = new ArrayList();
+        ArrayList<ArrayList<OrderedStroke>> combinations = new ArrayList();
         combinations(combinations, otherStrokes);
         formHypothesis(combinations, stroke);
         return hypothesis;
@@ -46,7 +46,7 @@ public class HypothesisForStroke {
     private void combinations(
             ArrayList<ArrayList<OrderedStroke>> combinations, OrderedStroke[] otherStrokes) {
 //        combinations = new ArrayList<ArrayList<OrderedStroke>>();
-        ArrayList<OrderedStroke> currentList = new ArrayList<OrderedStroke>();
+        ArrayList<OrderedStroke> currentList = new ArrayList();
         combinations.add(currentList);
         backtrack(combinations, otherStrokes,currentList, 0);
     }
@@ -57,7 +57,7 @@ public class HypothesisForStroke {
             return;
         int nextPosition = i + 1;
         backtrack(combinations, otherStrokes, currentList, nextPosition);
-        ArrayList<OrderedStroke> newList = new ArrayList<OrderedStroke>();
+        ArrayList<OrderedStroke> newList = new ArrayList();
         newList.addAll(currentList);
         newList.add(otherStrokes[i]);
         combinations.add(newList);

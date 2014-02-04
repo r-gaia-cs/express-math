@@ -46,7 +46,7 @@ public class NearestNeighborGraphHypothesisGenerator implements HypothesisGenera
         for (int i = 0; i < hypothesis.length; i++) {
             hypothesis[i] = new SymbolHypothesisForStroke();
         }
-        allHypothesis = new ArrayList<SymbolHypothesis>();
+        allHypothesis = new ArrayList();
     }
 
     public void fillDistancesMatrix(){
@@ -61,7 +61,7 @@ public class NearestNeighborGraphHypothesisGenerator implements HypothesisGenera
 
     public void calculateNearestNeighbors(){
         neighboors = new OrderedStroke[strokes.size()][numberOfNeighbors];
-        ArrayList<NearNeighboor> nearNeighbors = new ArrayList<NearNeighboor>();
+        ArrayList<NearNeighboor> nearNeighbors = new ArrayList();
         NearNeighboor neighbor;
         for (int i = 0; i < strokes.size(); i++) {
             for (int j = 0; j < strokes.size(); j++) {
@@ -81,6 +81,7 @@ public class NearestNeighborGraphHypothesisGenerator implements HypothesisGenera
         }
     }
     
+    @Override
     public List<SymbolHypothesis> getHypothesis(OrderedStroke stroke) {
         return hypothesis[stroke.getIndex()].getHypothesis();     
     }

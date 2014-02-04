@@ -31,12 +31,9 @@ public class NearNeighboor implements Comparable{
         this.indexOfStroke = indexOfStroke;
     }
 
+    @Override
     public int compareTo(Object o) {
-        if (getDistance() > ((NearNeighboor) o).getDistance())
-            return 1;
-        if (getDistance() < ((NearNeighboor) o).getDistance())
-            return -1;
-        return 0;
+        return Double.compare(getDistance(), ((NearNeighboor) o).getDistance());
     }
 
 
