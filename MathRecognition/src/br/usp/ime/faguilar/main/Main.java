@@ -17,7 +17,7 @@ import br.usp.ime.faguilar.evaluation.SymbolTestData;
 import br.usp.ime.faguilar.classification.Classifible;
 import br.usp.ime.faguilar.classification.SymbolLabels;
 import br.usp.ime.faguilar.classification.neuralNetwork.ClassifiactionDataSet;
-import br.usp.ime.faguilar.classification.neuralNetwork.NeuralNetworkClassifier;
+import br.usp.ime.faguilar.classification.neuralNetwork.NeuralNetworkClassifierEvaluator;
 import br.usp.ime.faguilar.conversion.DsymbolToGraphConversor;
 import br.usp.ime.faguilar.conversion.InkmlReader;
 import br.usp.ime.faguilar.cost.CostShapeContextInside;
@@ -41,6 +41,7 @@ import br.usp.ime.faguilar.segmentation.HypothesisTree.HypothesisFilter;
 import br.usp.ime.faguilar.segmentation.HypothesisTree.HypothesisGenerator;
 import br.usp.ime.faguilar.segmentation.HypothesisTree.NearestNeighborGraphHypothesisGenerator;
 import br.usp.ime.faguilar.segmentation.HypothesisTree.Partition;
+import br.usp.ime.faguilar.segmentation.HypothesisTree.PartitionTreeEvaluator;
 import br.usp.ime.faguilar.segmentation.HypothesisTree.PartitionTreeGenerator;
 import br.usp.ime.faguilar.segmentation.HypothesisTree.SymbolHypothesis;
 import br.usp.ime.faguilar.segmentation.SegmentationParameters;
@@ -74,6 +75,7 @@ public class Main {
     private Bag<Integer>[] adj;
     /**
      * @param args the command line arguments
+     * To test sometimes i need to use -Xmx1024m
      */
     public static void main(String[] args) {
         // TODO code application logic here
@@ -88,13 +90,17 @@ public class Main {
         
 //        testClassifier();
         
-//        testSegmentationTree();
+//        PartitionTreeEvaluator.testSegmentationTree();
+        PartitionTreeEvaluator.testSymbolHypothesis();
         
 //        extractFeaturesToTrainNeuralNetwork();
         
 //        ClassifiactionDataSet.testDataSet();
+        
+//        TO TEST NEURAL NETWORK CLASSIFIER
 //        NeuralNetworkClassifier.testNeuralNetworkWithIVCFiles();
-        NeuralNetworkClassifier.testNeuralNetworkWithInkml();
+//        NeuralNetworkClassifierEvaluator.testNeuralNetworkWithInkml();
+//        END-TO TEST NEURAL NETWORK CLASSIFIER        
 //        calculateSymbolStatistics();
 //        testSegmentationAndClassification();
 //        recognizeExpressions(args[0]);
@@ -152,37 +158,7 @@ public class Main {
 //                columns, numberOFFeaturesPerPoint);
     }
     
-    public static void testSegmentationTree(){
-        InkMLInput inkMlInput = new InkMLInput();
-        ArrayList strokes = inkMlInput.extractStrokesFromInkMLFile(
-                MathRecognitionFiles.INKML_CROHME_2012_TEST_DIR + "crohme_f042-eq067.inkml"); //"002-equation004.inkml" "formulaire054-equation056.inkml"  "KME2G3_1_sub_63.inkml"); //"KME2G3_11_sub_95.inkml");
-        PartitionTreeGenerator partitionGenerator = new PartitionTreeGenerator();
-        HypothesisGenerator hypothesisGenerator = new NearestNeighborGraphHypothesisGenerator();
-        
-        ClassifierTest test = new ClassifierTest();
-        test.setClassifier(new ShapeContextClassifier());
-        test.readData();
-        test.prepareClassifier();
-        
-        ClassificationFilter filter = new ClassificationFilter();
-        filter.setClassifier((ShapeContextClassifier) test.getClassifier());
-        ((NearestNeighborGraphHypothesisGenerator) hypothesisGenerator).setFilter(filter);
-        partitionGenerator.setHypothesisGenerator(hypothesisGenerator);
-        partitionGenerator.generateTree(strokes);
-        ArrayList<Partition> partitionsInIncreasingCost = partitionGenerator.getPartitionsInIncreasingCost();
-        System.out.println("num part: " + partitionsInIncreasingCost.size());
-        Partition aPartition;
-        for (int i = 0; i < partitionsInIncreasingCost.size(); i++) {
-            System.out.println("Partition: " );
-            aPartition = partitionsInIncreasingCost.get(i);
-            System.out.println("Cost: " + aPartition.getCost());
-            for (SymbolHypothesis symbolHypothesis : aPartition.getSymbols()) {
-                System.out.println(symbolHypothesis.getLabels().get(0) + " size: " 
-                        + symbolHypothesis.getSymbol().size() + " cost: " + symbolHypothesis.getCost());
-            }
-            System.out.println("\n");
-        }
-    }
+    
 
     public static void recognizeExpression(String[] inputAndOutputFiles){
             SegmentationAndClassificationEvaluator evaluator = new SegmentationAndClassificationEvaluator(
