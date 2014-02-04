@@ -20,8 +20,7 @@ public class SymbolHypothesis {
     private boolean[] binaryRepresentation;
     private DSymbol symbol;
     private double cost;
-    private ArrayList<String> labels;
-    
+    private ArrayList<String> labels;    
     public static int BINARY_REPRESENTATION_LENGHT = 20;   
     
     public SymbolHypothesis(){
@@ -35,7 +34,7 @@ public class SymbolHypothesis {
     public void setLabels(ArrayList<String> labels) {
         this.labels = labels;
     }
-
+    
     public DSymbol getSymbol() {
         return symbol;
     }
@@ -61,7 +60,14 @@ public class SymbolHypothesis {
         }
         return equal;
     }
-
+    
+    public boolean hasLabel(String label){
+        for (String string : labels) {
+            if(string.equals(label))
+                return true;
+        }
+        return false;
+    }
 //    @Override
 //    public int hashCode() {
 //        int hash = 3;

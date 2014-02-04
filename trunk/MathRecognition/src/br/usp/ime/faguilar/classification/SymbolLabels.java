@@ -20,9 +20,10 @@ import java.util.logging.Logger;
 public class SymbolLabels {
     private static ArrayList<String> symbolLabels;
     private static Map<String, Integer> labelToPosition;
+    private static final String LABELS_PATH = "listSymbols.txt";
 
-    public static void readClassesFromFile(String path){
-        BufferedReader bufferedReader = FilesUtil.getBufferedReader(path);
+    public static void readClassesFromFile(){
+        BufferedReader bufferedReader = FilesUtil.getBufferedReader(LABELS_PATH);
         symbolLabels = new ArrayList<>();
         labelToPosition = new HashMap<>();
         String line;
@@ -51,4 +52,14 @@ public class SymbolLabels {
     public static int getIndexOfSymbolByLabel(String label){
         return labelToPosition.get(label);
     }
+
+    public static ArrayList<String> getSymbolLabels() {
+        return symbolLabels;
+    }
+
+    public static void setSymbolLabels(ArrayList<String> symbolLabels) {
+        SymbolLabels.symbolLabels = symbolLabels;
+    }
+    
+    
 }

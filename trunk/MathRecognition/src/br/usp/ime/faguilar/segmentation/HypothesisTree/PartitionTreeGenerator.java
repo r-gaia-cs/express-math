@@ -70,6 +70,10 @@ public class PartitionTreeGenerator {
         }
         return nodes;
     }
+    
+    public ArrayList<SymbolHypothesis> getHypothesis(){
+        return hypothesisGenerator.getAllHypothesis();
+    }
 
     public ArrayList<Partition> getPartitionsInIncreasingCost(){
         return partitionTree.getPartitionsInIncreasingCost();

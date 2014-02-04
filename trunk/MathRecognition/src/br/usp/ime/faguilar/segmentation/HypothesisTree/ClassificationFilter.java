@@ -8,7 +8,9 @@ package br.usp.ime.faguilar.segmentation.HypothesisTree;
 
 import br.usp.ime.faguilar.classification.Classifible;
 import br.usp.ime.faguilar.classification.ClassificationResult;
+import br.usp.ime.faguilar.classification.Classifier;
 import br.usp.ime.faguilar.classification.ShapeContextClassifier;
+import br.usp.ime.faguilar.classification.neuralNetwork.NeuralNetworkClassifier;
 import java.util.ArrayList;
 
 /**
@@ -16,10 +18,11 @@ import java.util.ArrayList;
  * @author Frank Aguilar
  */
 public class ClassificationFilter implements HypothesisFilter{
-    private ShapeContextClassifier classifier;
+    private Classifier classifier;
 
     public ClassificationFilter() {
-        classifier = new ShapeContextClassifier();
+//        classifier = new ShapeContextClassifier();
+        classifier = new NeuralNetworkClassifier();
     }
     
     @Override
@@ -36,17 +39,18 @@ public class ClassificationFilter implements HypothesisFilter{
                 listOfClasses.add((String) clasResult.getMyClass());
                 symbolHypothesis.setLabels(listOfClasses);
                 symbolHypothesis.setCost(clasResult.getCost());
+                symbolHypothesis.setLabels((ArrayList<String>) classifier.orderedListOfClasses());
                 selected.add(symbolHypothesis);
             }
         }
         return selected;
     }
 
-    public ShapeContextClassifier getClassifier() {
+    public Classifier getClassifier() {
         return classifier;
     }
 
-    public void setClassifier(ShapeContextClassifier classifier) {
+    public void setClassifier(Classifier classifier) {
         this.classifier = classifier;
     }
     

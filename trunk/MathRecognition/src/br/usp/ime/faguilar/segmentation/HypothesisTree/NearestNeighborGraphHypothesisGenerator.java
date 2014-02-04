@@ -17,7 +17,8 @@ import java.util.List;
  * @author Frank Aguilar
  */
 public class NearestNeighborGraphHypothesisGenerator implements HypothesisGenerator{
-    private final int numberOfNeighbors = 3;
+    private static final int DEFAULT_NUMBER_OF_NEIGHBORS = 3;
+    private int numberOfNeighbors;
 
     double[][] distances;
     private OrderedStroke[][] neighboors;
@@ -27,6 +28,7 @@ public class NearestNeighborGraphHypothesisGenerator implements HypothesisGenera
     private SymbolHypothesisForStroke[] hypothesis;
     private ArrayList<SymbolHypothesis> allHypothesis;
 
+    @Override
     public void generateHypothesis(ArrayList<OrderedStroke> strokes) {
         init(strokes);
         fillDistancesMatrix();
@@ -38,6 +40,7 @@ public class NearestNeighborGraphHypothesisGenerator implements HypothesisGenera
     
     private void init(ArrayList<OrderedStroke> inputStrokes){
         this.strokes = inputStrokes;
+        numberOfNeighbors = Math.min(DEFAULT_NUMBER_OF_NEIGHBORS, strokes.size() - 1);
         SymbolHypothesis.BINARY_REPRESENTATION_LENGHT = (int) Math.pow(2, Math.ceil(Math.log(strokes.size())/ Math.log(2)));
         hypothesis = new SymbolHypothesisForStroke[strokes.size()];
         for (int i = 0; i < hypothesis.length; i++) {
@@ -141,6 +144,9 @@ public class NearestNeighborGraphHypothesisGenerator implements HypothesisGenera
         allHypothesis = filter.filter(allHypothesis);
     }
 
-    
+    public ArrayList<SymbolHypothesis> getAllHypothesis() {
+        return allHypothesis;
+    }
+
     
 }
