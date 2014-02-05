@@ -31,6 +31,7 @@ public class DSymbol extends MathExpressionData<DStroke>
         label="";
     }
 
+    @Override
     public boolean addCheckingBoundingBox(DStroke e) {
         Point2D p1=e.getLtPoint();
         Point2D p2=e.getRbPoint();

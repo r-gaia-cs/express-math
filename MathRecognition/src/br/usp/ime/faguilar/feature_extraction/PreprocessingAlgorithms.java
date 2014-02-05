@@ -42,7 +42,7 @@ public class PreprocessingAlgorithms {
     public static DMathExpression preprocessDMathExpressionWithOrderedStrokes(DMathExpression expression){
         DMathExpression newExpression=new GMathExpression();
         for (DSymbol symbol : expression) {
-            DSymbol newSymbol=preprocessDSymbolWithOrderedStrokes(symbol);
+            DSymbol newSymbol = preprocessDSymbolWithOrderedStrokes(symbol);
             newExpression.addCheckingBoundingBox(newSymbol);
         }
         return newExpression;

@@ -59,7 +59,7 @@ public class InkmlMathExpression {
     }
 
     private OrderedStroke getTraceAsStroke(int traceIndex){
-        OrderedStroke stroke =new OrderedStroke();
+        OrderedStroke stroke = new OrderedStroke();
         Trace trace = getTraces().get(traceIndex);
         TimePoint timePoint;
         for (Point2D point : trace.getPoints()) {

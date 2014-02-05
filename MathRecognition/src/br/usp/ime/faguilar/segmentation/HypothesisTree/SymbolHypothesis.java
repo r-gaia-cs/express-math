@@ -27,6 +27,10 @@ public class SymbolHypothesis {
         binaryRepresentation = new boolean[BINARY_REPRESENTATION_LENGHT];
     }
     
+    public SymbolHypothesis(int bynaryRepresentationSize){
+        binaryRepresentation = new boolean[bynaryRepresentationSize];
+    }
+    
     public ArrayList<String> getLabels() {
         return labels;
     }

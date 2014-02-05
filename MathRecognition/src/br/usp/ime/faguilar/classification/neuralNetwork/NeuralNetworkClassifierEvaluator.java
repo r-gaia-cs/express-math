@@ -166,40 +166,42 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
     }
     
     public static void testNeuralNetworkWithInkml(){
-        ClassifierTest classifierTest =  new ClassifierTest();
-        classifierTest.readData();
-        classifierTest.partData();
-        ArrayList<Classifible> trainClassifibles = classifierTest.getTrainData();
-//        ArrayList<Classifible> testClassifibles = SymbolUtil.readTemplatesFromInkmlFiles(MathRecognitionFiles.TEST_FILES_CROHME,
-//                MathRecognitionFiles.INKML_CROHME_2012_TEST_DIR);
+//        ClassifierTest classifierTest =  new ClassifierTest();
+//        classifierTest.readData();
+//        classifierTest.partData();
+//        ArrayList<Classifible> trainClassifibles = classifierTest.getTrainData();
+        
+        ArrayList<Classifible> testClassifibles = SymbolUtil.readTemplatesFromInkmlFiles(MathRecognitionFiles.TEST_FILES_CROHME,
+                MathRecognitionFiles.INKML_CROHME_2012_TEST_DIR);
                 
         NeuralNetwork nn;
         NeuralNetworkClassifierEvaluator nnetworkToTest = new NeuralNetworkClassifierEvaluator();
         int numberID;
        String result1, result2;
        SymbolLabels.readClassesFromFile();
-       nnetworkToTest.setTrainingData(trainClassifibles);
+//       nnetworkToTest.setTrainingData(trainClassifibles);
 //       System.out.println("start training...");
 //       nnetworkToTest.train();
       
         DataSet testDataset;
         System.out.println("Testing ...");
-        for (numberID = 20; numberID <= 400; numberID += 20) {
-            nn = null;
-            nn = NeuralNetwork.load("neural_network_6_angular_regions_rate_variable_" + numberID);
+        for (numberID = 4000; numberID <= 4000; numberID += 20) {
+//            nn = null;
+            nn = NeuralNetwork.load("neural_network_fuzzy" + numberID);
             nnetworkToTest.setNeuralNetwork(nn);
-            result1 = nnetworkToTest.testNeuralNetwork(nnetworkToTest.getTrainDataset());
-//            nnetworkToTest.getTrainDataset().saveAsTxt("dataFuzzyTrain", "\t");
-            testDataset = new DataSet(nnetworkToTest.getInputSize(), nnetworkToTest.getOutputSize());
-            nnetworkToTest.fillDatasetWithClassifibles(testDataset, classifierTest.getTestData());
-            result2 = nnetworkToTest.testNeuralNetwork(testDataset);
-            System.out.printf("%s\t%s\n", result1, result2);
+            
+//            result1 = nnetworkToTest.testNeuralNetwork(nnetworkToTest.getTrainDataset());
+////            nnetworkToTest.getTrainDataset().saveAsTxt("dataFuzzyTrain", "\t");
+//            testDataset = new DataSet(nnetworkToTest.getInputSize(), nnetworkToTest.getOutputSize());
+//            nnetworkToTest.fillDatasetWithClassifibles(testDataset, classifierTest.getTestData());
+//            result2 = nnetworkToTest.testNeuralNetwork(testDataset);
+//            System.out.printf("%s\t%s\n", result1, result2);
 ////            
 //            TO TEST DATASET
-//            testDataset = new DataSet(nnetworkToTest.getInputSize(), nnetworkToTest.getOutputSize());
-//            nnetworkToTest.fillDatasetWithClassifibles(testDataset, testClassifibles);
-//            result2 = nnetworkToTest.testNeuralNetwork(testDataset);
-//            System.out.printf("%s\n", result2);
+            testDataset = new DataSet(nnetworkToTest.getInputSize(), nnetworkToTest.getOutputSize());
+            nnetworkToTest.fillDatasetWithClassifibles(testDataset, testClassifibles);
+            result2 = nnetworkToTest.testNeuralNetwork(testDataset);
+            System.out.printf("%s\n", result2);
         }        
     }
 
