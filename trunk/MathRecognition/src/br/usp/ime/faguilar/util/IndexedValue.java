@@ -26,7 +26,6 @@ public class IndexedValue implements Comparable{
     public int compareTo(Object other) {
         IndexedValue otherValueIndex = (IndexedValue) other;
         return Double.compare(getValue(), otherValueIndex.getValue());
-        
     }
 
     public int getIndex() {
@@ -43,7 +42,5 @@ public class IndexedValue implements Comparable{
 
     public void setValue(double value) {
         this.value = value;
-    }
-    
-    
+    }   
 }

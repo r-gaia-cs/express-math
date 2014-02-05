@@ -25,10 +25,11 @@ public class NeuralNetworkClassifier extends Classifier{
     private static final String NEURAL_NETWORK_PATH = "neural_network_fuzzy4000";
     private NeuralNetwork neuralNetwork;
     private int numberofPossibleClasses;
+    private double[] networkOutput;
 
     public NeuralNetworkClassifier() {
         neuralNetwork = NeuralNetwork.load(NEURAL_NETWORK_PATH);
-        numberofPossibleClasses = 1;
+        numberofPossibleClasses = 5;
         if(SymbolLabels.getSymbolLabels() == null)
             SymbolLabels.readClassesFromFile();
     }
@@ -49,7 +50,7 @@ public class NeuralNetworkClassifier extends Classifier{
         double[] input = NeuralNetworkFeatures.extractMergedFeatures(classifible.getSymbol());
         neuralNetwork.setInput(input);
         neuralNetwork.calculate();
-        double[] networkOutput = neuralNetwork.getOutput();
+        networkOutput = neuralNetwork.getOutput();
         int classIndex = extractClassIndexFromOutput(networkOutput);
         String label = SymbolLabels.getLabelOfSymbolByIndex(classIndex);
         result.setMyClass(label);
@@ -85,16 +86,19 @@ public class NeuralNetworkClassifier extends Classifier{
 
     @Override
     public Object orderedListOfClasses() {
-        double[] networkOutput = neuralNetwork.getOutput();
+//        double[] networkOutput = neuralNetwork.getOutput();
         ArrayList<IndexedValue> indexedValues = new ArrayList();
         for (int i = 0; i < networkOutput.length; i++) {
-            indexedValues.add(IndexedValue.createIndexedValueFromIndexAndValue(i, networkOutput[i]));            
+            indexedValues.add(IndexedValue.createIndexedValueFromIndexAndValue(
+                    i, networkOutput[i]));            
         }
         Collections.sort(indexedValues);
         ArrayList<String> labels = new ArrayList<>();
         for (int i = 0; i < numberofPossibleClasses; i++) {
             labels.add(SymbolLabels.getLabelOfSymbolByIndex(indexedValues.get(
-                    indexedValues.size() - i - 1).getIndex()));          
+                    indexedValues.size() - i - 1).getIndex()));    
+//            labels.add(SymbolLabels.getLabelOfSymbolByIndex(
+//                    indexedValues.get(i).getIndex()));
         }
         return labels;
     }

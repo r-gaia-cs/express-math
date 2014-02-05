@@ -13,6 +13,7 @@ import br.usp.ime.faguilar.data.DStroke;
 import br.usp.ime.faguilar.data.DSymbol;
 import br.usp.ime.faguilar.directories.MathRecognitionFiles;
 import br.usp.ime.faguilar.feature_extraction.PreprocessingAlgorithms;
+import static br.usp.ime.faguilar.segmentation.HypothesisTree.SymbolHypothesis.BINARY_REPRESENTATION_LENGHT;
 import br.usp.ime.faguilar.segmentation.OrderedStroke;
 import br.usp.ime.faguilar.util.FilesUtil;
 import java.util.ArrayList;
@@ -63,8 +64,8 @@ public class PartitionTreeEvaluator {
             totalCorrectSegmentations += correctSegmentations;
             totalCorrectLbels += correctLabels;
         }
-        System.out.println("total correct segmentations: " + (float) totalCorrectSegmentations / totalSymbols +
-                "\t" + (float) totalCorrectLbels / totalCorrectSegmentations );
+        System.out.println("total correct segmentations: " + (float) totalCorrectSegmentations * 100 / totalSymbols +
+                "\t" + (float) totalCorrectLbels * 100 / totalCorrectSegmentations );
     }
     
     public static ArrayList extractStrokes(DMathExpression expression){
@@ -79,28 +80,29 @@ public class PartitionTreeEvaluator {
     
     public static void countCorrectSegmentations(ArrayList<SymbolHypothesis> hypothesis, 
             DMathExpression mathExpression){
-        int count = 0;
-        int countCorrectLabels = 0;
+        correctSegmentations = 0;
+        correctLabels = 0;
         for (DSymbol dSymbol : mathExpression) {
             for (SymbolHypothesis symbolHypothesis : hypothesis) {
-                if(haveSymbol(symbolHypothesis, dSymbol)){
-                    count++;
+                if(isHypothesisOfSymbol(symbolHypothesis, dSymbol)){
+                    correctSegmentations++;
                     if(symbolHypothesis.hasLabel(dSymbol.getLabel()))
-                        countCorrectLabels++;
+                        correctLabels++;
                     break;
                 }
             }
         }
-        correctSegmentations = count;
-        correctLabels = countCorrectLabels;
     }
     
-    public static boolean haveSymbol(SymbolHypothesis hypothesis, DSymbol symbol){
-        for (DStroke dStroke : symbol) {
-             if(!hypothesis.getBinaryRepresentation()[((OrderedStroke) dStroke).getIndex()])
-                 return false;
-        }
-        return true;
+    public static boolean isHypothesisOfSymbol(SymbolHypothesis hypothesis, DSymbol symbol){
+        SymbolHypothesis newHypothesis = new SymbolHypothesis(hypothesis.getBinaryRepresentation().length);
+        newHypothesis.setSymbol(symbol);
+        return hypothesis.hasSameStrokes(newHypothesis);
+//        for (DStroke dStroke : symbol) {
+//             if(!hypothesis.getBinaryRepresentation()[((OrderedStroke) dStroke).getIndex()])
+//                 return false;
+//        }
+//        return true;
     }
     
     public static void testSegmentationTree(){

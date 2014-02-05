@@ -29,15 +29,15 @@ public class ClassificationFilter implements HypothesisFilter{
     public ArrayList<SymbolHypothesis> filter(ArrayList<SymbolHypothesis> hypothesis) {
         ArrayList<SymbolHypothesis> selected = new ArrayList();
         ClassificationResult clasResult;
-        ArrayList<String> listOfClasses;
+//        ArrayList<String> listOfClasses;
         for (SymbolHypothesis symbolHypothesis : hypothesis) {
             Classifible classifible = new Classifible();
             classifible.setSymbol(symbolHypothesis.getSymbol());
             clasResult = (ClassificationResult) classifier.classify(classifible);
             if(clasResult != null){
-                listOfClasses = new ArrayList();
-                listOfClasses.add((String) clasResult.getMyClass());
-                symbolHypothesis.setLabels(listOfClasses);
+//                listOfClasses = new ArrayList();
+//                listOfClasses.add((String) clasResult.getMyClass());
+//                symbolHypothesis.setLabels(listOfClasses);
                 symbolHypothesis.setCost(clasResult.getCost());
                 symbolHypothesis.setLabels((ArrayList<String>) classifier.orderedListOfClasses());
                 selected.add(symbolHypothesis);

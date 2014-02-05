@@ -12,8 +12,6 @@ import br.usp.ime.faguilar.graphics.GStroke;
  */
 public class OrderedStroke extends GStroke implements Comparable{
     private int index;
-
-    
     
     public int getIndex() {
         return index;
@@ -23,8 +21,8 @@ public class OrderedStroke extends GStroke implements Comparable{
         this.index = index;
     }
 
+    @Override
     public int compareTo(Object o) {
         return getIndex() - ((OrderedStroke) o).getIndex();
     }
-
 }
