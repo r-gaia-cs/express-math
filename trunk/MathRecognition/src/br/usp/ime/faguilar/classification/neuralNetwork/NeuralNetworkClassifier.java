@@ -29,7 +29,7 @@ public class NeuralNetworkClassifier extends Classifier{
 
     public NeuralNetworkClassifier() {
         neuralNetwork = NeuralNetwork.load(NEURAL_NETWORK_PATH);
-        numberofPossibleClasses = 5;
+        numberofPossibleClasses = 10;
         if(SymbolLabels.getSymbolLabels() == null)
             SymbolLabels.readClassesFromFile();
     }
@@ -106,7 +106,7 @@ public class NeuralNetworkClassifier extends Classifier{
     public NeuralNetwork getNeuralNetwork() {
         return neuralNetwork;
     }
-
+    
     public void setNeuralNetwork(NeuralNetwork neuralNetwork) {
         this.neuralNetwork = neuralNetwork;
     }
