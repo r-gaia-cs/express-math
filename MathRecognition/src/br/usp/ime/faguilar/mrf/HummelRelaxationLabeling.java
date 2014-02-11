@@ -20,7 +20,7 @@ public class HummelRelaxationLabeling {
     private ArrayList<NodeLabeling> nodesLabeling;
     private double factor;
     private double maxFactor;
-    private static double decreaseOFFactor = 0.95;
+    private static final double decreaseOFFactor = 0.99;
     private CompatibilityFunction compatibilityFunction;
     
     public HummelRelaxationLabeling(){
