@@ -21,6 +21,8 @@ public class HummelRelaxationLabeling {
     private double factor;
     private double maxFactor;
     private static final double decreaseOFFactor = 0.99;
+    private static final double const1 = 1;
+    private static final double const2 = 1;
     private CompatibilityFunction compatibilityFunction;
     
     public HummelRelaxationLabeling(){
@@ -173,48 +175,5 @@ public class HummelRelaxationLabeling {
             for (int i = 0; i < nodeLabeling.getNumberOfLabels(); i++)
                 nodeLabeling.setLabelingScoreAt(i, nodeLabeling.getLAbelingScoreAt(i) + 
                         nodeLabeling.getDirectionAt(i) * factor);
-    }
-    
-    private class NodeLabeling{
-        private double[] labelingScores;
-        private double[] gradients;
-        private double[] directions;
-        private ArrayList neighboors;
-        private Object node;
-
-        private double getLAbelingScoreAt(int position){
-            return labelingScores[position];
-        }
-        
-        private double getDirectionAt(int position){
-            return directions[position];
-        }
-        
-        private double getGradientAt(int position){
-            return gradients[position];
-        }
-        
-        private int getNumberOfLabels(){
-            return labelingScores.length;
-        }
-        
-        private void setLabelingScoreAt(int position, double score){
-            labelingScores[position] = score;
-        }
-        
-        private void setGradientAt(int position, double gradient){
-            gradients[position] = gradient;
-        }
-        
-        private void setDirectionAt(int position, double direction){
-            directions[position] = direction;
-        }
-
-        private void updateGradients() {
-            for (int i = 0; i < gradients.length; i++) {
-//                doublr unari_compatibility = 
-//                update gradients
-            }
-        }
     }
 }
