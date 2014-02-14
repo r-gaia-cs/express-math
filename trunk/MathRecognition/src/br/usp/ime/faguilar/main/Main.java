@@ -62,6 +62,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -80,35 +81,35 @@ public class Main {
     public static void main(String[] args) {
         // TODO code application logic here
 //        showEvaluationView();
-
 //        TO CALCULATE COST FOR MARCELO
 //        ShapeContextDistanceCalculator calculator = new ShapeContextDistanceCalculator();
 //        FilesUtil.append("custos.txt", String.valueOf(calculator.calculateDistance(args)
 //                + "\n"));
 //        System.out.println(calculator.calculateDistance(args));
 //        END TO CALCULATE COSTS FOR MARCELO
-        
 //        testClassifier();
-        
 //        PartitionTreeEvaluator.testSegmentationTree();
-        PartitionTreeEvaluator.testSymbolHypothesis();
-        
+//        PartitionTreeEvaluator.testSymbolHypothesis();
 //        extractFeaturesToTrainNeuralNetwork();
-        
 //        ClassifiactionDataSet.testDataSet();
+        
+//        ArrayList<String> notHiddenFileNames = FilesUtil.getNotHiddenFileNames("C:\\Users\\Frank Aguilar\\Documents\\frank\\doctorado\\programa\\MathFiles\\CROHME\\2013\\train");
+//        Collections.shuffle(notHiddenFileNames);
+//        for (String string : notHiddenFileNames) {
+//            FilesUtil.append("crohme2013_randomizedFileNames.txt", string + "\n");
+//        }
         
 //        TO TEST NEURAL NETWORK CLASSIFIER
 //        NeuralNetworkClassifier.testNeuralNetworkWithIVCFiles();
-//        NeuralNetworkClassifierEvaluator.testNeuralNetworkWithInkml();
+        NeuralNetworkClassifierEvaluator.testNeuralNetworkWithInkml();
+//        NeuralNetworkClassifierEvaluator.runKFoldEvaluation();
 //        END-TO TEST NEURAL NETWORK CLASSIFIER        
 //        calculateSymbolStatistics();
 //        testSegmentationAndClassification();
 //        recognizeExpressions(args[0]);
-
 //        To recognize an individual expression
 //        args = new String[]{"formulaire046-equation062.inkml", "formulaire046-equation062.lg"};
 //        recognizeExpression(args);
-        
 //        executeFileNamesPartitionFromPath();
 //        executeFileNamesPartitionFromFile();
 //        SymbolUtil.partSymbolsInSeveralFiles(EvaluationView.TEMPLATES_FILE);

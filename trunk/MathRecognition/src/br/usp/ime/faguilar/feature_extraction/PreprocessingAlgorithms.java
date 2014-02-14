@@ -128,7 +128,8 @@ public class PreprocessingAlgorithms {
 //        int numStrokes=s.size();
 //        int total=0;
 
-        int[]pointsPerStroke=extractNNumberOfPointsPerStroke(s, N);
+//        int[]pointsPerStroke = extractNNumberOfPointsPerStroke(s, N);
+        int[]pointsPerStroke = extractNNumberOfPointsPerStrokeUsingLenght(s, N);
 
         for (int i = 0; i < pointsPerStroke.length; i++) {
 //            Point2D[] pts=getNPoints(s.get(i), pointsPerStroke);
@@ -164,7 +165,8 @@ public class PreprocessingAlgorithms {
     
     public static ShapeContextFeature getNGeneralizedShapeContetxFeatures(DSymbol s,int N){
         ShapeContextFeature features = new ShapeContextFeature();
-        int[] pointsPerStroke = extractNNumberOfPointsPerStroke(s, N);
+//        int[] pointsPerStroke = extractNNumberOfPointsPerStroke(s, N);
+        int[] pointsPerStroke = extractNNumberOfPointsPerStrokeUsingLenght(s, N);
 
         for (int i = 0; i < pointsPerStroke.length; i++) {
             ArrayList<FeatureGroup> newFeatures = getNShapeContetxFeatures(s, s.get(i), pointsPerStroke[i]);
@@ -182,7 +184,8 @@ public class PreprocessingAlgorithms {
     
     public static ShapeContextFeature getFuzzyShapeContetxFeatures(DSymbol s,int N){
         ShapeContextFeature features = new ShapeContextFeature();
-        int[] pointsPerStroke = extractNNumberOfPointsPerStroke(s, N);
+//        int[] pointsPerStroke = extractNNumberOfPointsPerStroke(s, N);
+        int[] pointsPerStroke = extractNNumberOfPointsPerStrokeUsingLenght(s, N);
 
         for (int i = 0; i < pointsPerStroke.length; i++) {
             ArrayList<FeatureGroup> newFeatures = getNShapeContetxFeatures(s, s.get(i), pointsPerStroke[i]);
@@ -235,6 +238,42 @@ public class PreprocessingAlgorithms {
        }
        return numberOfPoints;
     }
+    
+    public static int[] extractNNumberOfPointsPerStrokeUsingLenght(DSymbol s,int N){
+        double totalLenght= getLength(s);
+        if(totalLenght <= 0)
+            return new int[]{N};
+        int[] numberOfPoints = new int[s.size()];
+        int totalPoints = 0;
+        for (int i = 0; i < s.size(); i++) {
+            numberOfPoints[i] = (int) Math.round((getLength(s.get(i)) / totalLenght) * N);
+            if(numberOfPoints[i] <= 0)
+                numberOfPoints[i] = 1;
+            totalPoints += numberOfPoints[i];
+            if(i == s.size() -1){
+                if(totalPoints < N)
+                    numberOfPoints[i] += N - totalPoints;
+                else if(totalPoints > N)
+                    numberOfPoints[i] += totalPoints - N;
+            }
+        }
+       return numberOfPoints;
+    }
+    
+    public static double getLength(DSymbol symbol){
+        double length = 0;
+        for (DStroke dStroke : symbol) {
+            length += getLength(dStroke);
+        }
+        return length;
+    }
+    
+    public static double getLength(DStroke stroke){
+        double length = 0;
+        for (int i = 1; i < stroke.size(); i++)
+            length += stroke.get(i).distance(stroke.get(i - 1));
+        return length;
+    } 
 
     public static int sum(int[] numbers){
         int sum=0;
@@ -586,7 +625,7 @@ public class PreprocessingAlgorithms {
 //                }
                 dist=getDistance(copyOfPoints, i, j);
                 if(length<dist){
-                    Point2D newPoint=getNewPoint(copyOfPoints.get(i),
+                    Point2D newPoint = getNewPoint(copyOfPoints.get(i),
                             copyOfPoints.get(j),length);
                     resampledPoints.add(newPoint);
                     copyOfPoints.get(i).setLocation(newPoint.getX(),newPoint.getY());
@@ -602,7 +641,7 @@ public class PreprocessingAlgorithms {
                         break;
                     }
 //                    double Ldif=dist-length;
-                    double Ldif=length-getDistance(copyOfPoints, i, j-1);;
+                    double Ldif=length-getDistance(copyOfPoints, i, j-1);
                     Point2D newPoint=getNewPoint(copyOfPoints.get(j-1),
                             copyOfPoints.get(j),Ldif);
                     resampledPoints.add(newPoint);

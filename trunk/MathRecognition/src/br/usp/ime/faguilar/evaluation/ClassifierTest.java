@@ -246,4 +246,7 @@ public class ClassifierTest {
         this.gama = gama;
     }
     
+    public Map getMap(){
+        return symbolData.getMap();
+    }
 }
