@@ -272,18 +272,18 @@ public class SymbolUtil {
     }
 
     private static ArrayList<Classifible> readClassifiblesFromInkmlFiles(String[] fileNames) {
-        ArrayList<Classifible> classifibles = new ArrayList<Classifible>();
+        ArrayList<Classifible> classifibles = new ArrayList();
         ArrayList<Classifible> symbolsOfAFile;
         for (String aFileName: fileNames) {
-            if(aFileName.contains(".inkml") && !aFileName.contains("hirata") && !aFileName.contains("Nina")
-                    && !aFileName.contains("fujita")){
+//            if(aFileName.contains(".inkml") && !aFileName.contains("hirata") && !aFileName.contains("Nina")
+//                    && !aFileName.contains("fujita")){
 //                symbolsOfAFile = readInkmlClassifibles(DIR_COMPLEMENT+ aFileName);
                 symbolsOfAFile = readInkmlClassifibles(FILES_FOLDER + aFileName);
 //readInkmlClassifibles(MathRecognitionFiles.INKML_CROHME_2012_TRAIN_DIR + aFileName);
                 
 //                symbolsOfAFile = readInkmlClassifibles(EvaluationView.INKML_CHROME_2013_DIR + aFileName);
                 classifibles.addAll(symbolsOfAFile);
-            }
+//            }
         }
 //        System.out.println("min width of minus: " + MIN_WIDTH);
         return classifibles;
@@ -307,24 +307,23 @@ public class SymbolUtil {
         Classifible newClassifible;
 //        String[] fileNameArray = fileName.split("_");
 //        String userName = fileNameArray[1].substring(0, fileNameArray[1].length() - 4);
-        String userName = reader.getMathExpression().getWriter();
+//        String userName = reader.getMathExpression().getWriter();
         for (DSymbol symbol : mathExpression) {
             newSymbol = PreprocessingAlgorithms.preprocessDSymbolWithOrderedStrokes(symbol);
             newClassifible = new Classifible();
-            newClassifible.setUserSymbol(UserSymbol.newInstanceFromUserNickNameAndSymbolLabel(
-                    userName, newSymbol.getLabel()));
+//            newClassifible.setUserSymbol(UserSymbol.newInstanceFromUserNickNameAndSymbolLabel(
+//                    userName, newSymbol.getLabel()));
             newClassifible.setSymbol(newSymbol);
             newClassifible.setMyClass(newSymbol.getLabel());
 //            ShapeContextFeature inputFeatures = PreprocessingAlgorithms.getNShapeContetxFeatures(newSymbol, 
 //                MatchingParameters.numberOfPointPerSymbol);
 
 //            TO CALCULATE NGENERALIZED SHAPE CONTEXTS
-            ShapeContextFeature inputFeatures = PreprocessingAlgorithms.getNGeneralizedShapeContetxFeatures(newSymbol,
-                MatchingParameters.numberOfPointPerSymbol);
-            newClassifible.setAditionalFeatures(inputFeatures);
+//            ShapeContextFeature inputFeatures = PreprocessingAlgorithms.getNGeneralizedShapeContetxFeatures(newSymbol,
+//                MatchingParameters.numberOfPointPerSymbol);
+//            newClassifible.setAditionalFeatures(inputFeatures);
 //
 //            END- TO CALCULATE NGENERALIZED SHAPE CONTEXTS
-
             symbolData.add(newClassifible);
 //            if(symbol.getWidthAsDouble() < 0)
 //                System.out.println("less than zero");

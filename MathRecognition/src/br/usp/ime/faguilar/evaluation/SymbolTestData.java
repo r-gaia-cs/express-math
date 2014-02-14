@@ -34,6 +34,12 @@ public class SymbolTestData {
         list.add(classifible);
         map.put(classifible.getMyClass(), list);
     }
+    
+    public void addClassifibles(ArrayList<Classifible> clasifibles){
+        for (Classifible classifible : clasifibles) {
+            addClassyfible(classifible);
+        }
+    }
 
     public static String getTrainingFrequencies(){
         // Initialize frequency table from command line
@@ -44,6 +50,13 @@ public class SymbolTestData {
         return getFrequencies(allSymbols);
     }
 
+    public void printLabels(){
+        for (Object object : map.keySet()) {
+            System.out.println(object);
+        }
+    }
+    
+    
     public static String getFrequencies(ArrayList<Classifible> allSymbols){
         // Initialize frequency table from command line
 //        ArrayList<Classifible> allSymbols = SymbolUtil.readSymbolData(EvaluationView.TEMPLATES_FILE);

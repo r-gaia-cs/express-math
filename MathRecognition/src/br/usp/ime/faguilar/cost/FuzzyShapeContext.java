@@ -52,10 +52,13 @@ public class FuzzyShapeContext extends ShapeContext{
 
         //matriz de distancias
         float[][] dist = new float[totPoints][totPoints];
-        for (int i = 0; i < totPoints; i++)
-            for (int j = 0; j < totPoints; j++) {
+        for (int i = 0; i < totPoints; i++){
+            dist[i][i] = 0;
+            for (int j = i + 1; j < totPoints; j++) {
                 dist[i][j] = (float)this.euclideanDistance(vertexList[i], vertexList[j]);
+                dist[j][i] = dist[i][j];
             }
+        }
 
         float[]distCenter = new float[totPoints];
         Point2D center = graph.getCentroid();

@@ -31,7 +31,7 @@ public class NeuralNetworkClassifier extends Classifier{
         neuralNetwork = NeuralNetwork.load(NEURAL_NETWORK_PATH);
         numberofPossibleClasses = 10;
         if(SymbolLabels.getSymbolLabels() == null)
-            SymbolLabels.readClassesFromFile();
+            SymbolLabels.readCrohme2012Labels();
     }
        
     @Override
