@@ -253,28 +253,31 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
     
     public static void exportKFoldFiles(){
         NeuralNetworkClassifierEvaluator evaluator = new NeuralNetworkClassifierEvaluator();
-        ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles(MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
-                MathRecognitionFiles.INKML_CROHME_2013_TRAIN_DIR);
-        SymbolTestData symbolData = new SymbolTestData();
-        symbolData.addClassifibles(classifibles);
-//        symbolData.printLabels();
+        ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles(MathRecognitionFiles.INKML_CROHME_2013_TEST_FILES,//MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
+                MathRecognitionFiles.INKML_CROHME_2013_TEST_DIR);
         
-        KFoldPartitioner partitioner = new KFoldPartitioner();
-        partitioner.setMap(symbolData.getMap());
-        TrainTestGroup groupTrainAndTest;
-        int numberOfFolds = KFoldPartitioner.numberOfFolds;
+        
+//        SymbolTestData symbolData = new SymbolTestData();
+//        symbolData.addClassifibles(classifibles);
+////        symbolData.printLabels();
+//        
+//        KFoldPartitioner partitioner = new KFoldPartitioner();
+//        partitioner.setMap(symbolData.getMap());
+//        TrainTestGroup groupTrainAndTest;
+//        int numberOfFolds = KFoldPartitioner.numberOfFolds;
         SymbolLabels.readCrohme2013Labels();
-        
-        String trainName = "train30pts";
-        String testName = "test30pts";
-        for (int i = 1; i <= numberOfFolds; i++) {
-            groupTrainAndTest = null;
-            groupTrainAndTest = partitioner.partWithTestFoldAt(i);
-            
-            exportFeaturesToIVCFiles(groupTrainAndTest.getTrain(), trainName + "_" + i);
-            exportFeaturesToIVCFiles(groupTrainAndTest.getTest(), testName + "_" + i);
-
-        }
+        exportFeaturesToIVCFiles(classifibles, "crohme2013_test50pts.data");
+//        
+//        String trainName = "train30pts";
+//        String testName = "test30pts";
+//        for (int i = 1; i <= numberOfFolds; i++) {
+//            groupTrainAndTest = null;
+//            groupTrainAndTest = partitioner.partWithTestFoldAt(i);
+//            
+//            exportFeaturesToIVCFiles(groupTrainAndTest.getTrain(), trainName + "_" + i);
+//            exportFeaturesToIVCFiles(groupTrainAndTest.getTest(), testName + "_" + i);
+//
+//        }
     }
     
     public static void exportFeaturesToIVCFiles(ArrayList<Classifible> classifibles, String fileToExport){
@@ -283,7 +286,8 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
         double[] scontext;
         int count = 0;
         for (Classifible classifible : classifibles) {
-            labelAsInt = SymbolLabels.getIndexOfSymbolByLabel((String) classifible.getMyClass());
+            if(classifible.getSymbol().size() > 0) {
+                labelAsInt = SymbolLabels.getIndexOfSymbolByLabel((String) classifible.getMyClass());
             if(count >= 100){
                 FilesUtil.append(fileToExport, listsOfScontextAsString);
                 listsOfScontextAsString = "";
@@ -296,6 +300,9 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
                     formatedIVCFloatAndStringFromarray(scontext)
                     + "\n");
             count++;
+            } else
+                System.out.println(classifible.getMyClass());
+            
             
         }
         if(count > 0)
