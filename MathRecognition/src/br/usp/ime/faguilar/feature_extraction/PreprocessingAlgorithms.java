@@ -149,6 +149,41 @@ public class PreprocessingAlgorithms {
         }
         return points;
     }
+    
+    public static Point2D[] getNPointsAtSameDistance(DSymbol s,int N){
+        Point2D[] points=new Point2D[N];
+        ArrayList<Point2D> alPoints=new ArrayList<Point2D>();
+        double distance = getLength(s) / N - 1;
+        
+        for (DStroke dStroke : s) {
+            
+        }
+        
+//        int pointsPerStroke=(int) Math.round((double)N/s.size());
+//        int numStrokes=s.size();
+//        int total=0;
+
+//        int[]pointsPerStroke = extractNNumberOfPointsPerStroke(s, N);
+        int[]pointsPerStroke = extractNNumberOfPointsPerStrokeUsingLenght(s, N);
+
+        for (int i = 0; i < pointsPerStroke.length; i++) {
+//            Point2D[] pts=getNPoints(s.get(i), pointsPerStroke);
+//            alPoints.addAll(Arrays.asList(pts));
+//            total+=pointsPerStroke;
+            ArrayList<Point2D> pts=getNPoints(s.get(i), pointsPerStroke[i]);
+            alPoints.addAll(pts);
+        }
+
+//        int rest=N-total;
+//        Point2D[] pts=getNPoints(s.get(numStrokes-1), rest);
+//        alPoints.addAll(Arrays.asList(pts));
+
+        for (int i = 0; i < points.length; i++) {
+            points[i]=alPoints.get(i);
+
+        }
+        return points;
+    }
 
     public static ShapeContextFeature getNShapeContetxFeatures(DSymbol s,int N){
         ShapeContextFeature features = new ShapeContextFeature();
@@ -185,13 +220,19 @@ public class PreprocessingAlgorithms {
     public static ShapeContextFeature getFuzzyShapeContetxFeatures(DSymbol s,int N){
         ShapeContextFeature features = new ShapeContextFeature();
 //        int[] pointsPerStroke = extractNNumberOfPointsPerStroke(s, N);
-        int[] pointsPerStroke = extractNNumberOfPointsPerStrokeUsingLenght(s, N);
+//        int[] pointsPerStroke = extractNNumberOfPointsPerStrokeUsingLenght(s, N);
+        
 
-        for (int i = 0; i < pointsPerStroke.length; i++) {
-            ArrayList<FeatureGroup> newFeatures = getNShapeContetxFeatures(s, s.get(i), pointsPerStroke[i]);
-            features.addAll(newFeatures);
-        }
-        ShapeContext shapeContext = CostShapeContextInside.calculateFuzzyShapeContextFromPoints2D(features.getCoords());
+//        for (int i = 0; i < pointsPerStroke.length; i++) {
+//            ArrayList<FeatureGroup> newFeatures = getNShapeContetxFeatures(s, s.get(i), pointsPerStroke[i]);
+//            features.addAll(newFeatures);
+//        }
+//        ShapeContext shapeContext = CostShapeContextInside.calculateFuzzyShapeContextFromPoints2D(features.getCoords());
+        Point2D[] points = PointsExtractor.getNPoints(s, N);
+        if (points[0] == null)
+            System.out.println(s);
+        ShapeContext shapeContext = CostShapeContextInside.calculateFuzzyShapeContextFromPoints2D(
+                points);
         features.setShapeContext(shapeContext);
         return features;
     }

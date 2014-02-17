@@ -16,6 +16,8 @@ public class ExpTransferFunction extends TransferFunction{
 
     @Override
     public double getOutput(double net) {
+//        System.out.println(net);
+        
         return Math.exp(net);
     }
     
