@@ -159,6 +159,8 @@ public class InkmlReader {
             numberOfChannels = getMathExpression().getTraceFormat().getChannels().size();
         else
             numberOfChannels = 2;
+        if(numberOfChannels > 2 && lastChannelIsF())
+            numberOfChannels = 2;
 //        int numberOfChannels = 2;//getMathExpression().getTraceFormat().getChannels().size();
         ArrayList<Point2D> points = new ArrayList<Point2D>();
         Point2D point;
@@ -172,6 +174,14 @@ public class InkmlReader {
         trace.setPoints(points);
         return trace;
     }
+    
+//    TEMP CODE TO SOLVE PROBLEM WITH SOME ERRORS READING MFRDB DATASET SAMPLES
+    private boolean lastChannelIsF(){
+        int numberOFChannels = getMathExpression().getTraceFormat().getChannels().size();
+        return (getMathExpression().getTraceFormat().getChannels().get(
+                numberOFChannels - 1).getName().equals("F"));
+    }
+    
 
     private void processTraceGroup(XMLEvent event) throws XMLStreamException {
         StartElement startElement = event.asStartElement();

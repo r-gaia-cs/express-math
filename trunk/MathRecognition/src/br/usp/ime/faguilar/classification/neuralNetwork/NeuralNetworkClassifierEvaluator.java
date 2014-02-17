@@ -15,7 +15,10 @@ import br.usp.ime.faguilar.evaluation.KFoldPartitioner;
 import br.usp.ime.faguilar.evaluation.SymbolTestData;
 import br.usp.ime.faguilar.evaluation.TrainTestGroup;
 import br.usp.ime.faguilar.feature_extraction.NeuralNetworkFeatures;
+import br.usp.ime.faguilar.feature_extraction.PreprocessingAlgorithms;
+import br.usp.ime.faguilar.feature_extraction.ShapeContextFeature;
 import br.usp.ime.faguilar.matching.MatchingParameters;
+import static br.usp.ime.faguilar.outOfProject.ExtractionOFFeaturesToFile.NeuralNetworkFeaturesExtractor.convertMatrixShapeContextToText;
 import br.usp.ime.faguilar.util.FilesUtil;
 import br.usp.ime.faguilar.util.SymbolUtil;
 import java.util.ArrayList;
@@ -48,8 +51,8 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
 //    private DataSet testDataset;
     
     private int countIterations;
-    private double[] learningRates = new double[]{0.01};//{0.009, 0.007, 0.005, 0.003, 0.001, 0.0009, 0.0007, 0.0005};//{0.01, 0.005, 0.001, 0.0005};//{0.05};//{0.005};//{0.005, 0.005, 0.001, 0.0005, 0.0001};
-    private int[] iterations = new int[]{100};//{20, 20, 20, 20, 20};
+    private double[] learningRates = new double[]{0.005};//{0.005};//{0.009, 0.007, 0.005, 0.003, 0.001, 0.0009, 0.0007, 0.0005};//{0.01, 0.005, 0.001, 0.0005};//{0.05};//{0.005};//{0.005, 0.005, 0.001, 0.0005, 0.0001};
+    private int[] iterations = new int[]{1000};//{1000};//{20, 20, 20, 20, 20};
     private String logFile = "log_neural_net.txt";
     private int iterationIndex;
     private int countToSave;
@@ -69,10 +72,10 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
     
     @Override
     public void train(){
-//        neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 
-//                inputSize, numberOfHiddenUnits, outputSize); 
-        neuralNetwork = new NeuralNetworkWithSoftMaxActivation(TransferFunctionType.SIGMOID, 
-                inputSize, numberOfHiddenUnits, outputSize);  
+        neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 
+                inputSize, numberOfHiddenUnits, outputSize); 
+//        neuralNetwork = new NeuralNetworkWithSoftMaxActivation(TransferFunctionType.SIGMOID, 
+//                inputSize, numberOfHiddenUnits, outputSize);  
         
 //        neuralNetwork = NeuralNetwork.load("neural_network_1500");
         LearningRule learningRule = new BackPropagation();//new BackPropagation();
@@ -85,11 +88,10 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
         ((SupervisedLearning) learningRule).setLearningRate(learningRates[iterationIndex]);
         ((SupervisedLearning) learningRule).setMaxError(0.0008);
         neuralNetwork.setLearningRule(learningRule);
-        
-        for (Neuron neuron : neuralNetwork.getOutputNeurons()) {
-            neuron.setTransferFunction(new ExpTransferFunction());
-        }
-        
+//        for (Neuron neuron : neuralNetwork.getOutputNeurons()) {
+//            neuron.setTransferFunction(new ExpTransferFunction());
+//        }
+//        ((SupervisedLearning) learningRule).setBatchMode(true);
         learningRule.learn(trainDataset); 
     }
     
@@ -197,9 +199,9 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
 //      
         DataSet testDataset;
 //        System.out.println("Testing ...");
-        for (numberID = 100; numberID <= 100; numberID += 50) {
+        for (numberID = 180; numberID <= 1000; numberID += 20) {
             nn = null;
-            nn = NeuralNetwork.load("neural_network_fuzzy_soft" + numberID);
+            nn = NeuralNetwork.load("neural_network_fuzzy_soft50" + numberID);
             nnetworkToTest.setNeuralNetwork(nn);
 //            
             result1 = nnetworkToTest.testNeuralNetwork(nnetworkToTest.getTrainDataset());
@@ -208,7 +210,7 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
             nnetworkToTest.fillDatasetWithClassifibles(testDataset, classifierTest.getTestData());
             result2 = nnetworkToTest.testNeuralNetwork(testDataset);
             System.out.printf("%s\t%s\n", result1, result2);
-//////            
+////////            
 ////            TO TEST DATASET
 //            testDataset = new DataSet(nnetworkToTest.getInputSize(), nnetworkToTest.getOutputSize());
 //            nnetworkToTest.fillDatasetWithClassifibles(testDataset, testClassifibles);
@@ -245,10 +247,71 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
             testDataset = new DataSet(evaluator.getInputSize(), evaluator.getOutputSize());
             evaluator.fillDatasetWithClassifibles(testDataset, groupTrainAndTest.getTest());
             result = evaluator.testNeuralNetwork(testDataset);
-            FilesUtil.append(networkName, result);
+            FilesUtil.append(networkName, result + "\n");
         }
     }
     
+    public static void exportKFoldFiles(){
+        NeuralNetworkClassifierEvaluator evaluator = new NeuralNetworkClassifierEvaluator();
+        ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles(MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
+                MathRecognitionFiles.INKML_CROHME_2013_TRAIN_DIR);
+        SymbolTestData symbolData = new SymbolTestData();
+        symbolData.addClassifibles(classifibles);
+//        symbolData.printLabels();
+        
+        KFoldPartitioner partitioner = new KFoldPartitioner();
+        partitioner.setMap(symbolData.getMap());
+        TrainTestGroup groupTrainAndTest;
+        int numberOfFolds = KFoldPartitioner.numberOfFolds;
+        SymbolLabels.readCrohme2013Labels();
+        
+        String trainName = "train30pts";
+        String testName = "test30pts";
+        for (int i = 1; i <= numberOfFolds; i++) {
+            groupTrainAndTest = null;
+            groupTrainAndTest = partitioner.partWithTestFoldAt(i);
+            
+            exportFeaturesToIVCFiles(groupTrainAndTest.getTrain(), trainName + "_" + i);
+            exportFeaturesToIVCFiles(groupTrainAndTest.getTest(), testName + "_" + i);
+
+        }
+    }
+    
+    public static void exportFeaturesToIVCFiles(ArrayList<Classifible> classifibles, String fileToExport){
+        int labelAsInt;
+        String listsOfScontextAsString = "";
+        double[] scontext;
+        int count = 0;
+        for (Classifible classifible : classifibles) {
+            labelAsInt = SymbolLabels.getIndexOfSymbolByLabel((String) classifible.getMyClass());
+            if(count >= 100){
+                FilesUtil.append(fileToExport, listsOfScontextAsString);
+                listsOfScontextAsString = "";
+                count = 0;
+            }
+            scontext = NeuralNetworkFeatures.extractMergedFeatures(classifible.getSymbol());
+//                    PreprocessingAlgorithms.getNShapeContetxFeatures(
+//                    classifible.getSymbol(), MatchingParameters.numberOfPointPerSymbol);
+            listsOfScontextAsString += (labelAsInt + "\t" +
+                    formatedIVCFloatAndStringFromarray(scontext)
+                    + "\n");
+            count++;
+            
+        }
+        if(count > 0)
+                FilesUtil.append(fileToExport, listsOfScontextAsString);
+        
+    }
+    
+    public static String formatedIVCFloatAndStringFromarray(double[] array){
+        String string = "";
+        for (int i = 0; i < array.length; i++) {
+            string += (float) array[i];
+            if(i < array.length - 1)
+                string += "\t";
+        }
+        return string;
+    }
 
     public NeuralNetwork getNeuralNetwork() {
         return neuralNetwork;
@@ -267,14 +330,14 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
         countIterations++;
         if(countIterations >= iterations[iterationIndex]){
             iterationIndex++;
-            if(iterationIndex < iterations.length){
+            if(iterationIndex < learningRates.length){
                 learning.setLearningRate(learningRates[iterationIndex]);
                 countIterations = 0;
             }
         }
         countToSave++;
-        if(countToSave >= 50){
-            neuralNetwork.save("neural_network_fuzzy_soft" + learning.getCurrentIteration());
+        if(countToSave >= 20){
+            neuralNetwork.save("neural_network_fuzzy_soft50" + learning.getCurrentIteration());
             countToSave = 0;
         }
         System.out.printf("iteration: %d\ttotal network error: %f\n", learning.getCurrentIteration(),

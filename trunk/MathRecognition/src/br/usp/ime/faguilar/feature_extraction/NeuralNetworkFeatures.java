@@ -32,7 +32,8 @@ public class NeuralNetworkFeatures {
     }
     
     private static double[] extractFuzzyShapecontexts(DSymbol symbol) {
-        ShapeContextFeature shapeContetxFeatures = PreprocessingAlgorithms.getFuzzyShapeContetxFeatures(symbol, MatchingParameters.numberOfPointPerSymbol);
+        ShapeContextFeature shapeContetxFeatures = PreprocessingAlgorithms.getFuzzyShapeContetxFeatures(symbol, 
+                MatchingParameters.numberOfPointPerSymbol);
         double[][] sc = shapeContetxFeatures.getShapeContext().getSC();
         return extractGeneralizedShapeContexts(sc);
     }

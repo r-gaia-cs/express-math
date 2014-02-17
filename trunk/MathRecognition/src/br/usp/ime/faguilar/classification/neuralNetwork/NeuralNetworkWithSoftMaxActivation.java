@@ -37,9 +37,9 @@ public class NeuralNetworkWithSoftMaxActivation extends MultiLayerPerceptron{
         for (double d : output1) {
             sum += d;
         }
-        for (Neuron neuron : getOutputNeurons()) {
-            neuron.setOutput(neuron.getOutput() / sum);
-        }
+        if(sum > 0)
+            for (Neuron neuron : getOutputNeurons())
+                neuron.setOutput(neuron.getOutput() / sum);
         fireNetworkEvent(new NNCalculatedEvent(this));
     }
     

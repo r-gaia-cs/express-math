@@ -93,7 +93,8 @@ public class Main {
 //        extractFeaturesToTrainNeuralNetwork();
 //        ClassifiactionDataSet.testDataSet();
         
-//        ArrayList<String> notHiddenFileNames = FilesUtil.getNotHiddenFileNames("C:\\Users\\Frank Aguilar\\Documents\\frank\\doctorado\\programa\\MathFiles\\CROHME\\2013\\train");
+//        To randomize crohme 2013 file names
+//        ArrayList<String> notHiddenFileNames = FilesUtil.getNotHiddenFileNames("../MathFiles/CROHME/2013/train");
 //        Collections.shuffle(notHiddenFileNames);
 //        for (String string : notHiddenFileNames) {
 //            FilesUtil.append("crohme2013_randomizedFileNames.txt", string + "\n");
@@ -101,8 +102,15 @@ public class Main {
         
 //        TO TEST NEURAL NETWORK CLASSIFIER
 //        NeuralNetworkClassifier.testNeuralNetworkWithIVCFiles();
-        NeuralNetworkClassifierEvaluator.testNeuralNetworkWithInkml();
+//        System.out.println(Math.exp(200));
+//        for (int i = -1000; i < 1000; i++) {
+//            System.out.println(i + "\t" + Math.exp(i));
+//            
+//        }
+        
+//        NeuralNetworkClassifierEvaluator.testNeuralNetworkWithInkml();
 //        NeuralNetworkClassifierEvaluator.runKFoldEvaluation();
+        NeuralNetworkClassifierEvaluator.exportKFoldFiles();
 //        END-TO TEST NEURAL NETWORK CLASSIFIER        
 //        calculateSymbolStatistics();
 //        testSegmentationAndClassification();
