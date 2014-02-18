@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class KFoldPartitioner {
     private Map<Object, List<Classifible>> map;
-    public static final int numberOfFolds = 10;
+    public static final int numberOfFolds = 4;
 
     public TrainTestGroup partWithTestFoldAt(int fold){
         ArrayList<Classifible> selectedSymbols;

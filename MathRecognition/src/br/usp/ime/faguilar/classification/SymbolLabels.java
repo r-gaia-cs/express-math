@@ -22,9 +22,15 @@ public class SymbolLabels {
     private static Map<String, Integer> labelToPosition;
     private static final String CROHME_2012_LABELS_PATH = "listSymbols.txt";
     private static final String CROHME_2013_LABELS_PATH = "listSymbolCrohme2013.txt";
+    private static final String CROHME_2013_LABELS_WITH_JUNK_PATH = "listSymbolCrohme2013withJunk.txt";
+    
 
     public static void readCrohme2013Labels(){
         readLabels(CROHME_2013_LABELS_PATH);
+    }
+    
+    public static void readCrohme2013LabelsWithJunk(){
+        readLabels(CROHME_2013_LABELS_WITH_JUNK_PATH);
     }
     
     public static void readCrohme2012Labels(){

@@ -105,6 +105,26 @@ public class FilesUtil {
         }
         return content;
     }
+    
+    public static String[] getContentAsStringArrayList(String fileName){
+        BufferedReader br = getBufferedReader(fileName);
+        ArrayList<String> content = new ArrayList<>();
+        try {
+            String line = null;
+            line = br.readLine();
+            while (line != null) {
+                content.add(line);
+                line = br.readLine();
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(FilesUtil.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        String[] array = new String[content.size()];
+        for (int i = 0; i < content.size(); i++) {
+            array[i] = content.get(i);            
+        }
+        return array;
+    }
 
     public void closeBReader(){
 

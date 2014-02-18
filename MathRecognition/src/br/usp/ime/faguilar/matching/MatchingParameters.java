@@ -32,7 +32,7 @@ public class MatchingParameters {
 
     public static int angularLocalRegions = 8;
 
-    public static int numberOfPointPerSymbol = 50;
+    public static int numberOfPointPerSymbol = 30;
 
     public static void setUpParametersForSegmentationCost(){
         LogPolarLocalRegions = 4;

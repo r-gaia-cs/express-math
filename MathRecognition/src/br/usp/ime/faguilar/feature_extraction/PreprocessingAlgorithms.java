@@ -200,8 +200,8 @@ public class PreprocessingAlgorithms {
     
     public static ShapeContextFeature getNGeneralizedShapeContetxFeatures(DSymbol s,int N){
         ShapeContextFeature features = new ShapeContextFeature();
-//        int[] pointsPerStroke = extractNNumberOfPointsPerStroke(s, N);
-        int[] pointsPerStroke = extractNNumberOfPointsPerStrokeUsingLenght(s, N);
+        int[] pointsPerStroke = extractNNumberOfPointsPerStroke(s, N);
+//        int[] pointsPerStroke = extractNNumberOfPointsPerStrokeUsingLenght(s, N);
 
         for (int i = 0; i < pointsPerStroke.length; i++) {
             ArrayList<FeatureGroup> newFeatures = getNShapeContetxFeatures(s, s.get(i), pointsPerStroke[i]);

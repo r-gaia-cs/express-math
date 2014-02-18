@@ -43,10 +43,33 @@ public class InkmlMathExpression {
                 symbol.setLabel(aTraceGroup.getAnnotation().getValue());
                 mathExpression.addCheckingBoundingBox(symbol);
             }
+        } else if(traces != null && !traces.isEmpty()){
+            // all traces are considered as a symbol and as a junk symbol
+            DSymbol symbol;
+            OrderedStroke traceAsStroke;
+            symbol = new GSymbol();
+            for (Trace aTrace : getTraces()) {
+                traceAsStroke = getTraceAsStroke(aTrace);
+                traceAsStroke.setIndex(aTrace.getId());
+                symbol.addCheckingBoundingBox(traceAsStroke);
+            }
+            symbol.setLabel(getExpressionTruth());
+            mathExpression.addCheckingBoundingBox(symbol);
         }
         return mathExpression;
     }
 
+    public String getExpressionTruth(){
+        String truth = "";
+        for (Annotation annotation : annotations) {
+            if(annotation.getType().equals("truth")){
+                truth = annotation.getValue();
+                break;
+            }
+        }
+        return truth;
+    }
+    
     public String getWriter(){
         String writer = "";
         for (Annotation annotation : annotations) {
@@ -61,6 +84,11 @@ public class InkmlMathExpression {
     private OrderedStroke getTraceAsStroke(int traceIndex){
         OrderedStroke stroke = new OrderedStroke();
         Trace trace = getTraces().get(traceIndex);
+        return getTraceAsStroke(trace);
+    }
+    
+    public OrderedStroke getTraceAsStroke(Trace trace){
+        OrderedStroke stroke = new OrderedStroke();
         TimePoint timePoint;
         for (Point2D point : trace.getPoints()) {
             timePoint = new TimePoint(point.getX(), point.getY(), 0);

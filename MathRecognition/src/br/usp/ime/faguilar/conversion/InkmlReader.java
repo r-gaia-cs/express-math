@@ -58,7 +58,8 @@ public class InkmlReader {
                       if(startElement.getName().getLocalPart().equals(TRACE))
                           processTrace(event);
                       if(startElement.getName().getLocalPart().equals(TRACE_GROUP))
-                          processTraceGroup(event);
+//                          processTraceGroup(event);
+                          break;
                 }
             }
         }
@@ -71,6 +72,7 @@ public class InkmlReader {
         } 
         catch (Exception e){
 //            System.out.println(fileName);
+            e.printStackTrace();
             System.out.println("problem reading " + fileName);
 //            e.printStackTrace();
         }
@@ -152,20 +154,23 @@ public class InkmlReader {
     private Trace getTrace(String stringPoints) {
         Trace trace = new Trace();
         stringPoints = stringPoints.trim();
+        
         String[] stringArrayOfPoints = stringPoints.split("\\s+|,\\s*|\\n");
+        String[] firstElement = stringPoints.split(",\\s*|\\n");
+        int jumpSize = firstElement[0].split("\\s+").length;
         TraceFormat traceFormat = getMathExpression().getTraceFormat();
-        int numberOfChannels;
-        if(traceFormat != null)
-            numberOfChannels = getMathExpression().getTraceFormat().getChannels().size();
-        else
-            numberOfChannels = 2;
-        if(numberOfChannels > 2 && lastChannelIsF())
-            numberOfChannels = 2;
+//        int numberOfChannels;
+//        if(traceFormat != null)
+//            numberOfChannels = getMathExpression().getTraceFormat().getChannels().size();
+//        else
+//            numberOfChannels = 2;
+//        if(numberOfChannels > 2 && lastChannelIsF())
+//            numberOfChannels = 2;
 //        int numberOfChannels = 2;//getMathExpression().getTraceFormat().getChannels().size();
         ArrayList<Point2D> points = new ArrayList<Point2D>();
         Point2D point;
 //        System.out.println("channels: "+ numberOfChannels);
-        for (int j = 0; j < stringArrayOfPoints.length; j = j + numberOfChannels) {
+        for (int j = 0; j < stringArrayOfPoints.length; j = j + jumpSize) {
             point = new Point2D.Float(Float.valueOf(
                     stringArrayOfPoints[j]), Float.valueOf(stringArrayOfPoints[j+1]));
             points.add(point);
@@ -186,35 +191,37 @@ public class InkmlReader {
     private void processTraceGroup(XMLEvent event) throws XMLStreamException {
         StartElement startElement = event.asStartElement();
         Iterator<Attribute> attributes = startElement.getAttributes();
-        Attribute attribute = attributes.next();
-        TraceGroup traceGroup = new TraceGroup();
-        TraceGroup newTraceGroup;
-        traceGroup.setId(attribute.getValue());
-        boolean addTRaceGroupt = true;
+        if(attributes.hasNext()){
+            Attribute attribute = attributes.next();
+            TraceGroup traceGroup = new TraceGroup();
+            TraceGroup newTraceGroup;
+            traceGroup.setId(attribute.getValue());
+            boolean addTRaceGroupt = true;
 
-        eventReader.nextEvent();
-        event = eventReader.nextEvent();
-        Annotation annotation = new Annotation();
-        startElement = event.asStartElement();
-        attributes = startElement.getAttributes();
-        attribute = attributes.next();
-        annotation.setType(attribute.getValue());
-        event = eventReader.nextEvent();
-        annotation.setValue(event.asCharacters().getData());
-        traceGroup.setAnnotation(annotation);
-        eventReader.nextEvent();
-        eventReader.nextEvent();
-        event = eventReader.nextEvent();
-        while(addTRaceGroupt){
-            newTraceGroup = getSymbolTraceGroup(event);
-            traceGroup.addTraceGroup(newTraceGroup);
+            eventReader.nextEvent();
             event = eventReader.nextEvent();
-//            System.out.println(event.asCharacters().getData());
-            if(!event.isStartElement() || !(event.asStartElement().getName()
-                    .getLocalPart().equals(TRACE_GROUP)))
-                addTRaceGroupt = false;
+            Annotation annotation = new Annotation();
+            startElement = event.asStartElement();
+            attributes = startElement.getAttributes();
+            attribute = attributes.next();
+            annotation.setType(attribute.getValue());
+            event = eventReader.nextEvent();
+            annotation.setValue(event.asCharacters().getData());
+            traceGroup.setAnnotation(annotation);
+            eventReader.nextEvent();
+            eventReader.nextEvent();
+            event = eventReader.nextEvent();
+            while(addTRaceGroupt){
+                newTraceGroup = getSymbolTraceGroup(event);
+                traceGroup.addTraceGroup(newTraceGroup);
+                event = eventReader.nextEvent();
+    //            System.out.println(event.asCharacters().getData());
+                if(!event.isStartElement() || !(event.asStartElement().getName()
+                        .getLocalPart().equals(TRACE_GROUP)))
+                    addTRaceGroupt = false;
+            }
+            getMathExpression().setTraceGroup(traceGroup);
         }
-        getMathExpression().setTraceGroup(traceGroup);
     }
 
     private TraceGroup getSymbolTraceGroup(XMLEvent event) throws XMLStreamException {
