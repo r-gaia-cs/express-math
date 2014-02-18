@@ -57,7 +57,7 @@ public class PointsExtractor {
                     stroke++;
                     count = 0;
                 }
-                if(stroke > symbol.size())
+                if(stroke >= symbol.size())
                     stroke--;
             }
         }
@@ -74,6 +74,7 @@ public class PointsExtractor {
     }
 
     private static void addAPoint() {
+        double distanceTemp;
         if(sampledPoints == 0){
             points[sampledPoints] = new Point2D.Double(
                     symbol.get(currentStroke).get(currentPoisitionInStroke).getX(), 
@@ -81,23 +82,25 @@ public class PointsExtractor {
             currentPointToMeasureDistance = symbol.get(currentStroke).get(currentPoisitionInStroke);
             sampledPoints++;
             currentPoisitionInStroke++;
-        } else if(symbol.get(currentStroke).size() == 1 && 
+        } else if(currentStroke < symbol.size() && symbol.get(currentStroke).size() == 1 && 
                 currentPoisitionInStroke < 1) {
             points[sampledPoints] = new Point2D.Double(
                     symbol.get(currentStroke).get(currentPoisitionInStroke).getX(), 
                     symbol.get(currentStroke).get(currentPoisitionInStroke).getY());
             advanceStroke();
             sampledPoints++;
-        } else {
+        } else if(currentStroke < symbol.size()){
             double accumulatedDistance = 0;
             while(currentPoisitionInStroke < symbol.get(currentStroke).size()){
 //                if (difference <= accumulatedDistance + currentPointToMeasureDistance.distance(
 //                symbol.get(currentStroke).get(currentPoisitionInStroke)))
-                if (differenceLessThanAccumulated(difference, accumulatedDistance + currentPointToMeasureDistance.distance(
-                symbol.get(currentStroke).get(currentPoisitionInStroke))))
-                    break;
-                accumulatedDistance += currentPointToMeasureDistance.distance(
+                distanceTemp = accumulatedDistance + currentPointToMeasureDistance.distance(
                 symbol.get(currentStroke).get(currentPoisitionInStroke));
+                if (differenceLessThanAccumulated(difference, distanceTemp))
+                    break;
+                accumulatedDistance = distanceTemp;
+//                        currentPointToMeasureDistance.distance(
+//                symbol.get(currentStroke).get(currentPoisitionInStroke));
                 currentPointToMeasureDistance = symbol.get(currentStroke).get(currentPoisitionInStroke);
                 currentPoisitionInStroke ++;
             }
@@ -116,23 +119,21 @@ public class PointsExtractor {
             else {
                 difference -= accumulatedDistance;
                 advanceStroke();
-                if(currentStroke < symbol.size())
+//                if(currentStroke < symbol.size())
                     addAPoint();
-                else {
-                    int lastStrokeSize = symbol.get(currentStroke - 1).size();
-                    double x = symbol.get(currentStroke - 1).get(lastStrokeSize - 1).getX();
-                    double y = symbol.get(currentStroke - 1).get(lastStrokeSize - 1).getY();
-                    points[sampledPoints] = new Point2D.Double(x, y);
-                    sampledPoints++;
-                }
             }
-                
+        } else {
+            int lastStrokeSize = symbol.get(currentStroke - 1).size();
+            double x = symbol.get(currentStroke - 1).get(lastStrokeSize - 1).getX();
+            double y = symbol.get(currentStroke - 1).get(lastStrokeSize - 1).getY();
+            points[sampledPoints] = new Point2D.Double(x, y);
+            sampledPoints++;
         }
     }
     
     public static boolean differenceLessThanAccumulated(double val1, double val2){
         double diference = val1 - val2;
-        return (diference < 0.0000001);
+        return (diference < 0.000001);
     }
     
     private static void advanceStroke(){

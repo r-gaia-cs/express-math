@@ -225,9 +225,9 @@ public class SymbolUtil {
     }
 
     public static String[] readFilesNamesInAFile(){
-        String fileContesnt = FilesUtil.getContentAsString(FILES);
-        String[] fileNames = fileContesnt.split("\n");
-        return fileNames;
+//        String fileContesnt = FilesUtil.getContentAsString(FILES);
+//        String[] fileNames = fileContesnt.split("\n");
+        return FilesUtil.getContentAsStringArrayList(FILES);
     }
 
     public static ArrayList<Classifible> readTemplates(){

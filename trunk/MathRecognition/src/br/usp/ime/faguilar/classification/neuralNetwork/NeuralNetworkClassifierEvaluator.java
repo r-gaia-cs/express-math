@@ -252,32 +252,46 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
     }
     
     public static void exportKFoldFiles(){
-        NeuralNetworkClassifierEvaluator evaluator = new NeuralNetworkClassifierEvaluator();
-        ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles(MathRecognitionFiles.INKML_CROHME_2013_TEST_FILES,//MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
-                MathRecognitionFiles.INKML_CROHME_2013_TEST_DIR);
-        
-        
-//        SymbolTestData symbolData = new SymbolTestData();
-//        symbolData.addClassifibles(classifibles);
-////        symbolData.printLabels();
-//        
-//        KFoldPartitioner partitioner = new KFoldPartitioner();
-//        partitioner.setMap(symbolData.getMap());
-//        TrainTestGroup groupTrainAndTest;
-//        int numberOfFolds = KFoldPartitioner.numberOfFolds;
-        SymbolLabels.readCrohme2013Labels();
-        exportFeaturesToIVCFiles(classifibles, "crohme2013_test50pts.data");
-//        
-//        String trainName = "train30pts";
-//        String testName = "test30pts";
-//        for (int i = 1; i <= numberOfFolds; i++) {
-//            groupTrainAndTest = null;
-//            groupTrainAndTest = partitioner.partWithTestFoldAt(i);
-//            
-//            exportFeaturesToIVCFiles(groupTrainAndTest.getTrain(), trainName + "_" + i);
-//            exportFeaturesToIVCFiles(groupTrainAndTest.getTest(), testName + "_" + i);
-//
+//        NeuralNetworkClassifierEvaluator evaluator = new NeuralNetworkClassifierEvaluator();
+//        ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles(MathRecognitionFiles.INKML_CROHME_2013_TEST_FILES,//MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
+//                MathRecognitionFiles.INKML_CROHME_2013_TEST_DIR);
+//        ArrayList<String> notHiddenFileNames = FilesUtil.getNotHiddenFileNames("C:\\Users\\Frank Aguilar\\Documents\\frank\\doctorado\\programa\\MathFiles\\CROHME\\isolatedJunk");
+//        for (String string : notHiddenFileNames) {
+//            FilesUtil.append("isolatedJunk.txt", string + "\n");
 //        }
+        ArrayList<Classifible> classifiblesJunk = SymbolUtil.readTemplatesFromInkmlFiles("isolatedJunk.txt",//MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
+               "C:\\Users\\Frank Aguilar\\Documents\\frank\\doctorado\\programa\\MathFiles\\CROHME\\isolatedJunk\\");
+        
+        ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles("isolatedSymbols.txt",//MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
+               "C:\\Users\\Frank Aguilar\\Documents\\frank\\doctorado\\programa\\MathFiles\\CROHME\\isolatedSymb\\");
+        classifibles.addAll(classifiblesJunk);
+
+        SymbolTestData symbolData = new SymbolTestData();
+        symbolData.addClassifibles(classifibles);
+//        symbolData.printLabels();
+        
+        KFoldPartitioner partitioner = new KFoldPartitioner();
+        partitioner.setMap(symbolData.getMap());
+        TrainTestGroup groupTrainAndTest;
+        int numberOfFolds = KFoldPartitioner.numberOfFolds;
+        
+//        TO EXPORT ONLY TEST FILES
+//        SymbolLabels.readCrohme2013Labels();
+//        exportFeaturesToIVCFiles(classifibles, "crohme2013_test50pts.data");
+//        
+        SymbolLabels.readCrohme2013LabelsWithJunk();
+        String trainName = "trainFuzzySC";
+        String testName = "testFuzzySC";
+        String format = ".data";
+        for (int i = 1; i <= numberOfFolds; i++) {
+            groupTrainAndTest = null;
+            groupTrainAndTest = partitioner.partWithTestFoldAt(i);
+            exportFeaturesToIVCFiles(groupTrainAndTest.getTrain(), trainName + "_" + i + 
+                   format);
+            exportFeaturesToIVCFiles(groupTrainAndTest.getTest(), testName + "_" + i + 
+                    format);
+
+        }
     }
     
     public static void exportFeaturesToIVCFiles(ArrayList<Classifible> classifibles, String fileToExport){
@@ -301,9 +315,7 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
                     + "\n");
             count++;
             } else
-                System.out.println(classifible.getMyClass());
-            
-            
+                System.out.println(classifible.getMyClass());            
         }
         if(count > 0)
                 FilesUtil.append(fileToExport, listsOfScontextAsString);

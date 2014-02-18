@@ -6,6 +6,7 @@
 package br.usp.ime.faguilar.outOfProject.ExtractionOFFeaturesToFile;
 
 import br.usp.ime.faguilar.classification.Classifible;
+import br.usp.ime.faguilar.classification.SymbolLabels;
 import br.usp.ime.faguilar.cost.GeneralizedShapeContext;
 import br.usp.ime.faguilar.cost.ShapeContext;
 import br.usp.ime.faguilar.data.DStroke;
@@ -15,6 +16,7 @@ import br.usp.ime.faguilar.evaluation.ClassifierTest;
 import br.usp.ime.faguilar.feature_extraction.PreprocessingAlgorithms;
 import br.usp.ime.faguilar.feature_extraction.ShapeContextFeature;
 import br.usp.ime.faguilar.matching.MatchingParameters;
+import br.usp.ime.faguilar.segmentation.SymbolLabel;
 import br.usp.ime.faguilar.util.FilesUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -99,6 +101,26 @@ public class NeuralNetworkFeaturesExtractor {
         for (numberOFSymbol = 0; numberOFSymbol < classifibles.size(); numberOFSymbol++) {
             unpContent = ".COORD\tX Y\n" + ".SEGMENT CHARACTER ? ? \"" + 
                classifibles.get(0).getMyClass() + "\"\n";
+            unpContent += extractUNPInfoFromSymbol(classifibles.get(numberOFSymbol).getSymbol());
+            unpFileName = label  + "_" + numberOFSymbol + ".unp";
+            FilesUtil.append(LIST_OF_SYMBOL_FILE_NAMES, unpFileName + "\n");
+            FilesUtil.write(UNP_SYMBOL_DIRECTORY + unpFileName, unpContent);
+        }
+    }
+    
+    public static void exportUNPFiles(ArrayList<Classifible> classifibles){
+        int classOrder;
+        int numberOFSymbol;
+        String label;// = "symbol" + "_" + String.valueOf(classOrder);
+        String unpContent;
+        String unpFileName;
+//        if(!classifibles.isEmpty())
+//            label = classifibles.get(0).getSymbol().getLabel();
+        for (numberOFSymbol = 0; numberOFSymbol < classifibles.size(); numberOFSymbol++) {
+            classOrder = SymbolLabels.getIndexOfSymbolByLabel((String) classifibles.get(numberOFSymbol).getMyClass());
+            label = "symbol" + "_" + String.valueOf(classOrder);
+            unpContent = ".COORD\tX Y\n" + ".SEGMENT CHARACTER ? ? \"" + 
+               classifibles.get(numberOFSymbol).getMyClass() + "\"\n";
             unpContent += extractUNPInfoFromSymbol(classifibles.get(numberOFSymbol).getSymbol());
             unpFileName = label  + "_" + numberOFSymbol + ".unp";
             FilesUtil.append(LIST_OF_SYMBOL_FILE_NAMES, unpFileName + "\n");
