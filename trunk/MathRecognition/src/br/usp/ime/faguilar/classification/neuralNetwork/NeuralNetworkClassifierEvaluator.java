@@ -18,6 +18,7 @@ import br.usp.ime.faguilar.feature_extraction.NeuralNetworkFeatures;
 import br.usp.ime.faguilar.feature_extraction.PreprocessingAlgorithms;
 import br.usp.ime.faguilar.feature_extraction.ShapeContextFeature;
 import br.usp.ime.faguilar.matching.MatchingParameters;
+import br.usp.ime.faguilar.outOfProject.ExtractionOFFeaturesToFile.NeuralNetworkFeaturesExtractor;
 import static br.usp.ime.faguilar.outOfProject.ExtractionOFFeaturesToFile.NeuralNetworkFeaturesExtractor.convertMatrixShapeContextToText;
 import br.usp.ime.faguilar.util.FilesUtil;
 import br.usp.ime.faguilar.util.SymbolUtil;
@@ -286,15 +287,101 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
         for (int i = 1; i <= numberOfFolds; i++) {
             groupTrainAndTest = null;
             groupTrainAndTest = partitioner.partWithTestFoldAt(i);
-            exportFeaturesToIVCFiles(groupTrainAndTest.getTrain(), trainName + "_" + i + 
+            exportSContextsToIVCFiles(groupTrainAndTest.getTrain(), trainName + "_" + i + 
                    format);
-            exportFeaturesToIVCFiles(groupTrainAndTest.getTest(), testName + "_" + i + 
+            exportSContextsToIVCFiles(groupTrainAndTest.getTest(), testName + "_" + i + 
                     format);
 
         }
     }
     
-    public static void exportFeaturesToIVCFiles(ArrayList<Classifible> classifibles, String fileToExport){
+    
+    
+    public static void exportUNP_Files(){
+
+        ArrayList<Classifible> classifiblesJunk = SymbolUtil.readTemplatesFromInkmlFiles("isolatedJunk.txt",//MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
+               "../MathFiles/CROHME/isolatedJunk/");
+        
+        ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles("isolatedSymbols.txt",//MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
+               "../MathFiles/CROHME/isolatedSymb/");
+        classifibles.addAll(classifiblesJunk);
+
+        SymbolTestData symbolData = new SymbolTestData();
+        symbolData.addClassifibles(classifibles);
+        SymbolLabels.readCrohme2013LabelsWithJunk();
+        NeuralNetworkFeaturesExtractor.exportUNPFiles(classifibles);
+        
+        
+
+    }
+    
+    public static void generateFoldsFromIVCFiles(){
+        SymbolLabels.readCrohme2013LabelsWithJunk();
+        ArrayList<Classifible> classifibles = readClassifiblesFromIVCFiles();
+
+        SymbolTestData symbolData = new SymbolTestData();
+        symbolData.addClassifibles(classifibles);        
+        KFoldPartitioner partitioner = new KFoldPartitioner();
+        partitioner.setMap(symbolData.getMap());
+        TrainTestGroup groupTrainAndTest;
+        int numberOfFolds = KFoldPartitioner.numberOfFolds;
+        
+        String trainName = "trainOnline";
+        String testName = "validationOnline";
+        String format = ".data";
+        for (int i = 1; i <= numberOfFolds; i++) {
+            groupTrainAndTest = null;
+            groupTrainAndTest = partitioner.partWithTestFoldAt(i);
+            exportOnlineFeaturesToIVCFiles(groupTrainAndTest.getTrain(), trainName + "_" + i + 
+                   format);
+            exportOnlineFeaturesToIVCFiles(groupTrainAndTest.getTest(), testName + "_" + i + 
+                    format);
+
+        }
+    }
+    
+    public static void exportOnlineFeaturesToIVCFiles(ArrayList<Classifible> classifibles, String fileToExport){
+        int labelAsInt;
+        String listsOfScontextAsString = "";
+        double[] scontext;
+        int count = 0;
+        for (Classifible classifible : classifibles) {
+            if(((double[]) classifible.getAditionalFeatures()).length > 0) {
+                labelAsInt = SymbolLabels.getIndexOfSymbolByLabel((String) classifible.getMyClass());
+            if(count >= 100){
+                FilesUtil.append(fileToExport, listsOfScontextAsString);
+                listsOfScontextAsString = "";
+                count = 0;
+            }
+            scontext = (double[]) classifible.getAditionalFeatures();
+//                    PreprocessingAlgorithms.getNShapeContetxFeatures(
+//                    classifible.getSymbol(), MatchingParameters.numberOfPointPerSymbol);
+            listsOfScontextAsString += (labelAsInt + "\t" +
+                    formatedIVCFloatAndStringFromarray(scontext)
+                    + "\n");
+            count++;
+            } else
+                System.out.println(classifible.getMyClass());            
+        }
+        if(count > 0)
+                FilesUtil.append(fileToExport, listsOfScontextAsString);
+        
+    }
+    
+    public static ArrayList<Classifible> readClassifiblesFromIVCFiles(){
+        double[][] matrixData = FilesUtil.readNumbersInMatrix("onlineFeaturesCrohme2013.data", "\t");
+        ArrayList<Classifible> classifibles = new ArrayList(matrixData.length);
+        Classifible aClassifible;
+        for (double[] ds : matrixData) {
+            aClassifible = new Classifible();
+            aClassifible.setAditionalFeatures(ds);
+            aClassifible.setMyClass(SymbolLabels.getLabelOfSymbolByIndex((int) ds[0]));
+            classifibles.add(aClassifible);
+        }
+        return classifibles;
+    }
+    
+    public static void exportSContextsToIVCFiles(ArrayList<Classifible> classifibles, String fileToExport){
         int labelAsInt;
         String listsOfScontextAsString = "";
         double[] scontext;

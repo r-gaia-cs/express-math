@@ -33,9 +33,9 @@ import java.util.logging.Logger;
 public class NeuralNetworkFeaturesExtractor {
     public final static String UNP_DIRECTORY = "../MathFiles/unp/";
     public final static String SYMBOL_LABELS = UNP_DIRECTORY + "symbol-labels.txt";
-    public final static String LIST_OF_SYMBOL_FILE_NAMES = UNP_DIRECTORY + "list-unp-test-crohmme2012-files.txt";
-    public final static String UNP_SYMBOL_DIRECTORY = UNP_DIRECTORY + "unp-symbols/crohme2012/test/";
-    public final static String UNP__LABELED_SYMBOL_DIRECTORY = UNP_DIRECTORY + "unp-labeled-symbols/";
+    public final static String LIST_OF_SYMBOL_FILE_NAMES = UNP_DIRECTORY + "listUNP_CROHME2013.txt";//"list-unp-test-crohmme2012-files.txt";
+    public final static String UNP_SYMBOL_DIRECTORY = UNP_DIRECTORY + "";//"unp-symbols/crohme2012/test/";
+    public final static String UNP__LABELED_SYMBOL_DIRECTORY = UNP_DIRECTORY + "CROHME2013/train_validation/";//"unp-labeled-symbols/";
     public static final String FILE_TO_PART = "generalized-shape-contexts.txt";
 //            "D:\\frank_temp\\NeededFilesForInterface_learningAnMLP"
 //                + "\\train-test\\scontext\\shape-contexts30PointsAllTrainCrohme2012D2.txt";

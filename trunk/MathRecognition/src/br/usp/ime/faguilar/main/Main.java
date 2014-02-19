@@ -110,7 +110,11 @@ public class Main {
         
 //        NeuralNetworkClassifierEvaluator.testNeuralNetworkWithInkml();
 //        NeuralNetworkClassifierEvaluator.runKFoldEvaluation();
-        NeuralNetworkClassifierEvaluator.exportKFoldFiles();
+//        NeuralNetworkClassifierEvaluator.exportKFoldFiles();
+        
+//        NeuralNetworkClassifierEvaluator.exportUNP_Files();
+        NeuralNetworkClassifierEvaluator.generateFoldsFromIVCFiles();
+        
 //        END-TO TEST NEURAL NETWORK CLASSIFIER       
         
 //        calculateSymbolStatistics();
