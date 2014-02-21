@@ -279,7 +279,7 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
 //        TO EXPORT ONLY TEST FILES
 //        SymbolLabels.readCrohme2013Labels();
 //        exportFeaturesToIVCFiles(classifibles, "crohme2013_test50pts.data");
-//        
+
         SymbolLabels.readCrohme2013LabelsWithJunk();
         String trainName = "trainFuzzySC";
         String testName = "testFuzzySC";
@@ -336,7 +336,6 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
                    format);
             exportOnlineFeaturesToIVCFiles(groupTrainAndTest.getTest(), testName + "_" + i + 
                     format);
-
         }
     }
     
@@ -369,7 +368,7 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
     }
     
     public static ArrayList<Classifible> readClassifiblesFromIVCFiles(){
-        double[][] matrixData = FilesUtil.readNumbersInMatrix("onlineFeaturesCrohme2013.data", "\t");
+        double[][] matrixData = FilesUtil.readNumbersInMatrix("onlineTrainCrohme2013.data", "\t");
         ArrayList<Classifible> classifibles = new ArrayList(matrixData.length);
         Classifible aClassifible;
         for (double[] ds : matrixData) {
@@ -411,7 +410,7 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
     
     public static String formatedIVCFloatAndStringFromarray(double[] array){
         String string = "";
-        for (int i = 0; i < array.length; i++) {
+        for (int i = 1; i < array.length; i++) {
             string += (float) array[i];
             if(i < array.length - 1)
                 string += "\t";

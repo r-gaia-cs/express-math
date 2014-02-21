@@ -113,7 +113,9 @@ public class Main {
 //        NeuralNetworkClassifierEvaluator.exportKFoldFiles();
         
 //        NeuralNetworkClassifierEvaluator.exportUNP_Files();
-        NeuralNetworkClassifierEvaluator.generateFoldsFromIVCFiles();
+//        NeuralNetworkClassifierEvaluator.generateFoldsFromIVCFiles();
+//        mergeFeatures();
+        
         
 //        END-TO TEST NEURAL NETWORK CLASSIFIER       
         
@@ -128,6 +130,29 @@ public class Main {
 //        SymbolUtil.partSymbolsInSeveralFiles(EvaluationView.TEMPLATES_FILE);
         //TO TEST READING OF TEMPLATES FROM INKML FILES
 //        testInkmlReader();
+    }
+    
+    public static void mergeFeatures(){
+        String[] sContextTrainNames = {"trainFuzzySC_",
+        "trainSC_"};
+        String[] sContextValidationNames = {"validationFuzzySC_", 
+        "validationSC_"};
+        
+        
+        for (int namePosition = 0; namePosition < sContextValidationNames.length; namePosition++) {
+            for (int i = 3; i <= 4; i++) {
+            NeuralNetworkFeaturesExtractor.mergeFeatureFiles("C:\\Users\\Frank Aguilar\\Documents\\frank\\doctorado\\crohme2013_evaluation\\training\\scontext\\dataset\\"//"F:\\crohme2013_evaluation\\training\\dataset\\" 
+                    + 
+                    sContextTrainNames[namePosition] + i + ".data", 
+                "trainOnline_" + i + ".data", 
+            sContextTrainNames[namePosition] + "online_" + i + ".data");
+            
+            NeuralNetworkFeaturesExtractor.mergeFeatureFiles("C:\\Users\\Frank Aguilar\\Documents\\frank\\doctorado\\crohme2013_evaluation\\training\\scontext\\dataset\\" + //"F:\\crohme2013_evaluation\\training\\dataset\\" + 
+                    sContextValidationNames[namePosition] + i + ".data", 
+                "trainOnline_" + i + ".data", 
+            sContextValidationNames[namePosition] + "online_" + i + ".data");
+        }    
+        }
     }
     
     public static void extractFeaturesToTrainNeuralNetwork(){
