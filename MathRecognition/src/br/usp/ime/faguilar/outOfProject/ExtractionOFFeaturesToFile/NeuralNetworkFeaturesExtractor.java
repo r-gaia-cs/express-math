@@ -265,7 +265,7 @@ public class NeuralNetworkFeaturesExtractor {
                 line1 = line1.replaceAll("\\s", "\t");
                 line2 = line2.replaceAll("\\s", "\t");
                 lines = line2.split("\t");
-                outputLine = line1;
+                outputLine = line1 + "\t";
                 for (int i = 1; i < lines.length; i++) {
                     outputLine += lines[i] + "\t";                    
                 }
