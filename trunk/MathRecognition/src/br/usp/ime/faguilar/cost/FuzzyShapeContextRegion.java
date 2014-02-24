@@ -186,25 +186,35 @@ public class FuzzyShapeContextRegion {
         }
         int angularPosToUpdate = -1;
         dist = anglularRegions[id_t] - theta;
-        if(id_t < anglularRegions.length - 1 && dist < minAngleDiferenceFromLimit){
+        if( dist < minAngleDiferenceFromLimit){ //id_t < anglularRegions.length - 1 &&
             angularPosToUpdate = id_t + 1;
+            if(angularPosToUpdate >= anglularRegions.length)
+                angularPosToUpdate = 0;
             angularUpdate = (dist + minAngleDiferenceFromLimit) / 
                     (2 * minAngleDiferenceFromLimit);
         }
-        if(id_t > 0){
-            dist = theta - anglularRegions[id_t - 1];
-            if(dist < minAngleDiferenceFromLimit){
-                angularPosToUpdate = id_t - 1;
-                angularUpdate = (dist + minAngleDiferenceFromLimit) / 
-                        (2 * minAngleDiferenceFromLimit);
-            }
+//        if(id_t > 0){
+        int previous = id_t - 1;
+        if(previous < 0)
+            dist = theta;
+        else
+            dist = theta - anglularRegions[previous];
+        if(dist < minAngleDiferenceFromLimit){
+            angularPosToUpdate = id_t - 1;
+            if(angularPosToUpdate < 0)
+                angularPosToUpdate = anglularRegions.length - 1;
+            angularUpdate = (dist + minAngleDiferenceFromLimit) / 
+                    (2 * minAngleDiferenceFromLimit);
         }
+//        }
         updateBin(id_r, id_t, scOfAPoint, radioUpdate, angularUpdate);
         if(radialPosToUpdate >= 0)
             updateBin(radialPosToUpdate, id_t, scOfAPoint, 1 - radioUpdate, angularUpdate);
         if(angularPosToUpdate >= 0)
             updateBin(id_r, angularPosToUpdate, scOfAPoint, radioUpdate, 1 - angularUpdate);
-          
+        if(angularPosToUpdate >= 0&& radialPosToUpdate >= 0)
+            updateBin(radialPosToUpdate, angularPosToUpdate, scOfAPoint, 1 - radioUpdate, 
+                    1 - angularUpdate);
 //        updateBinAt(id_r, id_t, scOfAPoint, raio, theta);
 //        float midPointRadial = radialRegions[id_r];
 //        if(id_r > 0){
