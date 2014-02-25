@@ -309,7 +309,7 @@ public class SymbolUtil {
 //        String userName = fileNameArray[1].substring(0, fileNameArray[1].length() - 4);
 //        String userName = reader.getMathExpression().getWriter();
         for (DSymbol symbol : mathExpression) {
-            newSymbol = symbol;//PreprocessingAlgorithms.preprocessDSymbolWithOrderedStrokes(symbol);
+            newSymbol = PreprocessingAlgorithms.preprocessDSymbolWithOrderedStrokes(symbol);
             newClassifible = new Classifible();
 //            newClassifible.setUserSymbol(UserSymbol.newInstanceFromUserNickNameAndSymbolLabel(
 //                    userName, newSymbol.getLabel()));
