@@ -356,7 +356,7 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
 //                    PreprocessingAlgorithms.getNShapeContetxFeatures(
 //                    classifible.getSymbol(), MatchingParameters.numberOfPointPerSymbol);
             listsOfScontextAsString += (labelAsInt + "\t" +
-                    formatedIVCFloatAndStringFromarray(scontext)
+                    formatedIVCFloatAndStringFromarrayWithFirstElement(scontext)
                     + "\n");
             count++;
             } else
@@ -397,7 +397,8 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
 //                    PreprocessingAlgorithms.getNShapeContetxFeatures(
 //                    classifible.getSymbol(), MatchingParameters.numberOfPointPerSymbol);
             listsOfScontextAsString += (labelAsInt + "\t" +
-                    formatedIVCFloatAndStringFromarray(scontext)
+//                    formatedIVCFloatAndStringFromarray(scontext)
+                   formatedIVCFloatAndStringFromarrayWithFirstElement(scontext)
                     + "\n");
             count++;
             } else
@@ -408,9 +409,19 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
         
     }
     
-    public static String formatedIVCFloatAndStringFromarray(double[] array){
+    public static String formatedIVCFloatAndStringFromarrayWithoutFirstElement(double[] array){
         String string = "";
         for (int i = 1; i < array.length; i++) {
+            string += (float) array[i];
+            if(i < array.length - 1)
+                string += "\t";
+        }
+        return string;
+    }
+    
+    public static String formatedIVCFloatAndStringFromarrayWithFirstElement(double[] array){
+        String string = "";
+        for (int i = 0; i < array.length; i++) {
             string += (float) array[i];
             if(i < array.length - 1)
                 string += "\t";

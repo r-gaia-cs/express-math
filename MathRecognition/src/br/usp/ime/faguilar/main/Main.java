@@ -110,10 +110,10 @@ public class Main {
         
 //        NeuralNetworkClassifierEvaluator.testNeuralNetworkWithInkml();
 //        NeuralNetworkClassifierEvaluator.runKFoldEvaluation();
-//        NeuralNetworkClassifierEvaluator.exportKFoldFiles();
+        NeuralNetworkClassifierEvaluator.exportKFoldFiles();
         
 //        NeuralNetworkClassifierEvaluator.exportUNP_Files();
-        NeuralNetworkClassifierEvaluator.generateFoldsFromIVCFiles();
+//        NeuralNetworkClassifierEvaluator.generateFoldsFromIVCFiles();
 //        mergeFeatures();
         
         
