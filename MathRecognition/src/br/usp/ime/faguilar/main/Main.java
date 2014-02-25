@@ -113,7 +113,7 @@ public class Main {
 //        NeuralNetworkClassifierEvaluator.exportKFoldFiles();
         
 //        NeuralNetworkClassifierEvaluator.exportUNP_Files();
-//        NeuralNetworkClassifierEvaluator.generateFoldsFromIVCFiles();
+        NeuralNetworkClassifierEvaluator.generateFoldsFromIVCFiles();
 //        mergeFeatures();
         
         

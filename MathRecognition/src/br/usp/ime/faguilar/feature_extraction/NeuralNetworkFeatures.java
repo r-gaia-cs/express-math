@@ -24,8 +24,8 @@ public class NeuralNetworkFeatures {
 //        Point2D[] points = PointsExtractor.getNPoints(symbol, MatchingParameters.numberOfPointPerSymbol);
 //        double[] shapeContexts = extractshapecontexts(points);
         
-//        double[] shapeContexts = extractFuzzyShapecontexts(symbol);
-        double[] shapeContexts = extractGeneralizedShapecontexts(symbol);
+        double[] shapeContexts = extractFuzzyShapecontexts(symbol);
+//        double[] shapeContexts = extractGeneralizedShapecontexts(symbol);
 //        double[] ivcFeatures = extractIVCFeatures(points);
 //        return ArraysUtil.concat(shapeContexts, ivcFeatures);
         return shapeContexts;
