@@ -256,7 +256,7 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
 
         ArrayList<Classifible> classifiblesJunk = SymbolUtil.readTemplatesFromInkmlFiles("isolatedJunk.txt",//MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
                "../MathFiles/CROHME/isolatedJunk/");
-        
+//        
         ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles("isolatedSymbols.txt",//MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
                "../MathFiles/CROHME/isolatedSymb/");
         classifibles.addAll(classifiblesJunk);
@@ -272,17 +272,17 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
         partitioner.setMap(symbolData.getMap());
         TrainTestGroup groupTrainAndTest;
         int numberOfFolds = KFoldPartitioner.numberOfFolds;
-        
+//        
 //        TO EXPORT ONLY TEST FILES
 //        SymbolLabels.readCrohme2013LabelsWithJunk();
-//        exportSContextsToIVCFiles(classifibles, "crohme2013SFuzzyContextTest.data");
+//        exportSContextsToIVCFiles(classifibles, "crohme2013SFuzzyContextTestNew.data");
 //      END TO EXPORT TEST
         
         SymbolLabels.readCrohme2013LabelsWithJunk();
-        String trainName = "trainSC";
-        String testName = "validationSC";
+        String trainName = "trainFuzzySC";
+        String testName = "validationFuzzySC";
         String format = ".data";
-        for (int i = 1; i <= numberOfFolds; i++) {
+        for (int i = 1; i <= 1; i++) {
             groupTrainAndTest = null;
             groupTrainAndTest = partitioner.partWithTestFoldAt(i);
             exportSContextsToIVCFiles(groupTrainAndTest.getTrain(), trainName + "_" + i + 
