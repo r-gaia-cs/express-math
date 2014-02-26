@@ -110,11 +110,18 @@ public class Main {
         
 //        NeuralNetworkClassifierEvaluator.testNeuralNetworkWithInkml();
 //        NeuralNetworkClassifierEvaluator.runKFoldEvaluation();
-        NeuralNetworkClassifierEvaluator.exportKFoldFiles();
+        
+//        ArrayList<String> notHiddenFileNames = FilesUtil.getNotHiddenFileNames("../MathFiles/CROHME/test/junk");
+//        ArrayList<String> notHiddenFileNames2 = FilesUtil.getNotHiddenFileNames("../MathFiles/CROHME/test/symbols");
+//        notHiddenFileNames.addAll(notHiddenFileNames2);
+//        for (String string : notHiddenFileNames) {
+//            FilesUtil.append("testSymbolsAndJunkCrohme2013.txt", string + "\n");
+//        }
+//        NeuralNetworkClassifierEvaluator.exportKFoldFiles();
         
 //        NeuralNetworkClassifierEvaluator.exportUNP_Files();
 //        NeuralNetworkClassifierEvaluator.generateFoldsFromIVCFiles();
-//        mergeFeatures();
+        mergeFeatures();
         
         
 //        END-TO TEST NEURAL NETWORK CLASSIFIER       
@@ -133,26 +140,33 @@ public class Main {
     }
     
     public static void mergeFeatures(){
-        String[] sContextTrainNames = {"trainFuzzySC_",
-        "trainSC_"};
-        String[] sContextValidationNames = {"validationFuzzySC_", 
-        "validationSC_"};
+//        NeuralNetworkFeaturesExtractor.mergeFeatureFiles("allTrainSC.data", 
+//                "allTrainOnline.data", 
+//            "allTrainSC_online.data");
         
-        
-        for (int namePosition = 0; namePosition < sContextValidationNames.length; namePosition++) {
-            for (int i = 3; i <= 4; i++) {
-            NeuralNetworkFeaturesExtractor.mergeFeatureFiles("C:\\Users\\Frank Aguilar\\Documents\\frank\\doctorado\\crohme2013_evaluation\\training\\scontext\\dataset\\"//"F:\\crohme2013_evaluation\\training\\dataset\\" 
-                    + 
-                    sContextTrainNames[namePosition] + i + ".data", 
-                "trainOnline_" + i + ".data", 
-            sContextTrainNames[namePosition] + "online_" + i + ".data");
-            
-            NeuralNetworkFeaturesExtractor.mergeFeatureFiles("C:\\Users\\Frank Aguilar\\Documents\\frank\\doctorado\\crohme2013_evaluation\\training\\scontext\\dataset\\" + //"F:\\crohme2013_evaluation\\training\\dataset\\" + 
-                    sContextValidationNames[namePosition] + i + ".data", 
-                "trainOnline_" + i + ".data", 
-            sContextValidationNames[namePosition] + "online_" + i + ".data");
-        }    
-        }
+        NeuralNetworkFeaturesExtractor.mergeFeatureFiles("allTrainFuzzySC.data", 
+                "allTrainOnline.data", 
+            "allTrainFuzzySC_onlineFirst100.data");
+//        String[] sContextTrainNames = {"trainFuzzySC_",
+//        "trainSC_"};
+//        String[] sContextValidationNames = {"validationFuzzySC_", 
+//        "validationSC_"};
+//        
+//        
+//        for (int namePosition = 0; namePosition < sContextValidationNames.length; namePosition++) {
+//            for (int i = 3; i <= 4; i++) {
+//            NeuralNetworkFeaturesExtractor.mergeFeatureFiles("C:\\Users\\Frank Aguilar\\Documents\\frank\\doctorado\\crohme2013_evaluation\\training\\scontext\\dataset\\"//"F:\\crohme2013_evaluation\\training\\dataset\\" 
+//                    + 
+//                    sContextTrainNames[namePosition] + i + ".data", 
+//                "trainOnline_" + i + ".data", 
+//            sContextTrainNames[namePosition] + "online_" + i + ".data");
+//            
+//            NeuralNetworkFeaturesExtractor.mergeFeatureFiles("C:\\Users\\Frank Aguilar\\Documents\\frank\\doctorado\\crohme2013_evaluation\\training\\scontext\\dataset\\" + //"F:\\crohme2013_evaluation\\training\\dataset\\" + 
+//                    sContextValidationNames[namePosition] + i + ".data", 
+//                "trainOnline_" + i + ".data", 
+//            sContextValidationNames[namePosition] + "online_" + i + ".data");
+//        }    
+//        }
     }
     
     public static void extractFeaturesToTrainNeuralNetwork(){

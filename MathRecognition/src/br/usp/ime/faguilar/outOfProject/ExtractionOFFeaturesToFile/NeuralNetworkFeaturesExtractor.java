@@ -257,19 +257,21 @@ public class NeuralNetworkFeaturesExtractor {
         BufferedReader reader2 = FilesUtil.getBufferedReader(fileName2);
         String outputLine;
         String line1, line2;
-        String[] lines;
+        String[] line2AsArray;
         try {
             while(reader1.ready()){
                 line1 = reader1.readLine();
                 line2 = reader2.readLine();
-                line1 = line1.replaceAll("\\s", "\t");
-                line2 = line2.replaceAll("\\s", "\t");
-                lines = line2.split("\t");
+//                line1 = line1.replaceAll("\\s", "\t");
+//                line2 = line2.replaceAll("\\s", "\t");
+                line2AsArray = line2.split("\t");
                 outputLine = line1 + "\t";
-                for (int i = 1; i < lines.length; i++) {
-                    outputLine += lines[i] + "\t";                    
+                for (int i = 1; i < line2AsArray.length; i++) {
+                    outputLine += line2AsArray[i];
+                    if(i < line2AsArray.length - 1)
+                         outputLine += "\t";
                 }
-                outputLine = outputLine.substring(0, outputLine.length()-1) + "\n";
+                outputLine = outputLine + "\n";
                 FilesUtil.append(outputFileName, outputLine);
             }
         } catch (IOException ex) {
