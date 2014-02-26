@@ -253,46 +253,44 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
     }
     
     public static void exportKFoldFiles(){
-//        NeuralNetworkClassifierEvaluator evaluator = new NeuralNetworkClassifierEvaluator();
-//        ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles(MathRecognitionFiles.INKML_CROHME_2013_TEST_FILES,//MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
-//                MathRecognitionFiles.INKML_CROHME_2013_TEST_DIR);
-//        ArrayList<String> notHiddenFileNames = FilesUtil.getNotHiddenFileNames("C:\\Users\\Frank Aguilar\\Documents\\frank\\doctorado\\programa\\MathFiles\\CROHME\\isolatedJunk");
-//        for (String string : notHiddenFileNames) {
-//            FilesUtil.append("isolatedJunk.txt", string + "\n");
-//        }
+
         ArrayList<Classifible> classifiblesJunk = SymbolUtil.readTemplatesFromInkmlFiles("isolatedJunk.txt",//MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
                "../MathFiles/CROHME/isolatedJunk/");
         
         ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles("isolatedSymbols.txt",//MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
                "../MathFiles/CROHME/isolatedSymb/");
         classifibles.addAll(classifiblesJunk);
+//        ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles("testSymbolsAndJunkCrohme2013.txt",//MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
+//               "../MathFiles/CROHME/test/symbolsAndJunk/");
+        
 
-//        SymbolTestData symbolData = new SymbolTestData();
-//        symbolData.addClassifibles(classifibles);
+        SymbolTestData symbolData = new SymbolTestData();
+        symbolData.addClassifibles(classifibles);
 //        symbolData.printLabels();
         
-//        KFoldPartitioner partitioner = new KFoldPartitioner();
-//        partitioner.setMap(symbolData.getMap());
-//        TrainTestGroup groupTrainAndTest;
-//        int numberOfFolds = KFoldPartitioner.numberOfFolds;
+        KFoldPartitioner partitioner = new KFoldPartitioner();
+        partitioner.setMap(symbolData.getMap());
+        TrainTestGroup groupTrainAndTest;
+        int numberOfFolds = KFoldPartitioner.numberOfFolds;
         
 //        TO EXPORT ONLY TEST FILES
-        SymbolLabels.readCrohme2013LabelsWithJunk();
-        exportSContextsToIVCFiles(classifibles, "allTrainFuzzySC.data");
-
 //        SymbolLabels.readCrohme2013LabelsWithJunk();
-//        String trainName = "trainFuzzySC";
-//        String testName = "testFuzzySC";
-//        String format = ".data";
-//        for (int i = 1; i <= numberOfFolds; i++) {
-//            groupTrainAndTest = null;
-//            groupTrainAndTest = partitioner.partWithTestFoldAt(i);
-//            exportSContextsToIVCFiles(groupTrainAndTest.getTrain(), trainName + "_" + i + 
-//                   format);
-//            exportSContextsToIVCFiles(groupTrainAndTest.getTest(), testName + "_" + i + 
-//                    format);
-//
-//        }
+//        exportSContextsToIVCFiles(classifibles, "crohme2013SFuzzyContextTest.data");
+//      END TO EXPORT TEST
+        
+        SymbolLabels.readCrohme2013LabelsWithJunk();
+        String trainName = "trainSC";
+        String testName = "validationSC";
+        String format = ".data";
+        for (int i = 1; i <= numberOfFolds; i++) {
+            groupTrainAndTest = null;
+            groupTrainAndTest = partitioner.partWithTestFoldAt(i);
+            exportSContextsToIVCFiles(groupTrainAndTest.getTrain(), trainName + "_" + i + 
+                   format);
+            exportSContextsToIVCFiles(groupTrainAndTest.getTest(), testName + "_" + i + 
+                    format);
+
+        }
     }
     
     
