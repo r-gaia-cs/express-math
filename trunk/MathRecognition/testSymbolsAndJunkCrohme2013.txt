@@ -9345,7 +9345,6 @@ symb466.inkml
 symb4660.inkml
 symb4661.inkml
 symb4662.inkml
-symb4663.inkml
 symb4664.inkml
 symb4665.inkml
 symb4666.inkml

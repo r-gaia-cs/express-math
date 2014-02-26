@@ -258,25 +258,29 @@ public class NeuralNetworkFeaturesExtractor {
         String outputLine;
         String line1, line2;
         String[] line2AsArray;
+        int count= 0;
         try {
             while(reader1.ready()){
                 line1 = reader1.readLine();
                 line2 = reader2.readLine();
-//                line1 = line1.replaceAll("\\s", "\t");
-//                line2 = line2.replaceAll("\\s", "\t");
-                line2AsArray = line2.split("\t");
-                outputLine = line1 + "\t";
-                for (int i = 1; i < line2AsArray.length; i++) {
-                    outputLine += line2AsArray[i];
-                    if(i < line2AsArray.length - 1)
-                         outputLine += "\t";
-                }
-                outputLine = outputLine + "\n";
-                FilesUtil.append(outputFileName, outputLine);
+                count++;
+                if(!line1.split("\t")[0].equals(line2.split("\t")[0]))
+                    System.out.println(count);
+                
+//                line2AsArray = line2.split("\t");
+//                outputLine = line1 + "\t";
+//                for (int i = 1; i < line2AsArray.length; i++) {
+//                    outputLine += line2AsArray[i];
+//                    if(i < line2AsArray.length - 1)
+//                         outputLine += "\t";
+//                }
+//                outputLine = outputLine + "\n";
+//                FilesUtil.append(outputFileName, outputLine);
             }
         } catch (IOException ex) {
             Logger.getLogger(NeuralNetworkFeaturesExtractor.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
     }
     
     public static void extractColumns(String inputFileName, String outputFileName, 
