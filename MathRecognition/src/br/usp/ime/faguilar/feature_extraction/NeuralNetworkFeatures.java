@@ -21,10 +21,10 @@ public class NeuralNetworkFeatures {
     public static int numberOShapecontext = 8;
     public static double[] extractMergedFeatures(DSymbol symbol){
 //        Point2D[] points = PreprocessingAlgorithms.getNPoints(symbol, MatchingParameters.numberOfPointPerSymbol);
-//        Point2D[] points = PointsExtractor.getNPoints(symbol, MatchingParameters.numberOfPointPerSymbol);
-//        double[] shapeContexts = extractshapecontexts(points);
+        Point2D[] points = PointsExtractor.getNPoints(symbol, MatchingParameters.numberOfPointPerSymbol);
+        double[] shapeContexts = extractshapecontexts(points);
         
-        double[] shapeContexts = extractFuzzyShapecontexts(symbol);
+//        double[] shapeContexts = extractFuzzyShapecontexts(symbol);
 //        double[] shapeContexts = extractGeneralizedShapecontexts(symbol);
 //        double[] ivcFeatures = extractIVCFeatures(points);
 //        return ArraysUtil.concat(shapeContexts, ivcFeatures);

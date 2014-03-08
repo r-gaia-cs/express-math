@@ -144,9 +144,9 @@ public class Main {
 //                "allTrainOnline.data", 
 //            "allTrainSC_online.data");
         
-        NeuralNetworkFeaturesExtractor.mergeFeatureFiles("../MathFiles/CROHME/test_dataICFHR2014/allTrainFuzzySCNew.data",//crohme2013SFuzzyContextTest.data", 
-                "../MathFiles/CROHME/test_dataICFHR2014/allTrainOnline.data",//testOnlineCrohme2013.data", 
-            "../MathFiles/CROHME/test_dataICFHR2014/crohme2013SFuzzyContextOnlineTest.data");
+        NeuralNetworkFeaturesExtractor.mergeFeatureFiles("../MathFiles/CROHME/validationFuzzySC_2.data",//crohme2013SFuzzyContextTest.data", 
+                "../MathFiles/CROHME/validationOnline_2.data",//testOnlineCrohme2013.data", 
+            "../MathFiles/CROHME/validationFuzzySC_online2.data");
 //        String[] sContextTrainNames = {"trainFuzzySC_",
 //        "trainSC_"};
 //        String[] sContextValidationNames = {"validationFuzzySC_", 
