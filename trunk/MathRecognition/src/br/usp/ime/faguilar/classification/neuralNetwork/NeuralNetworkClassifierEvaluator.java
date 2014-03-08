@@ -279,10 +279,10 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
 //      END TO EXPORT TEST
         
         SymbolLabels.readCrohme2013LabelsWithJunk();
-        String trainName = "trainFuzzySC";
-        String testName = "validationFuzzySC";
+        String trainName = "trainSC";
+        String testName = "validationSC";
         String format = ".data";
-        for (int i = 1; i <= 1; i++) {
+        for (int i = 2; i <= 2; i++) {
             groupTrainAndTest = null;
             groupTrainAndTest = partitioner.partWithTestFoldAt(i);
             exportSContextsToIVCFiles(groupTrainAndTest.getTrain(), trainName + "_" + i + 
