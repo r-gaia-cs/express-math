@@ -23,21 +23,21 @@ public class FuzzyShapeContext extends ShapeContext{
     public FuzzyShapeContext(float raioSC, Graph graph, int tot_r, int tot_t, 
             boolean rotation, GMathExpression mathExpression) {
         super();
-        this.tot_r = tot_r;
-        this.tot_t = tot_t;
-        this.totSC = tot_r * tot_t;
+        this.numberOfRadialBins = tot_r;
+        this.numberOfAngularBins = tot_t;
+        
         regionShapecontext = new FuzzyShapeContextRegion();
         
         this.init(raioSC, graph, rotation);
     }
     
     protected void init(float raioSC, Graph graph, boolean rotation) {
-        
-        this.raioSC = raioSC;
+        int totSC = numberOfAngularBins * numberOfRadialBins;
+        this.radio = raioSC;
         Vertex [] vertexList = graph.getIndexedVertexes();
 
-        float[] vt = regionShapecontext.calculateAngularRegions(tot_t, rotation);
-        float[] vr = regionShapecontext.calculateRadialRegions(tot_r, raioSC);
+        float[] vt = regionShapecontext.calculateAngularRegions(numberOfAngularBins, rotation);
+        float[] vr = regionShapecontext.calculateRadialRegions(numberOfRadialBins, raioSC);
 
         int totPoints = graph.getVertexSize();
         this.sc = new double[totPoints][totSC];
@@ -122,19 +122,19 @@ public class FuzzyShapeContext extends ShapeContext{
             float raio = modv;
             //tenho raio e theta, agora localiza 'bin' por angulo e raio
             int id_r=0, id_t=0;
-            for (int ii = 0; ii < tot_r; ii++){
+            for (int ii = 0; ii < numberOfRadialBins; ii++){
                 if (raio <= vr[ii]) {
                     id_r = ii;
                     break;
                 }
             }
-            for (int jj = 0; jj < tot_t; jj++){
+            for (int jj = 0; jj < numberOfAngularBins; jj++){
                 if (theta <= vt[jj]) {
                     id_t = jj;
                     break;
                 }
             }
-            if (rotation && theta > vt[tot_t - 1]){
+            if (rotation && theta > vt[numberOfAngularBins - 1]){
                 id_t = 0;
             }
             //System.out.println(i + ">> (" + x1 + ";" + y1 + ") vs. (" + x2 + ";" + y2 + "):\t"+ id_t);
