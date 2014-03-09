@@ -21,14 +21,14 @@ import java.util.*;
 public class ShapeContext implements Serializable{
     static final long serialVersionUID = -8563085518696891422L;
 
-    protected float raioSC;
-    protected int tot_r; //Total of radius bins
-    protected int tot_t; //Total of angle region bins
-    protected int totSC;
+    protected float radio;
+    protected int numberOfRadialBins; //Total of radius bins
+    protected int numberOfAngularBins; //Total of angle region bins
+//    protected int totSC;
 
     protected double[][] sc; // Shape Context
 
-    private GMathExpression gmathExpression;
+//    private GMathExpression gmathExpression;
 
     protected double[] centerShapeContext;
 
@@ -36,37 +36,37 @@ public class ShapeContext implements Serializable{
 
 
     public ShapeContext(){
-        gmathExpression = null;
+//        gmathExpression = null;
         centerShapeContext = null;
         centerVertex = null;
         sc = null;
     }
     public ShapeContext(float raioSC, Graph graph, int tot_r, int tot_t,
             boolean rotation,GMathExpression mathExpression) {
-        this.tot_r = tot_r;
-        this.tot_t = tot_t;
-        this.totSC = tot_r * tot_t;
-        gmathExpression=mathExpression;
+        this.numberOfRadialBins = tot_r;
+        this.numberOfAngularBins = tot_t;
+        
+//        gmathExpression=mathExpression;
         this.init(raioSC, graph, rotation);
     }
 
     protected void init(float raioSC, Graph graph, boolean rotation) {
-
-        this.raioSC = raioSC;
+        int totSC = numberOfRadialBins * numberOfAngularBins;
+        this.radio = raioSC;
         Vertex [] vertexList = graph.getIndexedVertexes();
 
-        float[] vt = new float[tot_t]; // pi/6, pi/3, pi/2, 2pi/3, 5pi/6, pi, ..., 2pi
-        for (int i = 0; i < tot_t; i++){
-            vt[i] = ((2.0f*(float)Math.PI)/(float)tot_t) * (float) (i+1);//(2.0f*(float)Math.PI /(float)tot_t) * (float) (i+1);
+        float[] vt = new float[numberOfAngularBins]; // pi/6, pi/3, pi/2, 2pi/3, 5pi/6, pi, ..., 2pi
+        for (int i = 0; i < numberOfAngularBins; i++){
+            vt[i] = ((2.0f*(float)Math.PI)/(float)numberOfAngularBins) * (float) (i+1);//(2.0f*(float)Math.PI /(float)tot_t) * (float) (i+1);
             if(rotation){
                 vt[i] = vt[i] - (float)Math.PI / 4.0f;
             }
         }
         float base = 2.0f;
-        float max = (float)Math.pow(base,tot_r);
+        float max = (float)Math.pow(base,numberOfRadialBins);
         float multiplica = raioSC/max;
-        float[] vr = new float[tot_r];
-        for (int i = 0; i < tot_r; i++)
+        float[] vr = new float[numberOfRadialBins];
+        for (int i = 0; i < numberOfRadialBins; i++)
             vr[i] = (float)Math.pow(2.0f,i+1) * multiplica;
 
 
@@ -159,13 +159,13 @@ se (dy < 0) entao theta:= 2PI - theta
                 float raio = modv;
                 //tenho raio e theta, agora localiza 'bin' por angulo e raio
                 int id_r=0, id_t=0;
-                for (int ii = 0; ii < tot_r; ii++){
+                for (int ii = 0; ii < numberOfRadialBins; ii++){
                     if (raio <= vr[ii]) {
                         id_r = ii;
                         break;
                     }
                 }
-                for (int jj = 0; jj < tot_t; jj++){
+                for (int jj = 0; jj < numberOfAngularBins; jj++){
                     if (theta <= vt[jj]) {
                         id_t = jj;
                         break;
@@ -181,12 +181,12 @@ se (dy < 0) entao theta:= 2PI - theta
                     }*/
                    // }
                 }
-                if (rotation && theta > vt[tot_t - 1]){
+                if (rotation && theta > vt[numberOfAngularBins - 1]){
                     id_t = 0;
                 }
                 //System.out.println(i + ">> (" + x1 + ";" + y1 + ") vs. (" + x2 + ";" + y2 + "):\t"+ id_t);
                 //identificador do bin
-                int id_bin = id_t*tot_r+id_r;
+                int id_bin = id_t*numberOfRadialBins+id_r;
                 sc[i][id_bin] += 1.0f;
             }
 //            GUIForShapeContext.showGUI(vertexList, vt, vr,(int)this.raioSC , i,gmathExpression);
@@ -215,24 +215,24 @@ se (dy < 0) entao theta:= 2PI - theta
             float raio = modv;
             //tenho raio e theta, agora localiza 'bin' por angulo e raio
             int id_r=0, id_t=0;
-            for (int ii = 0; ii < tot_r; ii++){
+            for (int ii = 0; ii < numberOfRadialBins; ii++){
                 if (raio <= vr[ii]) {
                     id_r = ii;
                     break;
                 }
             }
-            for (int jj = 0; jj < tot_t; jj++){
+            for (int jj = 0; jj < numberOfAngularBins; jj++){
                 if (theta <= vt[jj]) {
                     id_t = jj;
                     break;
                 }
             }
-            if (rotation && theta > vt[tot_t - 1]){
+            if (rotation && theta > vt[numberOfAngularBins - 1]){
                 id_t = 0;
             }
             //System.out.println(i + ">> (" + x1 + ";" + y1 + ") vs. (" + x2 + ";" + y2 + "):\t"+ id_t);
             //identificador do bin
-            int id_bin = id_t*tot_r+id_r;
+            int id_bin = id_t*numberOfRadialBins+id_r;
             centerShapeContext[id_bin] += 1.0f;
         }
 //            GUIForShapeContext.showGUI(vertexList, vt, vr,(int)this.raioSC , i,gmathExpression);
@@ -273,4 +273,31 @@ se (dy < 0) entao theta:= 2PI - theta
     public double[][] getSC() {
         return sc;
     }
+
+    public float getRadio() {
+        return radio;
+    }
+
+    public void setRadio(float radio) {
+        this.radio = radio;
+    }
+
+    public int getNumberOfRadialBins() {
+        return numberOfRadialBins;
+    }
+
+    public void setNumberOfRadialBins(int numberOfRadialBins) {
+        this.numberOfRadialBins = numberOfRadialBins;
+    }
+
+    public int getNumberOfAngularBins() {
+        return numberOfAngularBins;
+    }
+
+    public void setNumberOfAngularBins(int numberOfAngularBins) {
+        this.numberOfAngularBins = numberOfAngularBins;
+    }
+    
+    
+    
 }
