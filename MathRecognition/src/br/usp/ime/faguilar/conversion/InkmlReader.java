@@ -58,8 +58,8 @@ public class InkmlReader {
                       if(startElement.getName().getLocalPart().equals(TRACE))
                           processTrace(event);
                       if(startElement.getName().getLocalPart().equals(TRACE_GROUP))
-//                          processTraceGroup(event);
-                          break;
+                          processTraceGroup(event);
+//                          break;
                 }
             }
         }

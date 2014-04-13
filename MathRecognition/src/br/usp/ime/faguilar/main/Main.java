@@ -21,6 +21,7 @@ import br.usp.ime.faguilar.classification.neuralNetwork.NeuralNetworkClassifierE
 import br.usp.ime.faguilar.conversion.DsymbolToGraphConversor;
 import br.usp.ime.faguilar.conversion.InkmlReader;
 import br.usp.ime.faguilar.cost.CostShapeContextInside;
+import br.usp.ime.faguilar.crohme2014.Task1;
 import br.usp.ime.faguilar.data.DMathExpression;
 import br.usp.ime.faguilar.data.DSymbol;
 import br.usp.ime.faguilar.directories.MathRecognitionFiles;
@@ -101,15 +102,20 @@ public class Main {
 //        }
         
 //        TO TEST NEURAL NETWORK CLASSIFIER
-//        NeuralNetworkClassifier.testNeuralNetworkWithIVCFiles();
+//        NeuralNetworkClassifierEvaluator.testNeuralNetworkWithIVCFiles();
 //        System.out.println(Math.exp(200));
-//        for (int i = -1000; i < 1000; i++) {
+//        for (int i = -1000; i < 1000; i+=20) {
 //            System.out.println(i + "\t" + Math.exp(i));
 //            
 //        }
-        
+//        
 //        NeuralNetworkClassifierEvaluator.testNeuralNetworkWithInkml();
 //        NeuralNetworkClassifierEvaluator.runKFoldEvaluation();
+        
+//        CROHME 2014 TEST
+//        Task1.trainWithValidationData();
+        Task1.evaluateClassificationForTask1();
+//        END CROHME 2014 TEST
         
 //        ArrayList<String> notHiddenFileNames = FilesUtil.getNotHiddenFileNames("../MathFiles/CROHME/test/junk");
 //        ArrayList<String> notHiddenFileNames2 = FilesUtil.getNotHiddenFileNames("../MathFiles/CROHME/test/symbols");
@@ -121,7 +127,7 @@ public class Main {
         
 //        NeuralNetworkClassifierEvaluator.exportUNP_Files();
 //        NeuralNetworkClassifierEvaluator.generateFoldsFromIVCFiles();
-        mergeFeatures();
+//        mergeFeatures();
         
         
 //        END-TO TEST NEURAL NETWORK CLASSIFIER       

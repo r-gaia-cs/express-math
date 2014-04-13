@@ -24,6 +24,7 @@ import br.usp.ime.faguilar.util.FilesUtil;
 import br.usp.ime.faguilar.util.SymbolUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.Neuron;
 import org.neuroph.core.events.LearningEvent;
@@ -48,18 +49,22 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
     private NeuralNetwork neuralNetwork;
     private DataSet trainDataset;
     private KFoldPartitioner partitioner;
-//    private DataSet validationDataset;
-//    private DataSet testDataset;
+    private DataSet validationDataset;
+    private DataSet testDataset;
+    private boolean useValidation;
+    private double biggestRecognitionRate;
+    private static final String OPTIMAL_NEURAL_NET_PATH = "optimalNeuralNet.net";
     
     private int countIterations;
-    private double[] learningRates = new double[]{0.005};//{0.005};//{0.009, 0.007, 0.005, 0.003, 0.001, 0.0009, 0.0007, 0.0005};//{0.01, 0.005, 0.001, 0.0005};//{0.05};//{0.005};//{0.005, 0.005, 0.001, 0.0005, 0.0001};
-    private int[] iterations = new int[]{1000};//{1000};//{20, 20, 20, 20, 20};
+    private double[] learningRates = new double[]{0.05, 0.01, 0.005, 0.001, 0.0005};
+    private int[] iterations = new int[]{20, 20, 20, 20, 20};//{1000};//{20, 20, 20, 20, 20};
     private String logFile = "log_neural_net.txt";
     private int iterationIndex;
     private int countToSave;
     private int outputSize;
     private int inputSize;
     private int numberOfHiddenUnits;
+    private static String savedFilesNames = "neural_network_v28_";
     
     public NeuralNetworkClassifierEvaluator(){
         inputSize = MatchingParameters.LogPolarLocalRegions * MatchingParameters.angularLocalRegions
@@ -67,33 +72,35 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
         //for generalized shape contxt
 //        inputSize *= 2;
 //        outputSize = 101;
-        outputSize = 75;
-        numberOfHiddenUnits = 100;
+        outputSize = 102;
+        numberOfHiddenUnits = 102;
+        useValidation = false;
     }
     
     @Override
     public void train(){
-        neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 
-                inputSize, numberOfHiddenUnits, outputSize); 
-//        neuralNetwork = new NeuralNetworkWithSoftMaxActivation(TransferFunctionType.SIGMOID, 
-//                inputSize, numberOfHiddenUnits, outputSize);  
+        if(useValidation)
+            biggestRecognitionRate = Double.MIN_VALUE;
+        neuralNetwork = new NeuralNetworkWithSoftMaxActivation(TransferFunctionType.TANH, 
+                inputSize, numberOfHiddenUnits, outputSize);  
         
-//        neuralNetwork = NeuralNetwork.load("neural_network_1500");
-        LearningRule learningRule = new BackPropagation();//new BackPropagation();
+        LearningRule learningRule = new MomentumBackpropagation();
         learningRule.setNeuralNetwork(neuralNetwork);
         ((SupervisedLearning) learningRule).addListener(this);
+        ((MomentumBackpropagation) learningRule).setMomentum(0.5);
         countIterations = 0;
         iterationIndex = 0;
         countToSave = 0;
         ((SupervisedLearning) learningRule).setMaxIterations(calculateMaxIterations());
         ((SupervisedLearning) learningRule).setLearningRate(learningRates[iterationIndex]);
-        ((SupervisedLearning) learningRule).setMaxError(0.0008);
+        ((SupervisedLearning) learningRule).setMaxError(0.0001);
         neuralNetwork.setLearningRule(learningRule);
-//        for (Neuron neuron : neuralNetwork.getOutputNeurons()) {
-//            neuron.setTransferFunction(new ExpTransferFunction());
-//        }
-//        ((SupervisedLearning) learningRule).setBatchMode(true);
         learningRule.learn(trainDataset); 
+    }
+    
+    public void eraseDatasets(){
+        trainDataset = null;
+        validationDataset = null;
     }
     
     public int calculateMaxIterations(){
@@ -104,29 +111,32 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
         return max;
     }
     
-    public String testNeuralNetwork(DataSet dataSet) {
+    public  String testNeuralNetwork(DataSet dataSet) {
+        return testNeuralNetwork(neuralNetwork, dataSet);
+    }
+    
+    public static String testNeuralNetwork(NeuralNetwork aNeuralNetwork, DataSet dataSet) {
         double[] desiredOutput;
         int correct = 0;
+        double[] networkOutput;
         for(DataSetRow row : dataSet.getRows()) {
-            neuralNetwork.setInput(row.getInput());
-            neuralNetwork.calculate();
-            double[] networkOutput = neuralNetwork.getOutput();
+            aNeuralNetwork.setInput(row.getInput());
+            aNeuralNetwork.calculate();
+            networkOutput = aNeuralNetwork.getOutput();
             networkOutput = NeuralNetworkClassifier.outputToZerosAndOne(networkOutput);
             desiredOutput = row.getDesiredOutput();
             //percn with 7 classes ans 20 iterations 92.07317
             if(isCorrectOutput(desiredOutput, networkOutput))
                 correct++;
-//            System.out.println(" Output: " + Arrays.toString( networkOutput) );
         }
-        //addToLogFile("Recognition percentage: " + (correct / (float) dataSet.size()) * 100 + "\n");
-//        System.out.println("Recognition percentage: " + (correct / (float) dataSet.size()) * 100 + "\n");
-//        last test result: 8.29916
         return String.valueOf((correct / (float) dataSet.size()) * 100);
     }
     
+    public static NeuralNetwork getOptimalNetwork(){
+        return NeuralNetwork.load(OPTIMAL_NEURAL_NET_PATH);
+    }
     
-    
-    public boolean isCorrectOutput(double[] desiredOutput, double[] output){
+    public static boolean isCorrectOutput(double[] desiredOutput, double[] output){
         boolean correctOutput = true;
         for (int i = 0; i < output.length; i++) {
 //            if(Math.round(desiredOutput[i]) != Math.round(output[i])){
@@ -186,23 +196,24 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
         classifierTest.partData();
         ArrayList<Classifible> trainClassifibles = classifierTest.getTrainData();
         
-//        ArrayList<Classifible> testClassifibles = SymbolUtil.readTemplatesFromInkmlFiles(MathRecognitionFiles.TEST_FILES_CROHME,
-//                MathRecognitionFiles.INKML_CROHME_2012_TEST_DIR);
+        ArrayList<Classifible> testClassifibles = SymbolUtil.readTemplatesFromInkmlFiles(MathRecognitionFiles.TEST_FILES_CROHME,
+                MathRecognitionFiles.INKML_CROHME_2012_TEST_DIR);
                 
         NeuralNetwork nn;
         NeuralNetworkClassifierEvaluator nnetworkToTest = new NeuralNetworkClassifierEvaluator();
         int numberID;
-       String result1, result2;
+       String result1, result2, result3;
        SymbolLabels.readCrohme2012Labels();
+       Collections.shuffle(trainClassifibles);
        nnetworkToTest.setTrainingData(trainClassifibles);
-//       System.out.println("start training...");
-//       nnetworkToTest.train();
+       System.out.println("start training...");
+       nnetworkToTest.train();
 //      
         DataSet testDataset;
-//        System.out.println("Testing ...");
-        for (numberID = 180; numberID <= 1000; numberID += 20) {
+        System.out.println("Testing ...");
+        for (numberID = 20; numberID <= nnetworkToTest.calculateMaxIterations(); numberID += 20) {
             nn = null;
-            nn = NeuralNetwork.load("neural_network_fuzzy_soft50" + numberID);
+            nn = NeuralNetwork.load(savedFilesNames + numberID);
             nnetworkToTest.setNeuralNetwork(nn);
 //            
             result1 = nnetworkToTest.testNeuralNetwork(nnetworkToTest.getTrainDataset());
@@ -210,13 +221,14 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
             testDataset = new DataSet(nnetworkToTest.getInputSize(), nnetworkToTest.getOutputSize());
             nnetworkToTest.fillDatasetWithClassifibles(testDataset, classifierTest.getTestData());
             result2 = nnetworkToTest.testNeuralNetwork(testDataset);
-            System.out.printf("%s\t%s\n", result1, result2);
-////////            
+//            System.out.printf("%s\t%s\n", result1, result2);
+
 ////            TO TEST DATASET
-//            testDataset = new DataSet(nnetworkToTest.getInputSize(), nnetworkToTest.getOutputSize());
-//            nnetworkToTest.fillDatasetWithClassifibles(testDataset, testClassifibles);
-//            result2 = nnetworkToTest.testNeuralNetwork(testDataset);
+            testDataset = new DataSet(nnetworkToTest.getInputSize(), nnetworkToTest.getOutputSize());
+            nnetworkToTest.fillDatasetWithClassifibles(testDataset, testClassifibles);
+            result3 = nnetworkToTest.testNeuralNetwork(testDataset);
 //            System.out.printf("%s\n", result2);
+            System.out.printf("%s\t%s\t%s\n", result1, result2, result3);
         }        
     }
     
@@ -316,7 +328,6 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
     public static void generateFoldsFromIVCFiles(){
         SymbolLabels.readCrohme2013LabelsWithJunk();
         ArrayList<Classifible> classifibles = readClassifiblesFromIVCFiles();
-
         SymbolTestData symbolData = new SymbolTestData();
         symbolData.addClassifibles(classifibles);        
         KFoldPartitioner partitioner = new KFoldPartitioner();
@@ -438,9 +449,8 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
     @Override
     public void handleLearningEvent(LearningEvent event) {
         SupervisedLearning learning = (SupervisedLearning) event.getSource();
-        String output = "Iteration: " + countIterations + "\t";
-        output += "error: " + learning.getTotalNetworkError() + "\n";
-//        addToLogFile(output);
+        learning.getTrainingSet().shuffle();
+
         countIterations++;
         if(countIterations >= iterations[iterationIndex]){
             iterationIndex++;
@@ -449,11 +459,21 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
                 countIterations = 0;
             }
         }
-        countToSave++;
-        if(countToSave >= 20){
-            neuralNetwork.save("neural_network_fuzzy_soft50" + learning.getCurrentIteration());
-            countToSave = 0;
+        if(useValidation){
+            String result = testNeuralNetwork(validationDataset);
+            Double resulDouble = Double.valueOf(result);
+            if(resulDouble > biggestRecognitionRate){
+                System.out.println("best net updated ");
+                biggestRecognitionRate = resulDouble;
+                neuralNetwork.save(OPTIMAL_NEURAL_NET_PATH);
+            }
         }
+        
+//        countToSave++;
+//        if(countToSave >= 20){
+//            neuralNetwork.save(savedFilesNames + learning.getCurrentIteration());
+//            countToSave = 0;
+//        }
         System.out.printf("iteration: %d\ttotal network error: %f\n", learning.getCurrentIteration(),
                 learning.getTotalNetworkError());
     }
@@ -475,6 +495,8 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
         trainDataset = new DataSet(inputSize, outputSize);
         fillDatasetWithClassifibles(trainDataset, classifiables);
     }
+    
+    
     
     public void fillDatasetWithClassifibles(DataSet dataset,
             ArrayList<Classifible> classifiables){
@@ -505,6 +527,32 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
         
     }
 
+    public DataSet getValidationDataset() {
+        return validationDataset;
+    }
+
+    public void setValidationDataset(DataSet validationDataset) {
+        this.validationDataset = validationDataset;
+    }
+
+    public DataSet getTestDataset() {
+        return testDataset;
+    }
+
+    public void setTestDataset(DataSet testDataset) {
+        this.testDataset = testDataset;
+    }
+
+    public boolean isUseValidation() {
+        return useValidation;
+    }
+
+    public void setUseValidation(boolean useValidation) {
+        this.useValidation = useValidation;
+    }
+
+    
+    
     public int getOutputSize() {
         return outputSize;
     }

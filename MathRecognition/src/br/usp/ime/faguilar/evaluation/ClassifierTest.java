@@ -57,7 +57,7 @@ public class ClassifierTest {
 //        ArrayList<Classifible> classifibles = SymbolUtil.readSymbolData(EvaluationView.TEMPLATES_FILE);
         ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles(MathRecognitionFiles.TRAINING_FILES_CROHME,
                 MathRecognitionFiles.INKML_CROHME_2012_TRAIN_DIR);//SymbolUtil.readTemplatesFromInkmlFiles();//SymbolUtil.readTemplatesWithStrokesInfo();//SymbolUtil.readTemplates();
-        HashMap<UserSymbol, Integer> map = new HashMap<UserSymbol, Integer>();
+        HashMap<UserSymbol, Integer> map = new HashMap<>();
         for (Classifible classifible : classifibles){
 //            if(!selectedClasses.isEmpty()){
 //                if(selectedClasses.contains(classifible.getMyClass()))

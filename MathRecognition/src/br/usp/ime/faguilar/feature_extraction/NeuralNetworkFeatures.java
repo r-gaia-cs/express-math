@@ -23,12 +23,23 @@ public class NeuralNetworkFeatures {
 //        Point2D[] points = PreprocessingAlgorithms.getNPoints(symbol, MatchingParameters.numberOfPointPerSymbol);
         Point2D[] points = PointsExtractor.getNPoints(symbol, MatchingParameters.numberOfPointPerSymbol);
         double[] shapeContexts = extractshapecontexts(points);
+        double[] normalizedPoints = extractNormalizedPoints(points, symbol);
         
 //        double[] shapeContexts = extractFuzzyShapecontexts(symbol);
 //        double[] shapeContexts = extractGeneralizedShapecontexts(symbol);
 //        double[] ivcFeatures = extractIVCFeatures(points);
-//        return ArraysUtil.concat(shapeContexts, ivcFeatures);
-        return shapeContexts;
+        return ArraysUtil.concat(shapeContexts, normalizedPoints);
+//        return shapeContexts;
+    }
+    
+    public static double[] extractNormalizedPoints(Point2D[] points, DSymbol symbol){
+        Point2D[] newPoints = PreprocessingAlgorithms.normalizePoints(points, symbol.getBBox());
+        double[] normalizedCoords = new double[newPoints.length * 2];
+        for (int i = 0; i < newPoints.length; i++) {
+            normalizedCoords[2 * i] = newPoints[i].getX();
+            normalizedCoords[2 * i + 1] = newPoints[i].getY();
+        }
+        return normalizedCoords;
     }
     
     private static double[] extractFuzzyShapecontexts(DSymbol symbol) {

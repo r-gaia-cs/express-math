@@ -9,6 +9,7 @@ package br.usp.ime.faguilar.classification.neuralNetwork;
 import org.neuroph.core.Layer;
 import org.neuroph.core.Neuron;
 import org.neuroph.core.events.NNCalculatedEvent;
+import org.neuroph.core.transfer.Sigmoid;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.util.TransferFunctionType;
 
@@ -22,6 +23,9 @@ public class NeuralNetworkWithSoftMaxActivation extends MultiLayerPerceptron{
             int numberOfHiddenUnits, int outputSize){
         super(transferFunctionType, 
                 inputSize, numberOfHiddenUnits, outputSize);
+        for (Neuron neuron : getOutputNeurons()) {
+            neuron.setTransferFunction(new ExpTransferFunction());
+        }
     }
     
     /**

@@ -10,7 +10,7 @@ package br.usp.ime.faguilar.classification;
  *
  * @author Frank Aguilar
  */
-public class ClassificationHypothesis {
+public class ClassificationHypothesis implements Comparable{
     private double cost;
     private String label;
 
@@ -28,6 +28,16 @@ public class ClassificationHypothesis {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        double diference = getCost() - ((ClassificationHypothesis) o).getCost();
+        if (diference < 0) 
+            return -1;
+        if (diference > 0)
+            return 1;
+        return 0;
     }
     
     
