@@ -17,7 +17,10 @@ public class ExpTransferFunction extends TransferFunction{
     @Override
     public double getOutput(double net) {
 //        System.out.println(net);
-        
+        if(net < -100)
+            return 0;
+        if(net > 100)
+            return 2.6881171418161356E43;
         return Math.exp(net);
     }
     

@@ -18,6 +18,7 @@ import br.usp.ime.faguilar.graphics.GSymbol;
 import br.usp.ime.faguilar.segmentation.OrderedStroke;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -383,6 +384,30 @@ public class PreprocessingAlgorithms {
         Point2D newPoint=getNewPoint(points.get(startPoint), points.get(finalPoint),
                 distance/2.);
         points.add(finalPoint, newPoint);
+    }
+    
+    public static Point2D[] normalizePoints(Point2D[] points, Rectangle2D boundingBox){
+        Point2D[] newPoints = new Point2D[points.length];
+        double minX = boundingBox.getMinX();
+        double minY = boundingBox.getMinY();
+        double width = boundingBox.getWidth();
+        double height = boundingBox.getHeight();
+        double newX;
+        double newY;
+        double diagonal = Math.sqrt(width * width + height * height);
+        double dx = (diagonal - width) / 2.;
+        double dy = (diagonal - height) / 2.;
+        for (int i = 0; i < points.length; i++) {
+            if(diagonal > 0){
+                newX = ((points[i].getX() - minX) / diagonal) + dx;
+                newY = ((points[i].getY() - minY) / diagonal) + dy;
+            } else {
+                newX = 0.5;
+                newY = 0.5;
+            }
+            newPoints[i] = new Point2D.Double(newX, newY);
+        }
+        return newPoints;
     }
 
     public static int getPosMaxDistance(ArrayList<Point2D> points){
