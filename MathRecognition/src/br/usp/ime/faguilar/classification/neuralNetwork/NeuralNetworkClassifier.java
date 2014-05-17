@@ -12,6 +12,8 @@ import br.usp.ime.faguilar.classification.Classifier;
 import br.usp.ime.faguilar.classification.SymbolLabels;
 import br.usp.ime.faguilar.data.DSymbol;
 import br.usp.ime.faguilar.feature_extraction.NeuralNetworkFeatures;
+import br.usp.ime.faguilar.segmentation.HypothesisTree.CostPerSymbolClass;
+import br.usp.ime.faguilar.segmentation.HypothesisTree.SymbolHypothesis;
 import br.usp.ime.faguilar.util.IndexedValue;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,16 +24,19 @@ import org.neuroph.core.NeuralNetwork;
  * @author Frank Aguilar
  */
 public class NeuralNetworkClassifier extends Classifier{
-    private static final String NEURAL_NETWORK_PATH = "neural_network_fuzzy4000";
+    private static final String NEURAL_NETWORK_PATH = "neuralNetwork.net";//"neural_network_fuzzy4000";
     private NeuralNetwork neuralNetwork;
     private int numberofPossibleClasses;
     private double[] networkOutput;
+    private static int meanClasses = 0;
+    
 
     public NeuralNetworkClassifier() {
         neuralNetwork = NeuralNetwork.load(NEURAL_NETWORK_PATH);
         numberofPossibleClasses = 10;
         if(SymbolLabels.getSymbolLabels() == null)
-            SymbolLabels.readCrohme2012Labels();
+            SymbolLabels.readCrohme2013LabelsWithJunk();
+//            SymbolLabels.readCrohme2012Labels();
     }
        
     @Override
@@ -57,8 +62,12 @@ public class NeuralNetworkClassifier extends Classifier{
         result.setCost(- Math.log(networkOutput[classIndex]));
         return result;
     }
+    
+    public static double probabilityToCost(double probability){
+        return - Math.log(probability);
+    }
         
-    private int extractClassIndexFromOutput(double[] output){
+    public static int extractClassIndexFromOutput(double[] output){
         int maxPosition = 0;
         double max = output[maxPosition];
         for (int i = 1; i < output.length; i++) {
@@ -88,20 +97,67 @@ public class NeuralNetworkClassifier extends Classifier{
     public Object orderedListOfClasses() {
 //        double[] networkOutput = neuralNetwork.getOutput();
         ArrayList<IndexedValue> indexedValues = new ArrayList();
+        ArrayList<CostPerSymbolClass> costsPerclass = new ArrayList<>();
         for (int i = 0; i < networkOutput.length; i++) {
             indexedValues.add(IndexedValue.createIndexedValueFromIndexAndValue(
                     i, networkOutput[i]));            
         }
         Collections.sort(indexedValues);
         ArrayList<String> labels = new ArrayList<>();
-        for (int i = 0; i < numberofPossibleClasses; i++) {
-            labels.add(SymbolLabels.getLabelOfSymbolByIndex(indexedValues.get(
-                    indexedValues.size() - i - 1).getIndex()));    
+        int indexSelected;
+        CostPerSymbolClass cost;
+        int newNumber = calculateNumberOfClassesAutomatically(indexedValues);
+//        meanClasses += newNumber;
+        for (int i = 0; i < newNumber; i++) {
+            indexSelected = indexedValues.get(
+                    indexedValues.size() - i - 1).getIndex();
+            cost = new CostPerSymbolClass();
+            cost.setCost(- Math.log(networkOutput[indexSelected]));
+            cost.setLabel(SymbolLabels.getLabelOfSymbolByIndex(indexSelected));
+            costsPerclass.add(cost);
+//            labels.add(SymbolLabels.getLabelOfSymbolByIndex(indexSelected));    
+            
 //            labels.add(SymbolLabels.getLabelOfSymbolByIndex(
 //                    indexedValues.get(i).getIndex()));
         }
-        return labels;
+        return costsPerclass;
     }
+    
+    public int calculateNumberOfClassesAutomatically(ArrayList<IndexedValue> values){
+        int number = 0;
+        double sum = 0;
+        
+        for (int i = values.size() -1 ; i >= 0; i--) {
+            sum += values.get(i).getValue();
+            number++;
+            if(sum >= 0.9999999)//0.9995)
+                break;
+        }
+        if(SymbolLabels.getLabelOfSymbolByIndex(values.get(values.size() - 1).getIndex()).equalsIgnoreCase("junk"))
+            if (number <= 1)
+                number = 2;
+        number = Math.min(number, numberofPossibleClasses);
+        return number;
+    }
+    
+//    @Override
+//    public Object orderedListOfClasses() {
+////        double[] networkOutput = neuralNetwork.getOutput();
+//        ArrayList<IndexedValue> indexedValues = new ArrayList();
+//        for (int i = 0; i < networkOutput.length; i++) {
+//            indexedValues.add(IndexedValue.createIndexedValueFromIndexAndValue(
+//                    i, networkOutput[i]));            
+//        }
+//        Collections.sort(indexedValues);
+//        ArrayList<String> labels = new ArrayList<>();
+//        for (int i = 0; i < numberofPossibleClasses; i++) {
+//            labels.add(SymbolLabels.getLabelOfSymbolByIndex(indexedValues.get(
+//                    indexedValues.size() - i - 1).getIndex()));    
+////            labels.add(SymbolLabels.getLabelOfSymbolByIndex(
+////                    indexedValues.get(i).getIndex()));
+//        }
+//        return labels;
+//    }
 
     public NeuralNetwork getNeuralNetwork() {
         return neuralNetwork;
@@ -118,6 +174,42 @@ public class NeuralNetworkClassifier extends Classifier{
     public void setNumberofPossibleClasses(int numberofPossibleClasses) {
         this.numberofPossibleClasses = numberofPossibleClasses;
     }
+
+//    public void putCostAndBestSymbolLabel(SymbolHypothesis symbolHypothesis) {
+//        ArrayList<IndexedValue> indexedValues = new ArrayList();
+//        for (int i = 0; i < networkOutput.length; i++) {
+//            indexedValues.add(IndexedValue.createIndexedValueFromIndexAndValue(
+//                    i, networkOutput[i]));            
+//        }
+//        Collections.sort(indexedValues);
+//        ArrayList<String> labels = new ArrayList<>();
+//        String label;
+//        int indexOFNetworkOutput;
+//        for (int i = 0; i < numberofPossibleClasses; i++) {
+//            indexOFNetworkOutput = indexedValues.get(
+//                    indexedValues.size() - i - 1).getIndex();
+//            label = SymbolLabels.getLabelOfSymbolByIndex(indexOFNetworkOutput);
+//            if (!label.equalsIgnoreCase("junk")){
+//                symbolHypothesis.setCost(- Math.log(networkOutput[indexOFNetworkOutput]));
+//                labels.add(label);
+//                symbolHypothesis.setLabels(labels);
+//                break;
+//            } 
+//            
+////            else {
+////                symbolHypothesis.setCost(- Math.log(networkOutput[indexedValues.get(
+////                    indexedValues.size() - numberofPossibleClasses - 1).getIndex()]));
+////                
+////                indexOFNetworkOutput = indexedValues.get(
+////                    indexedValues.size() - i - 2).getIndex();
+////                label = SymbolLabels.getLabelOfSymbolByIndex(indexOFNetworkOutput);
+////                
+////                labels.add(label);
+////                symbolHypothesis.setLabels(labels);
+////                break;
+////            }
+//        }
+//    }
     
     
     

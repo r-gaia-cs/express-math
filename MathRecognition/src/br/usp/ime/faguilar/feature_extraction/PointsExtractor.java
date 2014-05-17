@@ -63,6 +63,8 @@ public class PointsExtractor {
         }
         return points; 
     }
+    
+    
 
     private static int strokesOFSizeOne(DSymbol symbol) {
         int count = 0;

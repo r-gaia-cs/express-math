@@ -94,5 +94,5 @@ public class DStroke extends MathExpressionData<TimePoint>
         centroid.setLocation(sumX / this.size(), sumY / this.size());
         return centroid;
     }
-
+    
 }

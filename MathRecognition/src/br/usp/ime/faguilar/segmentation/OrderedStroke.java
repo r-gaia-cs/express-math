@@ -4,7 +4,9 @@
  */
 package br.usp.ime.faguilar.segmentation;
 
+import br.usp.ime.faguilar.data.DStroke;
 import br.usp.ime.faguilar.graphics.GStroke;
+import java.util.List;
 
 /**
  *
@@ -19,6 +21,17 @@ public class OrderedStroke extends GStroke implements Comparable{
 
     public void setIndex(int index) {
         this.index = index;
+    }
+    
+    public static DStroke findStrokeByID(List<DStroke> strokes, int id) {
+        DStroke stroke = null;
+        for (DStroke aStroke : strokes) {
+            if (((OrderedStroke)aStroke).getIndex() == id){
+                stroke = aStroke;
+                break;
+            }
+        }
+        return stroke;
     }
 
     @Override

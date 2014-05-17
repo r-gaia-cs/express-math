@@ -16,11 +16,12 @@ import java.util.Arrays;
  *
  * @author Frank Aguilar
  */
-public class SymbolHypothesis {
+public class SymbolHypothesis implements Comparable{
     private boolean[] binaryRepresentation;
     private DSymbol symbol;
     private double cost;
-    private ArrayList<String> labels;    
+//    private ArrayList<String> labels; 
+    private ArrayList<CostPerSymbolClass> costsPerClass;
     public static int BINARY_REPRESENTATION_LENGHT = 20;   
     
     public SymbolHypothesis(){
@@ -30,14 +31,38 @@ public class SymbolHypothesis {
     public SymbolHypothesis(int bynaryRepresentationSize){
         binaryRepresentation = new boolean[bynaryRepresentationSize];
     }
-    
-    public ArrayList<String> getLabels() {
-        return labels;
+
+    public ArrayList<CostPerSymbolClass> getCostsPerClass() {
+        return costsPerClass;
     }
 
-    public void setLabels(ArrayList<String> labels) {
-        this.labels = labels;
+    public void setCostsPerClass(ArrayList<CostPerSymbolClass> costsPerClass) {
+        this.costsPerClass = costsPerClass;
     }
+    
+    public String getLabel(int position){
+        return costsPerClass.get(position).getLabel();
+    }
+    
+    public double getCost(int position) {
+        return costsPerClass.get(position).getCost();
+    }
+    
+    
+    public String getStrokesIDsAsString(){
+        String ids = "";
+        for (DStroke dStroke : symbol) {
+            ids += ((OrderedStroke) dStroke).getIndex() + " ";
+        }
+        return ids;
+    }
+//    public ArrayList<String> getLabels() {
+//        return labels;
+//    }
+//
+//    public void setLabels(ArrayList<String> labels) {
+//        this.labels = labels;
+//    }
     
     public DSymbol getSymbol() {
         return symbol;
@@ -66,8 +91,8 @@ public class SymbolHypothesis {
     }
     
     public boolean hasLabel(String label){
-        for (String string : labels) {
-            if(string.equals(label))
+        for (CostPerSymbolClass aCost : costsPerClass) {
+            if(aCost.getLabel().equals(label))
                 return true;
         }
         return false;
@@ -114,4 +139,10 @@ public class SymbolHypothesis {
 //    public boolean hasStroke(int indexOfStroke){
 //        return 
 //    }
+
+    @Override
+    public int compareTo(Object o) {
+        double othersCost = ((SymbolHypothesis) o).getCost();
+        return Double.compare(getCost(), othersCost);
+    }
 }

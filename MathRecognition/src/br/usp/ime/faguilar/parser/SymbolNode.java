@@ -57,6 +57,55 @@ public class SymbolNode extends Node<RegionNode>{
         String data = getSymbol().getLabel();
         return data;
     }
+    
+    public String getSymbolLabel(){
+        String label = getSymbol().getLabel();
+        if(label.equals("-") && hasAboveAndBelow(getChildren()))//!getChildren().isEmpty())
+            return "\\frac";
+        return label;
+    }
+    
+    @Override
+    public String latexString(){
+        String string = "";
+        String label = getSymbol().getLabel();
+        string = label + " ";
+        if(label.equals("-") && hasAboveAndBelow(getChildren())) {
+            string = "\\frac ";
+            RegionNode numerator, denominator;
+            if(getChildren().get(0).getLabel() == RegionLabel.ABOVE){
+                numerator = getChildren().get(0);
+                denominator = getChildren().get(1);
+            } else {
+                numerator = getChildren().get(1);
+                denominator = getChildren().get(0);
+            }
+            string += numerator.latexString();   
+            string += denominator.latexString();
+        } else {
+            for (RegionNode t : getChildren()) {
+                string += t.latexString();
+            }
+        }
+            
+        
+//        if(label == RegionLabel.ABOVE){
+//            if(getParent().getSymbol().getLabel().equalsIgnoreCase("\frac")){
+//                if (!getChildren().isEmpty())
+//                    string += "{" + getChildren().get(0).latexString() + "}";
+//            }
+//                
+//        }
+        
+//        string += (stringData() + "(");
+//        for (T t : children) {
+//            string += (" " + t.treeString());
+//        }
+//        string += ") ";
+        return string;
+    }
+    
+
 
     public void addNodeToRegion(SymbolNode node, int regionLabel){
         RegionNode region = getRegion(regionLabel);
@@ -115,5 +164,18 @@ public class SymbolNode extends Node<RegionNode>{
 
     public void setSymbol(DSymbol symbol) {
         this.symbol = symbol;
+    }
+
+    private boolean hasAboveAndBelow(List<RegionNode> children) {
+        boolean above = false;
+        boolean below = false;
+        for (RegionNode regionNode : children) {
+            if(regionNode.getLabel() == RegionLabel.ABOVE)
+                above = true;
+            else if(regionNode.getLabel() == RegionLabel.BELOW)
+                below = true;
+            
+        }
+        return above && below;
     }
 }

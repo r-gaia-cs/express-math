@@ -28,7 +28,7 @@ public class SymbolClass {
     
     public static final HashMap<String, Integer> symbolClasses = SymbolClass.readSymbolClasses();
     
-    private static final String fileWithSymbolClasses = "files/symbol-classes.txt";
+    private static final String fileWithSymbolClasses = "symbol-classes-chrome2013.txt";//"files/symbol-classes.txt";
     
     public static double centroidY(DSymbol symbol){
         int symbolClass = symbolClass(symbol);
@@ -87,7 +87,7 @@ public class SymbolClass {
         double bottomY = symbol.getRbPoint().getY();
         switch(symbolClass){
             case NON_SCRIPTED: centroidY = bottomY - 0.5 * symbol.getHeightAsDouble(); break;
-            case OPEN_BRACKET: centroidY = bottomY - CENTROID_RATIO * symbol.getHeightAsDouble(); break;
+            case OPEN_BRACKET: centroidY = bottomY - 0.5 * symbol.getHeightAsDouble(); break; //CENTROID_RATIO * symbol.getHeightAsDouble(); break;
             case ROOT: centroidY = bottomY - CENTROID_RATIO * symbol.getHeightAsDouble(); break;
             case VARIABLE_RANGE: centroidY = bottomY - 0.5 * symbol.getHeightAsDouble(); break;
             case ASCENDER: centroidY = bottomY - CENTROID_RATIO * symbol.getHeightAsDouble(); break;
@@ -178,14 +178,14 @@ public class SymbolClass {
         double treashold = Double.MIN_VALUE;
         double bottomY = symbol.getRbPoint().getY();
         switch(symbolClass){
-            case NON_SCRIPTED: treashold = bottomY - (1 - TREASHOLD_RATIO) * symbol.getHeightAsDouble(); break;
-            case OPEN_BRACKET: treashold = bottomY - (1 - TREASHOLD_RATIO) * symbol.getHeightAsDouble(); break;
-            case ROOT: treashold = bottomY - (1 - TREASHOLD_RATIO) * symbol.getHeightAsDouble(); break;
-            case VARIABLE_RANGE: treashold = bottomY - (1 - TREASHOLD_RATIO) * symbol.getHeightAsDouble(); break;
-            case ASCENDER: treashold = bottomY - (1 - TREASHOLD_RATIO) * symbol.getHeightAsDouble(); break;
-            case DESCENDER: treashold = bottomY - (1 - 0.5 * TREASHOLD_RATIO) * symbol.getHeightAsDouble(); break;
-            case CENTERED: treashold = bottomY - (1 - TREASHOLD_RATIO) * symbol.getHeightAsDouble(); break;
-            case CLOSE_BRACKET: treashold = bottomY - (1 - TREASHOLD_RATIO) * symbol.getHeightAsDouble(); break;
+            case NON_SCRIPTED: treashold = bottomY - (1. - TREASHOLD_RATIO) * symbol.getHeightAsDouble(); break;
+            case OPEN_BRACKET: treashold = bottomY - (1. - TREASHOLD_RATIO) * symbol.getHeightAsDouble(); break;
+            case ROOT: treashold = bottomY - (1. - TREASHOLD_RATIO) * symbol.getHeightAsDouble(); break;
+            case VARIABLE_RANGE: treashold = bottomY - (1. - TREASHOLD_RATIO) * symbol.getHeightAsDouble(); break;
+            case ASCENDER: treashold = bottomY - (1. - TREASHOLD_RATIO) * symbol.getHeightAsDouble(); break;
+            case DESCENDER: treashold = bottomY - (1. - 0.5 * TREASHOLD_RATIO) * symbol.getHeightAsDouble(); break;
+            case CENTERED: treashold = bottomY - (1. - TREASHOLD_RATIO) * symbol.getHeightAsDouble(); break;
+            case CLOSE_BRACKET: treashold = bottomY - (1. - TREASHOLD_RATIO) * symbol.getHeightAsDouble(); break;
             
         }
         return treashold;

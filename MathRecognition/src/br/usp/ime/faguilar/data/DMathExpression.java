@@ -6,6 +6,7 @@ package br.usp.ime.faguilar.data;
 
 import java.awt.geom.Point2D;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  *
@@ -71,5 +72,15 @@ public class DMathExpression extends MathExpressionData<DSymbol>
                 rbPoint.setLocation(rbPoint.getX(),p2.getY());
         }
         return this.add(e);
+    }
+    
+    public static ArrayList extractStrokes(DMathExpression expression){
+    ArrayList strokes = new ArrayList();
+    for (DSymbol dSymbol : expression) {
+        for (DStroke dStroke : dSymbol) {
+                strokes.add(dStroke);
+            }
+        }
+    return strokes;
     }
 }

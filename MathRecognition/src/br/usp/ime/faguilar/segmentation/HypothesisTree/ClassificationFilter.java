@@ -35,11 +35,11 @@ public class ClassificationFilter implements HypothesisFilter{
             classifible.setSymbol(symbolHypothesis.getSymbol());
             clasResult = (ClassificationResult) classifier.classify(classifible);
             if(clasResult != null){
-//                listOfClasses = new ArrayList();
-//                listOfClasses.add((String) clasResult.getMyClass());
-//                symbolHypothesis.setLabels(listOfClasses);
                 symbolHypothesis.setCost(clasResult.getCost());
-                symbolHypothesis.setLabels((ArrayList<String>) classifier.orderedListOfClasses());
+                symbolHypothesis.setCostsPerClass((ArrayList<CostPerSymbolClass>) classifier.orderedListOfClasses());
+//                TEMP
+//                ((NeuralNetworkClassifier) classifier).putCostAndBestSymbolLabel(symbolHypothesis);
+                
                 selected.add(symbolHypothesis);
             }
         }

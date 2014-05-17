@@ -148,14 +148,14 @@ public class StructuralRelation {
     static boolean symbolDominatesPreviousSymbol(DSymbol symbol1, DSymbol symbol2) {
         if(overlaps(symbol1, symbol2) || contains(symbol1, symbol2) || 
                 (SymbolClass.symbolClass(symbol1) == SymbolClass.VARIABLE_RANGE && 
-                !isAdjacent(symbol2, symbol1)))
+                !isAdjacentUsingClassifier(symbol2, symbol1)))
             return true;
         return false;
     }
 
     static boolean isRegularHor(DSymbol symbol1, DSymbol symbol2) {
         int symbolClass = SymbolClass.symbolClass(symbol2);
-        if(isAdjacent(symbol2, symbol1) || (symbol1.getLtPoint().getY() >= 
+        if(isAdjacentUsingClassifier(symbol2, symbol1) || (symbol1.getLtPoint().getY() >= 
                 symbol2.getLtPoint().getY() && symbol1.getRbPoint().getY() <= 
                 symbol2.getRbPoint().getY()) || ((symbolClass == SymbolClass.OPEN_BRACKET 
                 || symbolClass == SymbolClass.CLOSE_BRACKET) && overlapsY(symbol2, symbol1)))
@@ -191,7 +191,7 @@ public class StructuralRelation {
 
     public static boolean contains(DSymbol symbol1, DSymbol symbol2) {
         if(symbol1 != symbol2 && SymbolClass.symbolClass(symbol1) == SymbolClass.ROOT 
-                && overlapsX(symbol1, symbol2) && overlapsY(symbol1, symbol2))
+                && RelationClassifier.isInsideRelation(symbol1, symbol2))//overlapsX(symbol1, symbol2) && overlapsY(symbol1, symbol2))
             return true;
         return false;
     }
@@ -206,12 +206,28 @@ public class StructuralRelation {
         return false;
     }
     
+    public static boolean isAdjacentUsingClassifier(DSymbol symbol1, DSymbol symbol2) {
+        if(SymbolClass.symbolClass(symbol2) != SymbolClass.NON_SCRIPTED 
+//                && SymbolClass.symbolClass(symbol2) != SymbolClass.OPEN_BRACKET 
+                && symbol1 != symbol2 && RelationClassifier.isInHorizontalZone(symbol2, symbol1))
+            return true;
+        return false;
+////        
+//        double centroidYSymbol1 = SymbolClass.centroidY(symbol1);
+//        if(SymbolClass.symbolClass(symbol2) != SymbolClass.NON_SCRIPTED 
+//                && SymbolClass.symbolClass(symbol2) != SymbolClass.OPEN_BRACKET &&
+//                symbol1 != symbol2 && !isYCoordAtSubScriptRegion(symbol2, centroidYSymbol1) && 
+//                !isYCoordAtSuperScriptRegion(symbol2, centroidYSymbol1))
+//            return true;
+//        return false;
+    }
+    
     public static double rightEndOfRegion(DSymbol symbol){
         Double rightEnd = Double.MAX_VALUE;
         double maxX = symbol.getRbPoint().getX();
         for (int i = 0; i < symbolsSortedByXCoord.size(); i++) {
             if(symbolsSortedByXCoord.get(i).getLtPoint().getX() > maxX)
-                if(isAdjacent(symbolsSortedByXCoord.get(i), symbol) || 
+                if(isAdjacentUsingClassifier(symbolsSortedByXCoord.get(i), symbol) || 
                         horizontalOverlappingGraterThan(symbol, symbolsSortedByXCoord.get(i), minIntersectionRatio)){
                     rightEnd = symbolsSortedByXCoord.get(i).getLtPoint().getX();
                     break;
@@ -225,7 +241,7 @@ public class StructuralRelation {
         double minX = symbol.getLtPoint().getX();
         for (int i = symbolsSortedByXCoord.size() -1 ; i >= 0; i--) {
             if(symbolsSortedByXCoord.get(i).getRbPoint().getX() < minX)
-                if(isAdjacent(symbol, symbolsSortedByXCoord.get(i)) || 
+                if(isAdjacentUsingClassifier(symbol, symbolsSortedByXCoord.get(i)) || 
                         horizontalOverlappingGraterThan(symbol, symbolsSortedByXCoord.get(i), minIntersectionRatio)){
                     rightEnd = symbolsSortedByXCoord.get(i).getRbPoint().getX();
                     break;
@@ -323,6 +339,7 @@ public class StructuralRelation {
                 isYCoordAtAboveRegion(symbol1, centroidY))
             return true;
         return false;
+//        return RelationClassifier.isAboveRelation(symbol1, symbol2);
     }
     
     
@@ -333,6 +350,7 @@ public class StructuralRelation {
                 isYCoordAtBelowRegion(symbol1, centroidY))
             return true;
         return false;
+//        return RelationClassifier.isBelowRelation(symbol1, symbol2);
     }
     
     public static boolean isSymbolAtSuperscriptRegion(DSymbol symbol1, DSymbol symbol2){
@@ -349,12 +367,15 @@ public class StructuralRelation {
 //        double centroidY = SymbolClass.centroidY(symbol2);
 //        if(isXcoordAtTopLEftOrBottomLeftRegions(symbol1, centroidX) && 
 //                isYCoordAtLeftSuperScriptRegion(symbol1, centroidY))
+        
         double centroidX2 = symbol2.getBoundingBoxCenter().getX();
         double centroidY2 = SymbolClass.centroidY(symbol2);
         double centroidY1 = SymbolClass.centroidY(symbol1);
         double minX = symbol1.getLtPoint().getX();
         if(centroidY2 < centroidY1 && centroidX2 < minX)
             return true;
+//        if(RelationClassifier.isTopLeftRelation(symbol1, symbol2) && centroidX2 < minX)
+//            return true;
         return false;
     }
     

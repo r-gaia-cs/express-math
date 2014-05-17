@@ -47,6 +47,13 @@ public class RegionLabel {
             case SUBSCRIPT: return "Sub";
             case INSIDE: return "I";
             case RIGHT: return "R";
+//            
+//            case ABOVE: return "Above";
+//            case BELOW: return "Below";
+//            case SUPERSCRIPT: return "Sup";
+//            case SUBSCRIPT: return "Sub";
+//            case INSIDE: return "Inside";
+//            case RIGHT: return "Right";
         }
         return "";
     }

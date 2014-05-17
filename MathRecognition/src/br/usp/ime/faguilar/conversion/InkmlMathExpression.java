@@ -80,6 +80,17 @@ public class InkmlMathExpression {
         }
         return writer;
     }
+    
+    public String getUI() {
+        String UI = "";
+        for (Annotation annotation : annotations) {
+            if(annotation.getType().equals("UI")) {
+                UI = annotation.getValue();
+                break;
+            }
+        }
+        return UI;
+    }
 
     private OrderedStroke getTraceAsStroke(int traceIndex){
         OrderedStroke stroke = new OrderedStroke();

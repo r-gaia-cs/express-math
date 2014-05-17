@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class SymbolHypothesisForStroke {
     List<SymbolHypothesis> hypothesis;
-
+    private int indexOfStroke;
 //    public boolean containsHypothesis(SymbolHypothesis anHypothesis){
 //        boolean contains = false;
 //        for (SymbolHypothesis symbolHypothesis : hypothesis) {
@@ -37,6 +37,14 @@ public class SymbolHypothesisForStroke {
 
     public void setHypothesis(List<SymbolHypothesis> hypothesis) {
         this.hypothesis = hypothesis;
+    }
+
+    public int getIndexOfStroke() {
+        return indexOfStroke;
+    }
+
+    public void setIndexOfStroke(int indexOfStroke) {
+        this.indexOfStroke = indexOfStroke;
     }
     
 }

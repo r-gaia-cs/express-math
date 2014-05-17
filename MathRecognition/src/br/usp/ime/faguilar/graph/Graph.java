@@ -132,7 +132,7 @@ public class Graph {
         double width = this.getWidth();
         double height = this.getHeight();
         Point2D min = this.getMinPositions();
-        return new Point2D.Double(min.getX() + (width / 2), min.getY() + (height / 2));
+        return new Point2D.Double(min.getX() + (width / 2.), min.getY() + (height / 2.));
     }
 
     public LinkedList<Vertex>[] getNeighboursList() {
