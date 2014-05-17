@@ -21,4 +21,8 @@ public interface HypothesisGenerator {
     public List<SymbolHypothesis> getHypothesis(OrderedStroke stroke);
 
     public ArrayList<SymbolHypothesis> getAllHypothesis();
+    
+    
+    
+    public ArrayList<SymbolHypothesis> getAllHypothesisFilteredByStroke();
 }

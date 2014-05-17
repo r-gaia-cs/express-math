@@ -313,6 +313,39 @@ public class CostShapeContextInside extends Cost {
                     MatchingParameters.angularLocalRegions, false,null);
         return sc;
     }
+    
+    public static ShapeContext calculateFuzzyShapeContextFromPoints2DAndCenter(Point2D[] points, 
+            Point2D center) {
+        Graph g = new Graph();
+        ShapeContext sc;
+        double height, width;
+        double maxX = Double.MIN_VALUE;
+        double minX = Double.MAX_VALUE;
+        double maxY = Double.MIN_VALUE;
+        double minY = Double.MAX_VALUE;
+        for (int i = 0; i < points.length; i++) {
+            g.addVertex(i, (float)points[i].getX(), (float)points[i].getY());
+            if(points[i].getX() > maxX)
+                maxX = points[i].getX();
+            if(points[i].getX() < minX)
+                minX = points[i].getX();
+            if(points[i].getY() > maxY)
+                maxY = points[i].getY();
+            if(points[i].getY() < minY)
+                minY = points[i].getY();
+        }
+        height = maxX - minX;
+        width = maxY - minY;
+
+//            float diagonal = (float) (Math.sqrt(height * height
+//                    + width * width) / 2);
+        float diagonal = (float) Math.sqrt(height * height
+                    + width * width);
+        FuzzyShapeContext.center = center;
+            sc = new FuzzyShapeContext(diagonal, g, MatchingParameters.LogPolarLocalRegions,
+                    MatchingParameters.angularLocalRegions, false,null);
+        return sc;
+    }
 
     public static ShapeContext calculateGeneralizedShapeContextFromPoints2D(Point2D[] points) {
         Graph g = new Graph();

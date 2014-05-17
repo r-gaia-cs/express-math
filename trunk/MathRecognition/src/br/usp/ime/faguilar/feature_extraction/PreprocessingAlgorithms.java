@@ -232,11 +232,47 @@ public class PreprocessingAlgorithms {
         Point2D[] points = PointsExtractor.getNPoints(s, N);
         if (points[0] == null)
             System.out.println(s);
+        return getFuzzyShapeContetxFeatures(points);
+    }
+    
+    public static ShapeContextFeature getFuzzyShapeContetxFeatures(Point2D[] points){
+        ShapeContextFeature features = new ShapeContextFeature();
+//        int[] pointsPerStroke = extractNNumberOfPointsPerStroke(s, N);
+//        int[] pointsPerStroke = extractNNumberOfPointsPerStrokeUsingLenght(s, N);
+        
+
+//        for (int i = 0; i < pointsPerStroke.length; i++) {
+//            ArrayList<FeatureGroup> newFeatures = getNShapeContetxFeatures(s, s.get(i), pointsPerStroke[i]);
+//            features.addAll(newFeatures);
+//        }
+//        ShapeContext shapeContext = CostShapeContextInside.calculateFuzzyShapeContextFromPoints2D(features.getCoords());
+        if (points[0] == null)
+            System.out.println("null points");
         ShapeContext shapeContext = CostShapeContextInside.calculateFuzzyShapeContextFromPoints2D(
                 points);
         features.setShapeContext(shapeContext);
         return features;
     }
+    
+    public static ShapeContextFeature getFuzzyShapeContetxFeaturesWithCenter(Point2D[] points, Point2D center){
+        ShapeContextFeature features = new ShapeContextFeature();
+//        int[] pointsPerStroke = extractNNumberOfPointsPerStroke(s, N);
+//        int[] pointsPerStroke = extractNNumberOfPointsPerStrokeUsingLenght(s, N);
+        
+
+//        for (int i = 0; i < pointsPerStroke.length; i++) {
+//            ArrayList<FeatureGroup> newFeatures = getNShapeContetxFeatures(s, s.get(i), pointsPerStroke[i]);
+//            features.addAll(newFeatures);
+//        }
+//        ShapeContext shapeContext = CostShapeContextInside.calculateFuzzyShapeContextFromPoints2D(features.getCoords());
+        if (points[0] == null)
+            System.out.println("null points");
+        ShapeContext shapeContext = CostShapeContextInside.calculateFuzzyShapeContextFromPoints2DAndCenter(
+                points, center);
+        features.setShapeContext(shapeContext);
+        return features;
+    }
+    
 
     public static int getNumberOfPoints(DSymbol s){
         int numberOfPooints=0;
@@ -395,17 +431,20 @@ public class PreprocessingAlgorithms {
         double newX;
         double newY;
         double diagonal = Math.sqrt(width * width + height * height);
-        double dx = (diagonal - width) / 2.;
-        double dy = (diagonal - height) / 2.;
-        for (int i = 0; i < points.length; i++) {
-            if(diagonal > 0){
+        if(diagonal > 0){
+            double dx = (diagonal - width) / (2. * diagonal);
+            double dy = (diagonal - height) / (2. * diagonal);
+            for (int i = 0; i < points.length; i++) {
                 newX = ((points[i].getX() - minX) / diagonal) + dx;
                 newY = ((points[i].getY() - minY) / diagonal) + dy;
-            } else {
-                newX = 0.5;
-                newY = 0.5;
+                newPoints[i] = new Point2D.Double(newX, newY);
             }
-            newPoints[i] = new Point2D.Double(newX, newY);
+        } else {
+            newX = 0.5;
+            newY = 0.5;
+            for (int i = 0; i < points.length; i++) {
+                newPoints[i] = new Point2D.Double(newX, newY);
+            }
         }
         return newPoints;
     }

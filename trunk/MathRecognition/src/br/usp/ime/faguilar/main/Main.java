@@ -15,6 +15,7 @@ import br.usp.ime.faguilar.guis.EvaluationView;
 import br.usp.ime.faguilar.evaluation.ClassifierTest;
 import br.usp.ime.faguilar.evaluation.SymbolTestData;
 import br.usp.ime.faguilar.classification.Classifible;
+import br.usp.ime.faguilar.classification.CrossValidationTrain;
 import br.usp.ime.faguilar.classification.SymbolLabels;
 import br.usp.ime.faguilar.classification.neuralNetwork.ClassifiactionDataSet;
 import br.usp.ime.faguilar.classification.neuralNetwork.NeuralNetworkClassifierEvaluator;
@@ -28,7 +29,9 @@ import br.usp.ime.faguilar.directories.MathRecognitionFiles;
 import br.usp.ime.faguilar.evaluation.SegmentationAndClassificationEvaluator;
 import br.usp.ime.faguilar.evaluation.ShapeContextStatistics;
 import br.usp.ime.faguilar.evaluation.TrainingAndTestDataPartitioner;
+import br.usp.ime.faguilar.feature_extraction.Histohgram2D;
 import br.usp.ime.faguilar.feature_extraction.PreprocessingAlgorithms;
+import br.usp.ime.faguilar.feature_extraction.RelationFeatures;
 import br.usp.ime.faguilar.graph.Graph;
 import br.usp.ime.faguilar.matching.GraphDeformationCalculator;
 import br.usp.ime.faguilar.matching.GraphMatching;
@@ -37,6 +40,7 @@ import br.usp.ime.faguilar.matching.symbol_matching.DSymbolMatching;
 import br.usp.ime.faguilar.matching.symbol_matching.UserSymbol;
 import br.usp.ime.faguilar.outOfProject.ExtractionOFFeaturesToFile.NeuralNetworkFeaturesExtractor;
 import br.usp.ime.faguilar.outOfProject.shapeContextDistanceCalculator.ShapeContextDistanceCalculator;
+import br.usp.ime.faguilar.parser.crohme2014.ParserCrohme2014;
 import br.usp.ime.faguilar.segmentation.HypothesisTree.ClassificationFilter;
 import br.usp.ime.faguilar.segmentation.HypothesisTree.HypothesisFilter;
 import br.usp.ime.faguilar.segmentation.HypothesisTree.HypothesisGenerator;
@@ -59,20 +63,27 @@ import java.awt.geom.Point2D;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.ProcessBuilder.Redirect;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import org.neuroph.core.NeuralNetwork;
 
 
 public class Main {
+    private static BufferedReader reader;
+
+    
 
     private Bag<Integer>[] adj;
     /**
@@ -89,16 +100,27 @@ public class Main {
 //        System.out.println(calculator.calculateDistance(args));
 //        END TO CALCULATE COSTS FOR MARCELO
 //        testClassifier();
-//        PartitionTreeEvaluator.testSegmentationTree();
+//        PARTITION EVALUATOR
+        PartitionTreeEvaluator.testSegmentationTree();
 //        PartitionTreeEvaluator.testSymbolHypothesis();
 //        extractFeaturesToTrainNeuralNetwork();
 //        ClassifiactionDataSet.testDataSet();
-        
 //        To randomize crohme 2013 file names
 //        ArrayList<String> notHiddenFileNames = FilesUtil.getNotHiddenFileNames("../MathFiles/CROHME/2013/train");
 //        Collections.shuffle(notHiddenFileNames);
 //        for (String string : notHiddenFileNames) {
 //            FilesUtil.append("crohme2013_randomizedFileNames.txt", string + "\n");
+//        }
+        
+//        String[] contentAsStringArrayList = FilesUtil.getContentAsStringArrayList(MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES);
+//        int train = (int) (0.8 * contentAsStringArrayList.length);
+//        
+//        for (int i = 0; i < contentAsStringArrayList.length; i++) {
+//            String string = contentAsStringArrayList[i] + "\n";
+//            if(i < train)
+//                FilesUtil.append("trainFilesCrohmePart4.txt", string);
+//            else
+//                FilesUtil.append("validationFilesCrohmePart4.txt", string);            
 //        }
         
 //        TO TEST NEURAL NETWORK CLASSIFIER
@@ -111,26 +133,58 @@ public class Main {
 //        
 //        NeuralNetworkClassifierEvaluator.testNeuralNetworkWithInkml();
 //        NeuralNetworkClassifierEvaluator.runKFoldEvaluation();
-        
-//        CROHME 2014 TEST
-//        Task1.trainWithValidationData();
-        Task1.evaluateClassificationForTask1();
-//        END CROHME 2014 TEST
-        
 //        ArrayList<String> notHiddenFileNames = FilesUtil.getNotHiddenFileNames("../MathFiles/CROHME/test/junk");
 //        ArrayList<String> notHiddenFileNames2 = FilesUtil.getNotHiddenFileNames("../MathFiles/CROHME/test/symbols");
 //        notHiddenFileNames.addAll(notHiddenFileNames2);
 //        for (String string : notHiddenFileNames) {
 //            FilesUtil.append("testSymbolsAndJunkCrohme2013.txt", string + "\n");
 //        }
-//        NeuralNetworkClassifierEvaluator.exportKFoldFiles();
-        
+//        CHECKKKKK
+//        NeuralNetworkClassifierEvaluator.exportKFoldFilesForClassification();
 //        NeuralNetworkClassifierEvaluator.exportUNP_Files();
 //        NeuralNetworkClassifierEvaluator.generateFoldsFromIVCFiles();
 //        mergeFeatures();
-        
+
+
         
 //        END-TO TEST NEURAL NETWORK CLASSIFIER       
+        
+        //        CROHME 2014 TEST
+//        ParserCrohme2014.testParser();
+//        Task1.trainAndTestWithValidationData();
+//        Task1.evaluateClassificationForTask1();
+        
+//        recognizeExpressionWithNeuralNetworkClassifier(args);
+//        ArrayList<String> notHiddenFileNames = FilesUtil.getNotHiddenFileNames("../MathFiles/CROHME/crohme2014/lastSegmentation/");relationLabelsTrainLabelesWithJunk
+//        for (String string : notHiddenFileNames) {
+//            FilesUtil.append("listFilesTestCrohme2014.txt", "../MathFiles/CROHME/crohme2014/lastSegmentation/" + 
+//                    string + "\n");
+//        }
+//        Task1.executeTask1(args);
+//        Histohgram2D.configureHistogramForRelations();
+//        RelationFeatures.batchExtractionOfFeatures();
+////        
+//        CrossValidationTrain relationTrain = new CrossValidationTrain();
+//        int numFeatures = 100;
+//        int numHidden = 100;
+//        int outputSize = 7;
+//        relationTrain.setInputSize(numFeatures);
+//        relationTrain.setNumberOFHidden(numHidden);
+//        relationTrain.setOutputSize(outputSize);
+//        relationTrain.runTrainingFromTrainAndValidationPathFiles("trainHistogramRelationFeaturesWithJunk.txt", "validationHistogramRelationFeaturesWithJunk.txt");
+//        
+//        ClassifiactionDataSet classificationDataset = ClassifiactionDataSet.createDatasetWithInputAndOutputSize(numFeatures, outputSize);
+//        classificationDataset.readDatasetInIVCFormat("trainHistogramRelationFeaturesWithJunk.txt", "\t");
+//        System.out.println(CrossValidationTrain.testNeuralNetwork(NeuralNetwork.load(CrossValidationTrain.OPTIMAL_NEURAL_NET_PATH), classificationDataset.getDataset()));
+//        classificationDataset.readDatasetInIVCFormat("validationHistogramRelationFeaturesWithJunk.txt", "\t");
+//        System.out.println(CrossValidationTrain.testNeuralNetwork(NeuralNetwork.load(CrossValidationTrain.OPTIMAL_NEURAL_NET_PATH), classificationDataset.getDataset()));
+//        classificationDataset.readDatasetInIVCFormat("testHistogramRelationFeaturesWithJunk.txt", "\t");
+//        CrossValidationTrain.generateOutputFile = true;
+//        CrossValidationTrain.outputFileName = "outputBestNTest.txt";
+//        System.out.println(CrossValidationTrain.testNeuralNetwork(NeuralNetwork.load(CrossValidationTrain.OPTIMAL_NEURAL_NET_PATH), classificationDataset.getDataset()));
+//        Histohgram2D.configureHistogramForSymbols();
+//        
+//        END CROHME 2014 TEST
         
 //        calculateSymbolStatistics();
 //        testSegmentationAndClassification();
@@ -229,6 +283,47 @@ public class Main {
             evaluator.setParameters(params.get(0));
             String fileName = "fileNames";
             evaluator.recognizeAExpression();
+    }
+    
+    public static void recognizeExpressionWithNeuralNetworkClassifier(String[] inputAndOutputFiles){
+//        String pathList = "../MathFiles/lists/crohme2013_testFileNames.txt";
+//        String[] contentAsStringArrayList = FilesUtil.getContentAsStringArrayList(pathList);
+//        SegmentationAndClassificationEvaluator evaluator = new SegmentationAndClassificationEvaluator();
+//        for (String string : contentAsStringArrayList) {
+//            
+//            evaluator.setaFileToTest("../MathFiles/CROHME/2013/test/" + string);
+//            evaluator.setOutputFile("../MathFiles/CROHME/2013/res/" + string.substring(0, string.length()- 5) + "lg");
+//            evaluator.recognizeAExpressionWithNeauralNetworkClassifier();
+//        }
+        
+        testRecognitionBatch();
+        
+//            SegmentationAndClassificationEvaluator evaluator = new SegmentationAndClassificationEvaluator();
+////            evaluator.setaFileToTest(inputAndOutputFiles[0]);
+////            evaluator.setOutputFile(inputAndOutputFiles[1]);
+////            evaluator.setaFileToTest(MathRecognitionFiles.INKML_CROHME_2013_TEST_DIR + "105_em_63.inkml");
+////            evaluator.setOutputFile("105_em_63.lg");
+//            evaluator.setaFileToTest(MathRecognitionFiles.INKML_CROHME_2013_TEST_DIR + "105_em_82.inkml");
+//            evaluator.setOutputFile("105_em_82.lg");
+//            evaluator.recognizeAExpressionWithNeauralNetworkClassifier();
+    }
+    
+    public static void testRecognitionBatch(){
+        SegmentationAndClassificationEvaluator evaluator = new SegmentationAndClassificationEvaluator();
+        String[] contentAsStringArrayList = FilesUtil.getContentAsStringArrayList(MathRecognitionFiles.INKML_CROHME_2013_TEST_FILES);
+        int count = 0;
+        String dirResult = "resultRecognition/";
+        for (String string : contentAsStringArrayList) {
+            evaluator.setaFileToTest(MathRecognitionFiles.INKML_CROHME_2013_TEST_DIR + string);
+            evaluator.setOutputFile(dirResult + string.substring(0, string.length() - 5) + 
+                    "lg");
+            evaluator.recognizeAExpressionWithNeauralNetworkClassifier();
+            count++;
+            System.out.println(count);
+//            if(count >= 20)
+//                break;
+        }
+            
     }
     
     public static void testInkmlReader(){

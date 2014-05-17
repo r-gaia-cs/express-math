@@ -19,6 +19,8 @@ import java.util.LinkedList;
  */
 public class FuzzyShapeContext extends ShapeContext{
     private FuzzyShapeContextRegion regionShapecontext;
+    public static boolean USE_PREDEFINED_CENTER = false;
+    public static Point2D center;
     
     public FuzzyShapeContext(float raioSC, Graph graph, int tot_r, int tot_t, 
             boolean rotation, GMathExpression mathExpression) {
@@ -60,9 +62,13 @@ public class FuzzyShapeContext extends ShapeContext{
             }
         }
 
-        float[]distCenter = new float[totPoints];
-        Point2D center = graph.getCentroid();
+        float[] distCenter = new float[totPoints];
+        
+        if(!USE_PREDEFINED_CENTER)
+            center = graph.getCentroid();
+         
         centerVertex = new Vertex(-1, center.getX(), center.getY());
+        
         for (int j = 0; j < totPoints; j++) {
                 distCenter[j] = (float)this.euclideanDistance(centerVertex, vertexList[j]);
         }
@@ -107,40 +113,49 @@ public class FuzzyShapeContext extends ShapeContext{
         int total = ldiscCenter.size();
         Iterator it = ldiscCenter.iterator();
         while(it.hasNext()) {
+            
             int j = ((Integer)it.next()).intValue();
-            //cos theta
+                //cos theta
             float dx = (float)(vertexList[j].getX() - center.getX());
             float dy = (float)(vertexList[j].getY() - center.getY());
             float modv = distCenter[j]; //(float)fe.euclideanDistance(x1,y1, x2,y2);
-            float cos_theta = dx / modv; //adjacente/hipotenusa
-            float theta = (float)Math.acos(cos_theta);
-//            CAMBIAR PARA MATH.ATAN2?
-            if (dy > 0){
-                theta = 2.0f*(float)Math.PI - theta;
-            }
-
+            float theta = (float) (Math.atan2(dy, dx) + Math.PI);
             float raio = modv;
-            //tenho raio e theta, agora localiza 'bin' por angulo e raio
-            int id_r=0, id_t=0;
-            for (int ii = 0; ii < numberOfRadialBins; ii++){
-                if (raio <= vr[ii]) {
-                    id_r = ii;
-                    break;
-                }
-            }
-            for (int jj = 0; jj < numberOfAngularBins; jj++){
-                if (theta <= vt[jj]) {
-                    id_t = jj;
-                    break;
-                }
-            }
-            if (rotation && theta > vt[numberOfAngularBins - 1]){
-                id_t = 0;
-            }
-            //System.out.println(i + ">> (" + x1 + ";" + y1 + ") vs. (" + x2 + ";" + y2 + "):\t"+ id_t);
-            //identificador do bin
-//            int id_bin = id_t*tot_r+id_r;
-//            centerShapeContext[id_bin] += 1.0f;
+            regionShapecontext.updateBinWithConstantSlope(centerShapeContext, raio, theta, 
+                    rotation);
+                
+                
+//            int j = ((Integer)it.next()).intValue();
+//            //cos theta
+//            float dx = (float)(vertexList[j].getX() - center.getX());
+//            float dy = (float)(vertexList[j].getY() - center.getY());
+//            float modv = distCenter[j]; //(float)fe.euclideanDistance(x1,y1, x2,y2);
+//            float cos_theta = dx / modv; //adjacente/hipotenusa
+//            float theta = (float)Math.acos(cos_theta);
+////            CAMBIAR PARA MATH.ATAN2?
+//            if (dy > 0){
+//                theta = 2.0f*(float)Math.PI - theta;
+//            }
+//
+//            float raio = modv;
+//            //tenho raio e theta, agora localiza 'bin' por angulo e raio
+//            int id_r=0, id_t=0;
+//            for (int ii = 0; ii < numberOfRadialBins; ii++){
+//                if (raio <= vr[ii]) {
+//                    id_r = ii;
+//                    break;
+//                }
+//            }
+//            for (int jj = 0; jj < numberOfAngularBins; jj++){
+//                if (theta <= vt[jj]) {
+//                    id_t = jj;
+//                    break;
+//                }
+//            }
+//            if (rotation && theta > vt[numberOfAngularBins - 1]){
+//                id_t = 0;
+//            }
+
         }
 //            GUIForShapeContext.showGUI(vertexList, vt, vr,(int)this.raioSC , i,gmathExpression);
         if (total > 0)

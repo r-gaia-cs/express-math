@@ -40,6 +40,8 @@ public abstract class Node<T extends Node>{
         return string;
     }
     
+    public abstract String latexString();
+    
     public String LabelGraphString(){
 //        String string = "";
 //        if(this instanceof SymbolNode)
@@ -215,4 +217,5 @@ public abstract class Node<T extends Node>{
     public void clearChildren(){
         getChildren().clear();
     }
+    
 }

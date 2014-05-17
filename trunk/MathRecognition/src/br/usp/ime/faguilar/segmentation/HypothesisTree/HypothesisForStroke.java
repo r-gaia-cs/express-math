@@ -43,7 +43,7 @@ public class HypothesisForStroke {
         }
     }
     
-    private void combinations(
+    public void combinations(
             ArrayList<ArrayList<OrderedStroke>> combinations, OrderedStroke[] otherStrokes) {
 //        combinations = new ArrayList<ArrayList<OrderedStroke>>();
         ArrayList<OrderedStroke> currentList = new ArrayList();
@@ -51,7 +51,7 @@ public class HypothesisForStroke {
         backtrack(combinations, otherStrokes,currentList, 0);
     }
     
-    private void backtrack(ArrayList<ArrayList<OrderedStroke>> 
+    public void backtrack(ArrayList<ArrayList<OrderedStroke>> 
             combinations, OrderedStroke[] otherStrokes, ArrayList<OrderedStroke> currentList,int i) {
         if( i >= otherStrokes.length)
             return;

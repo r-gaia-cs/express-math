@@ -6,9 +6,11 @@
 
 package br.usp.ime.faguilar.segmentation.HypothesisTree;
 
+import br.usp.ime.faguilar.data.DSymbol;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -23,8 +25,20 @@ public class PartitionTree {
         return partitions;
     }
     
+    public ArrayList<ArrayList<DSymbol>> getPartitionsAsListOfsymbolsInIncreasingCost(){
+        ArrayList<Partition> partitions = getPartitionsInIncreasingCost();
+        ArrayList<ArrayList<DSymbol>> symbolsAllPartitions = new ArrayList<>();
+        ArrayList<DSymbol> symbolsOfAPartition;
+        for (Partition partition : partitions) {
+            symbolsOfAPartition = new ArrayList<>();
+            symbolsOfAPartition.addAll(partition.getSymbols());
+            symbolsAllPartitions.add(symbolsOfAPartition);
+        }
+        return symbolsAllPartitions;
+    }
+    
     public ArrayList<Partition> extractPartitions(){
-        ArrayList<Partition> partitions = new ArrayList<Partition>();
+        ArrayList<Partition> partitions = new ArrayList<>();
         ArrayList<Node> leaves = getLeaves();
         Partition newPartition;
         Node nodeAux;
@@ -38,22 +52,31 @@ public class PartitionTree {
             newPartition.updateCost();
             partitions.add(newPartition);
         }
+        
+//        int max = Math.min(MAX_NUMBER_OF_PARTITIONS, partitions.size());
+//        ArrayList<Partition> subListOfPartitions = new ArrayList<>();
+//        subListOfPartitions.addAll(partitions.subList(0, max));
+//        return subListOfPartitions;
         return partitions;
     }
     
     public ArrayList<Node> getLeaves(){
-        ArrayList<Node> leaves = new ArrayList<Node>();
-        LinkedList<Node> pile = new LinkedList<Node>();
+        ArrayList<Node> leaves = new ArrayList<>();
+        LinkedList<Node> pile = new LinkedList<>();
         pile.addFirst(root);
         Node nodeAux;
         while (!pile.isEmpty()) {            
             nodeAux = pile.removeFirst();
             while(!nodeAux.getChilds().isEmpty()){
-                for (int i = 1; i < nodeAux.getChilds().size(); i++) 
-                    pile.addFirst(nodeAux.getChilds().get(i));
-                nodeAux = nodeAux.getChilds().get(0);
+                for (int i = 0; i < nodeAux.getChilds().size(); i++) {
+                    if(nodeAux.getChilds().get(i) != null)
+                        pile.addFirst(nodeAux.getChilds().get(i));
+                }
+                nodeAux = pile.removeFirst();
+//                nodeAux = nodeAux.getChilds().get(0);
             }
-            leaves.add(nodeAux);
+            if(nodeAux.isLeafWithCompleteStrokes())
+                leaves.add(nodeAux);
         }
         return leaves;
     }

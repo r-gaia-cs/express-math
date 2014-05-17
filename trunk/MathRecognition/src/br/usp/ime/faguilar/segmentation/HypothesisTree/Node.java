@@ -31,6 +31,10 @@ public class Node {
      * Childs of this node
      */
     private ArrayList<Node> childs;
+    
+    private int strokeIndex;
+    
+    private boolean leafWithCompleteStrokes;
 
     public Node() {
         selected = new ArrayList<Integer>();
@@ -50,6 +54,24 @@ public class Node {
         }
         return false;
     }
+
+    public int getStrokeIndex() {
+        return strokeIndex;
+    }
+
+    public void setStrokeIndex(int strokeIndex) {
+        this.strokeIndex = strokeIndex;
+    }
+
+    public boolean isLeafWithCompleteStrokes() {
+        return leafWithCompleteStrokes;
+    }
+
+    public void setLeafWithCompleteStrokes(boolean leafWithCompleteStrokes) {
+        this.leafWithCompleteStrokes = leafWithCompleteStrokes;
+    }
+    
+    
 
     public boolean isRoot(){
         return getFather() == null;

@@ -297,10 +297,29 @@ public class SymbolUtil {
         return readRecords;
     }
     
+    public static Classifible readInkmlClassifibleWithUI(String fileName){
+        InkmlReader reader = new InkmlReader();
+        reader.setOnlySymbol(true);
+        reader.read(fileName);
+        DMathExpression mathExpression = reader.getMathExpression().asDMathExpression();
+        DSymbol newSymbol;
+        Classifible newClassifible = null;
+        if(mathExpression != null && !mathExpression.isEmpty()){
+            newSymbol = PreprocessingAlgorithms.preprocessDSymbolWithOrderedStrokes(
+            mathExpression.get(0));
+            newClassifible = new Classifible();
+            newClassifible.setSymbol(newSymbol);
+    //        newClassifible.setMyClass(newSymbol.getLabel());
+            newClassifible.setAditionalFeatures(reader.getMathExpression().getUI());
+        }
+        return newClassifible;
+    }
+    
     private static ArrayList<Classifible> readInkmlClassifibles(String fileName){
 
         ArrayList<Classifible> symbolData = new ArrayList<Classifible>();
         InkmlReader reader = new InkmlReader();
+        reader.setOnlySymbol(true);
         reader.read(fileName);
         DMathExpression mathExpression = reader.getMathExpression().asDMathExpression();
         DSymbol newSymbol;
@@ -309,6 +328,7 @@ public class SymbolUtil {
 //        String userName = fileNameArray[1].substring(0, fileNameArray[1].length() - 4);
 //        String userName = reader.getMathExpression().getWriter();
         for (DSymbol symbol : mathExpression) {
+//            newSymbol = symbol;
             newSymbol = PreprocessingAlgorithms.preprocessDSymbolWithOrderedStrokes(symbol);
             newClassifible = new Classifible();
 //            newClassifible.setUserSymbol(UserSymbol.newInstanceFromUserNickNameAndSymbolLabel(

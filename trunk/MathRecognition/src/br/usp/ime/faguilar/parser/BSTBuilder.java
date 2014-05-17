@@ -25,6 +25,7 @@ import java.util.List;
 public class BSTBuilder {
     private RegionNode root;
     private List<DSymbol> mySymbols;
+    private boolean hasParsing;
     
     public String treeString(){
         String string = root.treeString();
@@ -36,10 +37,11 @@ public class BSTBuilder {
     }
     
     public RegionNode buildBST(List<DSymbol> symbols, Classifier classifier){
-        CompundSymbolsBuilder builder = CompundSymbolsBuilder.builderFromInputSymbols(symbols);
-        builder.setClassifier(classifier);
-        builder.calculateCompoundSymbols();
-        symbols = builder.getCompoundSymbols();
+//        CompundSymbolsBuilder builder = CompundSymbolsBuilder.builderFromInputSymbols(symbols);
+//        builder.setClassifier(classifier);
+//        builder.calculateCompoundSymbols();
+//        symbols = builder.getCompoundSymbols();
+        hasParsing = true;
         mySymbols = symbols;
         List<SymbolNode> symbolNodes = new ArrayList<SymbolNode>(symbols.size());
         for (int i = 0; i < symbols.size(); i++) {
@@ -59,7 +61,7 @@ public class BSTBuilder {
         setRoot(rootNode);
         if(symbolNodes.isEmpty())
             return rootNode;
-        List<SymbolNode> sortedSymbolNodes = new ArrayList<SymbolNode>(symbolNodes);
+        List<SymbolNode> sortedSymbolNodes = new ArrayList<>(symbolNodes);
         Collections.sort(sortedSymbolNodes, SymbolNode.minXComparator());
         copySortedSymbols(sortedSymbolNodes);
         rootNode.addChildren(sortedSymbolNodes);
@@ -67,7 +69,7 @@ public class BSTBuilder {
     }
     
     public void copySortedSymbols(List<SymbolNode> nodes){
-        StructuralRelation.symbolsSortedByXCoord = new ArrayList<DSymbol>();
+        StructuralRelation.symbolsSortedByXCoord = new ArrayList<>();
         for (SymbolNode symbolNode : nodes) {
             StructuralRelation.symbolsSortedByXCoord.add(symbolNode.getSymbol());
         }
@@ -78,7 +80,7 @@ public class BSTBuilder {
         if(children.size() <= 1)
             return regionNode;
         SymbolNode startSymbol = startSymbol(children);
-        List<SymbolNode> startList = new ArrayList<SymbolNode>();
+        List<SymbolNode> startList = new ArrayList<>();
         startList.add(startSymbol);
         List<SymbolNode> baseLineSymbols = horizontal(startList, children);
         List<SymbolNode> updatedBaseline = collectRegions(baseLineSymbols);
@@ -96,7 +98,7 @@ public class BSTBuilder {
      * @return 
      */
     private SymbolNode startSymbol(List<SymbolNode> nodes) {
-        List<SymbolNode> newNodes = new ArrayList<SymbolNode>(nodes);
+        List<SymbolNode> newNodes = new ArrayList<>(nodes);
         return recursiveStartSymbol(newNodes);
     }
     
@@ -130,13 +132,13 @@ public class BSTBuilder {
                 if(regionLabel == RegionLabel.NOT_DEFINED)
                     remainingNodes.add(symbolNode);
                 else{
-                    if(regionLabel == RegionLabel.ABOVE || regionLabel == RegionLabel.BELOW){
-                        if(canHaveAboveOrBelow(symbol.getSymbol()))
-                            symbol.addNodeToRegion(symbolNode, regionLabel);
-                        else
-                            remainingNodes.add(symbolNode);
-                    }
-                    else
+//                    if(regionLabel == RegionLabel.ABOVE || regionLabel == RegionLabel.BELOW){
+//                        if(canHaveAboveOrBelow(symbol.getSymbol()))
+//                            symbol.addNodeToRegion(symbolNode, regionLabel);
+//                        else
+//                            remainingNodes.add(symbolNode);
+//                    }
+//                    else
                         symbol.addNodeToRegion(symbolNode, regionLabel);
                 }
             }
@@ -161,13 +163,19 @@ public class BSTBuilder {
         List<SymbolNode> SL = new LinkedList<SymbolNode>(remainingSymbols);
         while(!SL.isEmpty()){
             SymbolNode firstNode = SL.get(0);
+            if(RelationClassifier.isHighProbabilityJunkRelation(currentSymbol.getSymbol(), firstNode.getSymbol()))
+                    hasParsing = false;
             if(StructuralRelation.isRegularHor(currentSymbol.getSymbol(), firstNode.getSymbol())
                     || symbolMustBeAtHorizontal(currentSymbol.getSymbol(), firstNode.getSymbol())
-                    || StructuralRelation.horizontalOverlappingGraterThan(
-                    currentSymbol.getSymbol(), firstNode.getSymbol(), StructuralRelation.minIntersectionRatio))
+//                    || StructuralRelation.horizontalOverlappingGraterThan(
+//                    currentSymbol.getSymbol(), firstNode.getSymbol(), StructuralRelation.minIntersectionRatio)
+                    ){
                 return horizontal(ListUtil.concat(startList, 
                         StructuralRelation.checkOverlap(firstNode, remainingSymbols)), 
                         remainingSymbols);
+                
+            }
+                
             SL.remove(0);
         }
         partitionFinal(remainingSymbols, currentSymbol);
@@ -315,6 +323,10 @@ public class BSTBuilder {
         
     }
 
+    public String latexResult() {
+        return root.latexString();
+    }
+
         
     
     private class PartitionSharedRegionResult{
@@ -357,4 +369,13 @@ public class BSTBuilder {
             }
         }
     }
+
+    public boolean isHasParsing() {
+        return hasParsing;
+    }
+
+    public void setHasParsing(boolean hasParsing) {
+        this.hasParsing = hasParsing;
+    }
+    
 }

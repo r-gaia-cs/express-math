@@ -19,7 +19,7 @@ public class MathRecognitionFiles {
     
     public static final String INKML_CROHME_2012_TEST_DIR = "../MathFiles/CROHME/2012/testDataGT/";
     public static final String INKML_CROHME_2013_TEST_FILES = "../MathFiles/lists/crohme2013_testFileNames.txt";
-    public static final String INKML_CROHME_2013_TRAIN_FILES = "../MathFiles/lists/crohme2013_trainRandomizedFileNames.txt";//"../MathFiles/lists/train_crohme_2013.txt";
+    public static final String INKML_CROHME_2013_TRAIN_FILES = "../MathFiles/lists/allCrohme2013_trainRandomizedFileNames.txt";//"../MathFiles/lists/train_crohme_2013.txt";
     public static final String TRAINING_FILES_CROHME =  "../MathFiles/lists/training_crohme.txt";//"../MathFiles/lists/all_crohme2012.txt";////"training-training.txt";//"trainingFiles.txt";
     public static final String TEST_FILES_CROHME = "../MathFiles/lists/test_crohme.txt"; //"../MathFiles/lists/test_crohme.txt";//"training-test.txt";//"testFiles.txt";
 

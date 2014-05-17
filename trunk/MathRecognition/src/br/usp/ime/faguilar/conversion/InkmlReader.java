@@ -34,6 +34,14 @@ public class InkmlReader {
     private InkmlMathExpression mathExpression;
 
     private XMLEventReader eventReader;
+    
+    private boolean onlySymbol;
+
+    public InkmlReader() {
+        onlySymbol = false;
+    }
+    
+    
 
     public void read(String fileName){
         mathExpression = new InkmlMathExpression();
@@ -57,9 +65,13 @@ public class InkmlReader {
                           processAnnotation(event);
                       if(startElement.getName().getLocalPart().equals(TRACE))
                           processTrace(event);
-                      if(startElement.getName().getLocalPart().equals(TRACE_GROUP))
-                          processTraceGroup(event);
-//                          break;
+                      if(startElement.getName().getLocalPart().equals(TRACE_GROUP)){
+                          if (onlySymbol)
+                              break;
+                          else
+                              processTraceGroup(event);
+                      }
+                          
                 }
             }
         }
@@ -126,7 +138,8 @@ public class InkmlReader {
         anAnnotation = new Annotation();
         anAnnotation.setType(attribute.getValue());
         event = eventReader.nextEvent();
-        anAnnotation.setValue(event.asCharacters().getData());
+        if(event.isCharacters())
+            anAnnotation.setValue(event.asCharacters().getData());
         mathExpression.addAnnotation(anAnnotation);
     }
 
@@ -277,4 +290,13 @@ public class InkmlReader {
         eventReader.nextEvent();
         return traceGroup;
     }
+
+    public boolean isOnlySymbol() {
+        return onlySymbol;
+    }
+
+    public void setOnlySymbol(boolean onlySymbol) {
+        this.onlySymbol = onlySymbol;
+    }
+    
 }

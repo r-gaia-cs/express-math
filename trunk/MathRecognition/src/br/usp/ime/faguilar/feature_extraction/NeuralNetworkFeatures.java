@@ -20,15 +20,19 @@ import java.awt.geom.Point2D;
 public class NeuralNetworkFeatures {
     public static int numberOShapecontext = 8;
     public static double[] extractMergedFeatures(DSymbol symbol){
-//        Point2D[] points = PreprocessingAlgorithms.getNPoints(symbol, MatchingParameters.numberOfPointPerSymbol);
-        Point2D[] points = PointsExtractor.getNPoints(symbol, MatchingParameters.numberOfPointPerSymbol);
-        double[] shapeContexts = extractshapecontexts(points);
-        double[] normalizedPoints = extractNormalizedPoints(points, symbol);
-        
-//        double[] shapeContexts = extractFuzzyShapecontexts(symbol);
 //        double[] shapeContexts = extractGeneralizedShapecontexts(symbol);
+        double[] shapeContexts = extractFuzzyShapecontexts(symbol);
+        Point2D[] points = PointsExtractor.getNPoints(symbol, MatchingParameters.numberOfPointPerSymbol);
+//        double[] shapeContexts = extractshapecontexts(points);
+//        double[] normalizedPoints = extractNormalizedPoints(points, symbol);
+        Histohgram2D histogram = new Histohgram2D();
+        histogram.calculateHistogram(points, symbol.getBBox());
+        double[] histogram2D = histogram.getHistogramAsArray();
+//        return histogram2D;
+        return ArraysUtil.concat(shapeContexts, histogram2D);
 //        double[] ivcFeatures = extractIVCFeatures(points);
-        return ArraysUtil.concat(shapeContexts, normalizedPoints);
+//        return ArraysUtil.concat(shapeContexts, normalizedPoints);
+//        return normalizedPoints;
 //        return shapeContexts;
     }
     
@@ -47,6 +51,11 @@ public class NeuralNetworkFeatures {
                 MatchingParameters.numberOfPointPerSymbol);
         double[][] sc = shapeContetxFeatures.getShapeContext().getSC();
         return extractGeneralizedShapeContexts(sc);
+    }
+    
+    public static double[] extractCenterFuzzyShapecontextsWitthCenter(Point2D[] points, Point2D center) {
+        ShapeContextFeature shapeContetxFeatures = PreprocessingAlgorithms.getFuzzyShapeContetxFeaturesWithCenter(points, center);
+        return shapeContetxFeatures.getShapeContext().getCenterShapeContext();
     }
     
     private static double[] extractGeneralizedShapecontexts(DSymbol symbol) {

@@ -1,0 +1,180 @@
+Error: command-line syntax problem: Unrecognized option: - 2+3
+Pep is an Earley Parser, version 0.4
+
+Pep is free software, copyright (C) 2007 Scott Martin.
+See the COPYING file for details.
+
+usage: pep [options] [string] (use - for stdin)
+ -g,--grammar <grammar file>      the grammar to use
+ -h,--help                        prints this message
+ -o,--option <OPTION=value>       use value for given property
+ -s,--seed <seed category>        the seed category to parse for
+ -v,--verbose <verbosity level>   0-3
+
+where the default OPTION=value pairs are:
+ IGNORE_TERMINAL_CASE=false
+ PREDICT_FOR_PRETERMINALS=false
+REJECT: S -> [2+3]
+REJECT: S -> [\sin]
+REJECT: S -> [2+3
+]
+REJECT: S -> [2+3
+]
+REJECT: S -> [2 + 3]
+REJECT: S -> [2,+,3]
+REJECT: S -> [ 2  +  3]
+REJECT: S -> [2, +, 3]
+0: seed     	0[<start> -> * S]
+0: predict 	0[S -> * FORMULA]
+0: predict 	0[FORMULA -> * EXP_OR_BRACED_EXP OPEQ EXP_OR_BRACED_EXP]
+0: predict 	0[EXP_OR_BRACED_EXP -> * EXP]
+0: predict 	0[EXP -> * LIMIT]
+0: predict 	0[LIMIT -> * LIMITWORD EXP]
+0: predict 	0[LIMIT -> * LIMITWORD SUB SUBLIMIT EXP]
+0: predict 	0[EXP -> * MUTE_LBRACE OPSUM TERM MUTE_RBRACE EXP]
+0: predict 	0[EXP -> * TERM]
+0: predict 	0[TERM -> * INTEGRATION]
+0: predict 	0[INTEGRATION -> * OPEN_BRACKET EXP CLOSE_BRACKET SUP SYMB_OR_BRACED_EXP SUB SYMB_OR_BRACED_EXP]
+0: predict 	0[OPEN_BRACKET -> * LEFT LBRACKET]
+0: predict 	0[OPEN_BRACKET -> * LBRACKET]
+0: predict 	0[INTEGRATION -> * OPEN_BRACKET EXP CLOSE_BRACKET SUB SYMB_OR_BRACED_EXP SUP SYMB_OR_BRACED_EXP]
+0: predict 	0[TERM -> * FUNCTION TERM_OR_BRACED_LR]
+0: predict 	0[FUNCTION -> * FUNCTRIGO]
+0: predict 	0[FUNCTRIGO -> * MUTE_LBRACE FUNCTRIGO MUTE_RBRACE]
+0: predict 	0[FUNCTION -> * FUNCTRIGO SUP SYMB_OR_BRACED_SYMB]
+0: predict 	0[FUNCTION -> * FUNCLOG]
+0: predict 	0[FUNCLOG -> * MUTE_LBRACE FUNCLOG MUTE_RBRACE]
+0: predict 	0[FUNCTION -> * FUNCLOG SUB SYMB_OR_BRACED_SYMB]
+0: predict 	0[TERM -> * LETTER PRIME]
+0: predict 	0[LETTER -> * CAPLETTER]
+0: predict 	0[LETTER -> * GREEKLETTER]
+0: predict 	0[LETTER -> * MINUSLETTER]
+0: predict 	0[MINUSLETTER -> * LETTER_D]
+0: predict 	0[TERM -> * TERM_OR_BRACED_LR SUP SYMB_OR_BRACED_EXP]
+0: predict 	0[TERM_OR_BRACED_LR -> * TERM]
+0: predict 	0[TERM -> * OPENVBAR EXP_OR_BRACED_EXP CLOSEVBAR]
+0: predict 	0[OPENVBAR -> * BIG VBAR]
+0: predict 	0[OPENVBAR -> * VBAR]
+0: predict 	0[OPENVBAR -> * LEFT VBAR]
+0: predict 	0[TERM -> * FRACTION]
+0: predict 	0[FRACTION -> * FRACTIONBAR SYMB_OR_BRACED_EXP SYMB_OR_BRACED_EXP]
+0: predict 	0[TERM -> * MUTE_LBRACE TERM MUTE_RBRACE]
+0: predict 	0[TERM -> * LETTER SUP PRIME]
+0: predict 	0[TERM -> * MUTE_LBRACE WORD MUTE_RBRACE SUB SYMB_OR_BRACED_EXP]
+0: predict 	0[TERM -> * SQRT LBRACKET SYMBOL RBRACKET SYMB_OR_BRACED_EXP]
+0: predict 	0[TERM -> * TERM_OR_BRACED_LR SUP SYMB_OR_BRACED_EXP SUB SYMB_OR_BRACED_EXP]
+0: predict 	0[TERM_OR_BRACED_LR -> * MUTE_LBRACE LEFTRIGHTPAIR MUTE_RBRACE]
+0: predict 	0[TERM -> * SYMB_OR_BRACED_SYMB FACTORIAL]
+0: predict 	0[SYMB_OR_BRACED_SYMB -> * SYMBOL]
+0: predict 	0[SYMBOL -> * LETTER]
+0: predict 	0[SYMBOL -> * DIGIT]
+0: predict 	0[DIGIT -> * DIGIT_1]
+0: predict 	0[DIGIT -> * DIGIT_0]
+0: predict 	0[SYMBOL -> * OTHER]
+0: predict 	0[SYMB_OR_BRACED_SYMB -> * MUTE_LBRACE SYMB_OR_BRACED_SYMB MUTE_RBRACE]
+0: predict 	0[TERM -> * SYMBOL]
+0: predict 	0[TERM -> * FLOAT]
+0: predict 	0[FLOAT -> * DIGIT DECIMALSEP DIGIT]
+0: predict 	0[TERM -> * SERIES]
+0: predict 	0[SERIES -> * BIGOP SUP SYMB_OR_BRACED_EXP SUB SUBSERIES TERM_OR_BRACED_EXP]
+0: predict 	0[SERIES -> * BIGOP SUB SUBSERIES SUP SYMB_OR_BRACED_EXP TERM_OR_BRACED_EXP]
+0: predict 	0[SERIES -> * BIGOP SUB SUBSERIES TERM_OR_BRACED_EXP]
+0: predict 	0[SERIES -> * BIGOP TERM_OR_BRACED_EXP]
+0: predict 	0[TERM -> * PAREXP]
+0: predict 	0[PAREXP -> * OPEN_BRACE EXP_LIST CLOSE_BRACE]
+0: predict 	0[OPEN_BRACE -> * LEFT MUTE_LBRACE]
+0: predict 	0[OPEN_BRACE -> * LBRACE]
+0: predict 	0[OPEN_BRACE -> * LEFT LBRACE]
+0: predict 	0[PAREXP -> * OPENP EXP_LIST CLOSEP]
+0: predict 	0[OPENP -> * LP]
+0: predict 	0[OPENP -> * BIG LP]
+0: predict 	0[OPENP -> * LEFT LP]
+0: predict 	0[PAREXP -> * OPEN_BRACE EXP_OR_BRACED_EXP CLOSE_BRACE]
+0: predict 	0[PAREXP -> * OPEN_BRACKET EXP_OR_BRACED_EXP CLOSE_BRACKET]
+0: predict 	0[PAREXP -> * OPEN_BRACKET EXP_LIST CLOSE_BRACKET]
+0: predict 	0[PAREXP -> * OPENP EXP_OR_BRACED_EXP CLOSEP]
+0: predict 	0[TERM -> * LETTER SUP MUTE_LBRACE PRIME MUTE_RBRACE]
+0: predict 	0[TERM -> * SYMB_OR_BRACED_SYMB SUB SYMB_OR_BRACED_EXP]
+0: predict 	0[TERM -> * SQRT SYMB_OR_BRACED_EXP]
+0: predict 	0[TERM -> * PAREXP SUP SYMB_OR_BRACED_EXP]
+0: predict 	0[TERM -> * CONTISUM]
+0: predict 	0[CONTISUM -> * INTEGRAL LIMITS_LAYOUT SUB SYMB_OR_BRACED_EXP SUP SYMB_OR_BRACED_EXP CONTISUM_END]
+0: predict 	0[CONTISUM -> * INTEGRAL CONTISUM_END]
+0: predict 	0[CONTISUM -> * INTEGRAL SUP SYMB_OR_BRACED_EXP SUB SYMB_OR_BRACED_EXP CONTISUM_END]
+0: predict 	0[CONTISUM -> * INTEGRAL SUB SYMB_OR_BRACED_EXP SUP SYMB_OR_BRACED_EXP CONTISUM_END]
+0: predict 	0[TERM -> * SYMB_OR_BRACED_SYMB SUB MUTE_LBRACE EXP_LIST MUTE_RBRACE]
+0: predict 	0[TERM -> * TERM_OR_BRACED_LR SUP FRACTION]
+0: predict 	0[TERM -> * LEFT VBAR EXP_OR_BRACED_EXP RIGHT VBAR]
+0: predict 	0[EXP -> * OPSUM TERM_OR_BRACED_LR]
+0: predict 	0[OPSUM -> * MUTE_LBRACE OPSUM MUTE_RBRACE]
+0: predict 	0[OPSUM -> * PLUS]
+0: predict 	0[EXP -> * LEFTRIGHTPAIR]
+0: predict 	0[LEFTRIGHTPAIR -> * LREND OPSP LREND]
+0: predict 	0[LREND -> * MUTE_LBRACE LEFTRIGHTPAIR MUTE_RBRACE]
+0: predict 	0[LREND -> * TERM]
+0: predict 	0[LREND -> * DOTS]
+0: predict 	0[DOTS -> * DOT DOT DOT]
+0: predict 	0[LEFTRIGHTPAIR -> * LEFTRIGHTPAIR OPSP LREND]
+0: predict 	0[LEFTRIGHTPAIR -> * LREND LREND]
+0: predict 	0[LEFTRIGHTPAIR -> * LEFTRIGHTPAIR LREND]
+0: predict 	0[EXP -> * OPSUM LEFTRIGHTPAIR]
+0: predict 	0[EXP_OR_BRACED_EXP -> * MUTE_LBRACE EXP_OR_BRACED_EXP MUTE_RBRACE]
+0: predict 	0[FORMULA -> * QUANTIFIER_LIST]
+0: predict 	0[QUANTIFIER_LIST -> * QUANTIFIER_ONE COMMA]
+0: predict 	0[QUANTIFIER_ONE -> * QUANTIFIER_SYMB RANGE]
+0: predict 	0[QUANTIFIER_ONE -> * RANGE]
+0: predict 	0[RANGE -> * LETTER QUANTIFIER_OP PAREXP]
+0: predict 	0[RANGE -> * LETTER QUANTIFIER_OP SET_EXP]
+0: predict 	0[QUANTIFIER_ONE -> * QUANTIFIER_SYMB LETTER]
+0: predict 	0[QUANTIFIER_LIST -> * QUANTIFIER_ONE]
+0: predict 	0[FORMULA -> * QUANTIFIER_LIST FORMULA]
+0: predict 	0[FORMULA -> * EXP_OR_BRACED_EXP OPEQ EXP_OR_BRACED_EXP OPEQ EXP_OR_BRACED_EXP]
+0: predict 	0[FORMULA -> * EXP_F_DEF]
+0: predict 	0[EXP_F_DEF -> * LETTER ARROW EXP_F_DEF]
+0: predict 	0[EXP_F_DEF -> * LETTER ARROW EXP]
+0: predict 	0[FORMULA -> * SET_EXP]
+0: predict 	0[SET_EXP -> * SETS SET_OP SET_EXP]
+0: predict 	0[SETS -> * CAPLETTER]
+0: predict 	0[SET_EXP -> * SETS SUP DIGIT]
+0: predict 	0[SET_EXP -> * SETS]
+0: predict 	0[FORMULA -> * EXP]
+0: predict 	0[FORMULA -> * MUTE_LBRACE FORMULA MUTE_RBRACE]
+0: predict 	0[FORMULA -> * EXP_LIST]
+0: predict 	0[EXP_LIST -> * EXP_OR_BRACED_EXP COMMA EXP_LIST_R]
+
+REJECT: S -> [2, +, 3]
+REJECT: S -> [2, +, 3]
+ACCEPT: S -> [2] (1)
+1. [S[FORMULA[EXP[TERM[SYMBOL[DIGIT[2]]]]]]]
+REJECT: S -> [2-8]
+REJECT: S -> [2	-	8]
+REJECT: S -> [2*8]
+REJECT: S -> [$2*8$]
+REJECT: S -> [2
+-
+9]
+REJECT: S -> [2, +, 3]
+ used grammar : GramCROHMEpart4_revision2.xml
+ used list of EM : list.txt
+ used output file : emAccepted.txt
+ACCEPT: S -> [2, +, 3] (1)
+ used grammar : GramCROHMEpart4_revision2.xml
+ used list of EM : list.txt
+ used output file : emAccepted.txt
+ACCEPT: S -> [2, ^, 4] (1)
+Impossible d'ouvrir le fichier source  : No such file or directory at parserCrohme2014/./tokenAndParse.pl line 43.
+ used grammar : GramCROHMEpart4_revision2.xml
+ used list of EM : temporyResults.txt
+ used output file : emAccepted.txt
+Impossible d'ouvrir le fichier source  : No such file or directory at parserCrohme2014/./tokenAndParse.pl line 43.
+ used grammar : GramCROHMEpart4_revision2.xml
+ used list of EM : temporyResults.txt
+ used output file : emAccepted.txt
+ used grammar : GramCROHMEpart4_revision2.xml
+ used list of EM : temporyResults.txt
+ used output file : emAccepted.txt
+ACCEPT: S -> [2, ^, 4] (1)
+ used grammar : GramCROHMEpart4_revision2.xml
+ used list of EM : temporyResults.txt
+ used output file : emAccepted.txt
+ACCEPT: S -> [2, ^, 4] (1)

@@ -14,6 +14,7 @@ import br.usp.ime.faguilar.evaluation.ClassifierTest;
 import br.usp.ime.faguilar.evaluation.KFoldPartitioner;
 import br.usp.ime.faguilar.evaluation.SymbolTestData;
 import br.usp.ime.faguilar.evaluation.TrainTestGroup;
+import br.usp.ime.faguilar.feature_extraction.Histohgram2D;
 import br.usp.ime.faguilar.feature_extraction.NeuralNetworkFeatures;
 import br.usp.ime.faguilar.feature_extraction.PreprocessingAlgorithms;
 import br.usp.ime.faguilar.feature_extraction.ShapeContextFeature;
@@ -48,16 +49,17 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
     
     private NeuralNetwork neuralNetwork;
     private DataSet trainDataset;
-    private KFoldPartitioner partitioner;
+//    private KFoldPartitioner partitioner;
     private DataSet validationDataset;
     private DataSet testDataset;
     private boolean useValidation;
     private double biggestRecognitionRate;
-    private static final String OPTIMAL_NEURAL_NET_PATH = "optimalNeuralNet.net";
+    private static final String OPTIMAL_NEURAL_NET_PATH = "neuralNetwork.net";
+//            "neuralNetworkFuzzySCHistogram5x5_sigmoid150Hidden_3LearningRates.net";//"optimalFuzzySC_Histogram2DNeuralNet_new.net";
     
     private int countIterations;
-    private double[] learningRates = new double[]{0.05, 0.01, 0.005, 0.001, 0.0005};
-    private int[] iterations = new int[]{20, 20, 20, 20, 20};//{1000};//{20, 20, 20, 20, 20};
+    private double[] learningRates = new double[]{0.05, 0.01, 0.005};
+    private int[] iterations = new int[]{20, 20, 40};//{1000};//{20, 20, 20, 20, 20};
     private String logFile = "log_neural_net.txt";
     private int iterationIndex;
     private int countToSave;
@@ -67,21 +69,28 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
     private static String savedFilesNames = "neural_network_v28_";
     
     public NeuralNetworkClassifierEvaluator(){
-        inputSize = MatchingParameters.LogPolarLocalRegions * MatchingParameters.angularLocalRegions
-                * NeuralNetworkFeatures.numberOShapecontext;
+        inputSize = calculateNumberOFInputFeatures();
         //for generalized shape contxt
 //        inputSize *= 2;
 //        outputSize = 101;
         outputSize = 102;
-        numberOfHiddenUnits = 102;
+        numberOfHiddenUnits = 150;
         useValidation = false;
+    }
+    
+    public static int calculateNumberOFInputFeatures(){
+        int numberOfHistogramFEatures = Histohgram2D.NUMBER_HORIZONTAL_BINS * Histohgram2D.NUMBER_VERTICAL_BINS;
+        
+        return MatchingParameters.LogPolarLocalRegions * MatchingParameters.angularLocalRegions
+                * NeuralNetworkFeatures.numberOShapecontext + numberOfHistogramFEatures;
+//        return numberOfHistogramFEatures;
     }
     
     @Override
     public void train(){
         if(useValidation)
             biggestRecognitionRate = Double.MIN_VALUE;
-        neuralNetwork = new NeuralNetworkWithSoftMaxActivation(TransferFunctionType.TANH, 
+        neuralNetwork = new NeuralNetworkWithSoftMaxActivation(TransferFunctionType.SIGMOID, //TransferFunctionType.TANH, 
                 inputSize, numberOfHiddenUnits, outputSize);  
         
         LearningRule learningRule = new MomentumBackpropagation();
@@ -264,35 +273,30 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
         }
     }
     
-    public static void exportKFoldFiles(){
-
+    public static void exportKFoldFilesForClassification(){
+        SymbolLabels.readCrohme2013LabelsWithJunk();
+        System.out.println("exporting train-validation sets");
+        exportKFoldSetFiles();
+        System.out.println("exporting test set");
+        exportTestFile();
+    }
+    
+    public static void exportKFoldSetFiles() {
         ArrayList<Classifible> classifiblesJunk = SymbolUtil.readTemplatesFromInkmlFiles("isolatedJunk.txt",//MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
-               "../MathFiles/CROHME/isolatedJunk/");
+               "../MathFiles/CROHME/crohme2014/isolated_symbols/train/isolatedJunk/");
 //        
         ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles("isolatedSymbols.txt",//MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
-               "../MathFiles/CROHME/isolatedSymb/");
+               "../MathFiles/CROHME/crohme2014/isolated_symbols/train/isolatedSymb/");
         classifibles.addAll(classifiblesJunk);
-//        ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles("testSymbolsAndJunkCrohme2013.txt",//MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
-//               "../MathFiles/CROHME/test/symbolsAndJunk/");
-        
-
         SymbolTestData symbolData = new SymbolTestData();
         symbolData.addClassifibles(classifibles);
-//        symbolData.printLabels();
         
         KFoldPartitioner partitioner = new KFoldPartitioner();
         partitioner.setMap(symbolData.getMap());
         TrainTestGroup groupTrainAndTest;
         int numberOfFolds = KFoldPartitioner.numberOfFolds;
-//        
-//        TO EXPORT ONLY TEST FILES
-//        SymbolLabels.readCrohme2013LabelsWithJunk();
-//        exportSContextsToIVCFiles(classifibles, "crohme2013SFuzzyContextTestNew.data");
-//      END TO EXPORT TEST
-        
-        SymbolLabels.readCrohme2013LabelsWithJunk();
-        String trainName = "trainSC";
-        String testName = "validationSC";
+        String trainName = "train_fuzzySC_histogram2D_5x5";
+        String testName = "validation_fuzzySC_histogram2D_5x5";
         String format = ".data";
         for (int i = 2; i <= 2; i++) {
             groupTrainAndTest = null;
@@ -301,8 +305,16 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
                    format);
             exportSContextsToIVCFiles(groupTrainAndTest.getTest(), testName + "_" + i + 
                     format);
-
         }
+    }
+    
+    public static void exportTestFile() {
+        ArrayList<Classifible> classifibles = SymbolUtil.readTemplatesFromInkmlFiles("testSymbolsAndJunkCrohme2013.txt",//MathRecognitionFiles.INKML_CROHME_2013_TRAIN_FILES,
+               "../MathFiles/CROHME/crohme2014/isolated_symbols/test/symbolsAndJunk/");
+        SymbolTestData symbolData = new SymbolTestData();
+        symbolData.addClassifibles(classifibles);
+//        exportSContextsToIVCFiles(classifibles, "test_histogram2D_3x3.data");
+        exportSContextsToIVCFiles(symbolData.getAllSymbolsAsArrayList(), "test_fuzzySC_histogram2D_5x5.data");
     }
     
     
@@ -403,10 +415,7 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
                 count = 0;
             }
             scontext = NeuralNetworkFeatures.extractMergedFeatures(classifible.getSymbol());
-//                    PreprocessingAlgorithms.getNShapeContetxFeatures(
-//                    classifible.getSymbol(), MatchingParameters.numberOfPointPerSymbol);
             listsOfScontextAsString += (labelAsInt + "\t" +
-//                    formatedIVCFloatAndStringFromarray(scontext)
                    formatedIVCFloatAndStringFromarrayWithFirstElement(scontext)
                     + "\n");
             count++;
@@ -447,10 +456,12 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
     }
 
     @Override
-    public void handleLearningEvent(LearningEvent event) {
+    public void handleLearningEvent(LearningEvent event) {        
         SupervisedLearning learning = (SupervisedLearning) event.getSource();
+        System.out.printf("iteration: %d\ttotal network error: %f\n", learning.getCurrentIteration(),
+        learning.getTotalNetworkError());
         learning.getTrainingSet().shuffle();
-
+        
         countIterations++;
         if(countIterations >= iterations[iterationIndex]){
             iterationIndex++;
@@ -474,8 +485,7 @@ public class NeuralNetworkClassifierEvaluator extends Classifier
 //            neuralNetwork.save(savedFilesNames + learning.getCurrentIteration());
 //            countToSave = 0;
 //        }
-        System.out.printf("iteration: %d\ttotal network error: %f\n", learning.getCurrentIteration(),
-                learning.getTotalNetworkError());
+
     }
     
     public void addToLogFile(String string){
