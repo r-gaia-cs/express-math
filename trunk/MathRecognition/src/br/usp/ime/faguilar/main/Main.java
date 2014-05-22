@@ -51,6 +51,7 @@ import br.usp.ime.faguilar.segmentation.HypothesisTree.PartitionTreeGenerator;
 import br.usp.ime.faguilar.segmentation.HypothesisTree.SymbolHypothesis;
 import br.usp.ime.faguilar.segmentation.SegmentationParameters;
 import br.usp.ime.faguilar.util.FilesUtil;
+import br.usp.ime.faguilar.util.ListUtil;
 import br.usp.ime.faguilar.util.SymbolUtil;
 import edu.princeton.cs.algs4.Bag;
 import edu.princeton.cs.algs4.Edge;
@@ -101,7 +102,7 @@ public class Main {
 //        END TO CALCULATE COSTS FOR MARCELO
 //        testClassifier();
 //        PARTITION EVALUATOR
-        PartitionTreeEvaluator.testSegmentationTree();
+//        PartitionTreeEvaluator.testSegmentationTree();
 //        PartitionTreeEvaluator.testSymbolHypothesis();
 //        extractFeaturesToTrainNeuralNetwork();
 //        ClassifiactionDataSet.testDataSet();
@@ -154,6 +155,21 @@ public class Main {
 //        Task1.trainAndTestWithValidationData();
 //        Task1.evaluateClassificationForTask1();
         
+//        TEST COMBINATIONS
+//        List<Integer> elements = new ArrayList<>();
+//        for (int i = 0; i < 4; i++) {
+//            elements.add(i);            
+//        }
+//        List<List<Integer>> generateCombinations = ListUtil.generateCombinations(elements);
+//        for (List<Integer> list : generateCombinations) {
+//            System.out.println("");
+//            for (Integer integer : list) {
+//                System.out.print(integer + " ");
+//            }
+//        }
+//        System.out.println("total: " + generateCombinations.size());
+        
+        
 //        recognizeExpressionWithNeuralNetworkClassifier(args);
 //        ArrayList<String> notHiddenFileNames = FilesUtil.getNotHiddenFileNames("../MathFiles/CROHME/crohme2014/lastSegmentation/");relationLabelsTrainLabelesWithJunk
 //        for (String string : notHiddenFileNames) {
@@ -185,7 +201,6 @@ public class Main {
 //        Histohgram2D.configureHistogramForSymbols();
 //        
 //        END CROHME 2014 TEST
-        
 //        calculateSymbolStatistics();
 //        testSegmentationAndClassification();
 //        recognizeExpressions(args[0]);
@@ -296,16 +311,16 @@ public class Main {
 //            evaluator.recognizeAExpressionWithNeauralNetworkClassifier();
 //        }
         
-        testRecognitionBatch();
+//        testRecognitionBatch();
         
-//            SegmentationAndClassificationEvaluator evaluator = new SegmentationAndClassificationEvaluator();
-////            evaluator.setaFileToTest(inputAndOutputFiles[0]);
-////            evaluator.setOutputFile(inputAndOutputFiles[1]);
-////            evaluator.setaFileToTest(MathRecognitionFiles.INKML_CROHME_2013_TEST_DIR + "105_em_63.inkml");
-////            evaluator.setOutputFile("105_em_63.lg");
-//            evaluator.setaFileToTest(MathRecognitionFiles.INKML_CROHME_2013_TEST_DIR + "105_em_82.inkml");
-//            evaluator.setOutputFile("105_em_82.lg");
-//            evaluator.recognizeAExpressionWithNeauralNetworkClassifier();
+            SegmentationAndClassificationEvaluator evaluator = new SegmentationAndClassificationEvaluator();
+//            evaluator.setaFileToTest(inputAndOutputFiles[0]);
+//            evaluator.setOutputFile(inputAndOutputFiles[1]);
+//            evaluator.setaFileToTest(MathRecognitionFiles.INKML_CROHME_2013_TEST_DIR + "105_em_63.inkml");
+//            evaluator.setOutputFile("105_em_63.lg");
+            evaluator.setaFileToTest(MathRecognitionFiles.INKML_CROHME_2013_TEST_DIR + "103_em_19.inkml");
+            evaluator.setOutputFile("103_em_19.lg");
+            evaluator.recognizeAExpressionWithNeauralNetworkClassifier();
     }
     
     public static void testRecognitionBatch(){
