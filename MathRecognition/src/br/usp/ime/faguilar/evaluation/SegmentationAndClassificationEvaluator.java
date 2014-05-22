@@ -22,6 +22,7 @@ import br.usp.ime.faguilar.guis.EvaluationView;
 import br.usp.ime.faguilar.matching.GraphMatching;
 import br.usp.ime.faguilar.parser.BSTBuilder;
 import br.usp.ime.faguilar.parser.ExpressionCost;
+import br.usp.ime.faguilar.parser.MultipleBSTBuilder;
 import br.usp.ime.faguilar.parser.crohme2014.ParserCrohme2014;
 import br.usp.ime.faguilar.segmentation.HypothesisTree.Partition;
 import br.usp.ime.faguilar.segmentation.HypothesisTree.PartitionTreeEvaluator;
@@ -149,7 +150,7 @@ public class SegmentationAndClassificationEvaluator {
 //        NEW VERSION
 //        ArrayList<ArrayList<DSymbol>> partitions = PartitionTreeEvaluator.getPartitionsAsListsOFsymbolsSORTBYINCREASINGCOST(getaFileToTest());
         List<Partition> partitions = PartitionTreeEvaluator.getPartitionsSORTBYINCREASINGCOST(getaFileToTest());
-        BSTBuilder parserBST = new BSTBuilder();
+        BSTBuilder parserBST = new MultipleBSTBuilder();//new BSTBuilder();
         classifier = new NeuralNetworkClassifier();
         goodResults = new ArrayList<>();
         badResults = new ArrayList<>();
@@ -498,10 +499,10 @@ public class SegmentationAndClassificationEvaluator {
             }
             Collections.sort(results);
 //            System.out.println("good results " + getOutputFile());
-//            for (int i = 0; i < Math.min(maxNumberOfCorrectPArsings, results.size()) ; i++) {
-//                System.out.println(results.get(i).getExpressionRoot().latexString());
-////                System.out.println(results.get(i).getMyPartition());
-//            }
+            for (int i = 0; i < Math.min(maxNumberOfCorrectPArsings, results.size()) ; i++) {
+                System.out.println(results.get(i).getExpressionRoot().latexString());
+//                System.out.println(results.get(i).getMyPartition());
+            }
             String labelGraph = results.get(0).getExpressionRoot().LabelGraphString();
 //            System.out.println(results.get(0).getExpressionRoot().latexString());
             FilesUtil.write(getOutputFile(), labelGraph); 

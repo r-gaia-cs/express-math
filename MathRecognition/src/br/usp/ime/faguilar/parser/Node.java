@@ -14,10 +14,11 @@ import java.util.List;
  *
  * @author frank
  */
-public abstract class Node<T extends Node>{
+public abstract class Node<T extends Node> 
+//implements Cloneable
+{
     private T parent;
-    private List<T> children;
-    
+    private List<T> children;    
     
     public Node(){
         parent = null;
@@ -65,8 +66,8 @@ public abstract class Node<T extends Node>{
         List<NodeWithRegion> newParents = new ArrayList<NodeWithRegion>();
         List<NodeWithRegion> leftParents = new ArrayList<NodeWithRegion>();
         return LabelGraphString(newParents, leftParents);
-        
     }
+    
     
     public String LabelGraphString(List<NodeWithRegion> parents, List<NodeWithRegion> leftParents){
         String string = "";
@@ -182,6 +183,10 @@ public abstract class Node<T extends Node>{
         }
         return data;
     }
+    
+//    protected T clone(){
+//        return 
+//    }
     
     public abstract String stringData();
     

@@ -271,7 +271,6 @@ public class PartitionTreeEvaluator {
         HypothesisGenerator hypothesisGenerator = new NearestNeighborGraphHypothesisGenerator();
         ClassificationFilter filter = new ClassificationFilter();
         
-
         ((NearestNeighborGraphHypothesisGenerator) hypothesisGenerator).setFilter(filter);
         partitionGenerator.setHypothesisGenerator(hypothesisGenerator);
         partitionGenerator.generateTree(strokes);
@@ -286,7 +285,6 @@ public class PartitionTreeEvaluator {
         HypothesisGenerator hypothesisGenerator = new NearestNeighborGraphHypothesisGenerator();
         ClassificationFilter filter = new ClassificationFilter();
         
-
         ((NearestNeighborGraphHypothesisGenerator) hypothesisGenerator).setFilter(filter);
         partitionGenerator.setHypothesisGenerator(hypothesisGenerator);
         partitionGenerator.generateTree(strokes);

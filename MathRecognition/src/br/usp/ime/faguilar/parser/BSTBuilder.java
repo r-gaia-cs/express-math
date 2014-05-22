@@ -65,7 +65,7 @@ public class BSTBuilder {
         Collections.sort(sortedSymbolNodes, SymbolNode.minXComparator());
         copySortedSymbols(sortedSymbolNodes);
         rootNode.addChildren(sortedSymbolNodes);
-        return extractBaseline(rootNode);
+        return extractBaselineRecursively(rootNode);
     }
     
     public void copySortedSymbols(List<SymbolNode> nodes){
@@ -75,7 +75,7 @@ public class BSTBuilder {
         }
     }
     
-    public RegionNode extractBaseline(RegionNode regionNode){
+    public RegionNode extractBaselineRecursively(RegionNode regionNode){
         List<SymbolNode> children = regionNode.getChildren();
         if(children.size() <= 1)
             return regionNode;
@@ -88,7 +88,7 @@ public class BSTBuilder {
         regionNode.addChildren(updatedBaseline);
         for (SymbolNode symbolNode : updatedBaseline)
             for (RegionNode childrenNode : symbolNode.getChildren())
-                childrenNode = extractBaseline(childrenNode);
+                childrenNode = extractBaselineRecursively(childrenNode);
         return regionNode;
     }
     
@@ -97,7 +97,7 @@ public class BSTBuilder {
      * @param nodes
      * @return 
      */
-    private SymbolNode startSymbol(List<SymbolNode> nodes) {
+    protected SymbolNode startSymbol(List<SymbolNode> nodes) {
         List<SymbolNode> newNodes = new ArrayList<>(nodes);
         return recursiveStartSymbol(newNodes);
     }
@@ -123,9 +123,9 @@ public class BSTBuilder {
             return nodes.get(0);
     }
 
-    private List<SymbolNode>  partition(List<SymbolNode> nodes, SymbolNode symbol) {
+    protected List<SymbolNode>  partition(List<SymbolNode> nodes, SymbolNode symbol) {
         int regionLabel;
-        List<SymbolNode> remainingNodes = new ArrayList<SymbolNode>();
+        List<SymbolNode> remainingNodes = new ArrayList<>();
         for (SymbolNode symbolNode : nodes) {
             if(symbol != symbolNode){
                 regionLabel = symbol.determineRegionForPartitionFunction(symbolNode.getSymbol());
@@ -148,7 +148,7 @@ public class BSTBuilder {
     
     
     
-    private List<SymbolNode> horizontal(List<SymbolNode> startList, List<SymbolNode> nodes) {
+    protected List<SymbolNode> horizontal(List<SymbolNode> startList, List<SymbolNode> nodes) {
         if(nodes.isEmpty()) 
             return startList;
         SymbolNode currentSymbol = startList.get(startList.size() - 1);
@@ -182,7 +182,7 @@ public class BSTBuilder {
         return ListUtil.concat(startList.subList(0, startList.size() - 1), currentSymbol);
     }
     
-    private boolean symbolMustBeAtHorizontal(DSymbol symbol, DSymbol mayBeAtHorizontal) {
+    protected boolean symbolMustBeAtHorizontal(DSymbol symbol, DSymbol mayBeAtHorizontal) {
         if(mustHaveOperandAtLeft(mayBeAtHorizontal.getLabel()) && 
                 StructuralRelation.overlapsY(symbol, mayBeAtHorizontal))
             return true;
@@ -198,8 +198,8 @@ public class BSTBuilder {
         return false;
     }
 
-    private List<SymbolNode> collectRegions(List<SymbolNode> baselineSymbols) {
-        List<SymbolNode> baselineCopy = new LinkedList<SymbolNode>(baselineSymbols);
+    protected List<SymbolNode> collectRegions(List<SymbolNode> baselineSymbols) {
+        List<SymbolNode> baselineCopy = new LinkedList<>(baselineSymbols);
         return recursiveCollectRegions(baselineCopy);
     }
     
@@ -226,19 +226,33 @@ public class BSTBuilder {
                 secondNode.removeRegion(RegionLabel.BOTTOM_LEFT);
                 secondNode.addNodesToRegion(resultBottomLeft.aboveOrBelowRegionSymbols, 
                     RegionLabel.BOTTOM_LEFT);
-            }
-            
+            }            
         }
         if(SymbolClass.symbolClass(firstNode.getSymbol()) == SymbolClass.VARIABLE_RANGE)
             mergeRegions(firstNode);
-        List<SymbolNode> firstNodeList = new ArrayList<SymbolNode>();
+        if(!canHaveAboveOrBelow(firstNode.getSymbol())){
+            int newRegion = -1;
+            int currentRegion = -1;
+            if (hasNonEmptyRegion(firstNode, RegionLabel.ABOVE)){
+                newRegion = RegionLabel.SUPERSCRIPT;
+                currentRegion = RegionLabel.ABOVE;
+            }
+            if (hasNonEmptyRegion(firstNode, RegionLabel.BELOW)){
+                newRegion = RegionLabel.SUBSCRIPT;
+                currentRegion = RegionLabel.BELOW;
+            }
+            if(newRegion != -1)
+                firstNode.getRegion(currentRegion).setLabel(newRegion);
+        }
+            
+        List<SymbolNode> firstNodeList = new ArrayList<>();
         firstNodeList.add(firstNode);
         return ListUtil.concat(firstNodeList, recursiveCollectRegions(
                 baselineSymbols));
     }
     
     private void mergeRegions(SymbolNode node){
-        List<Integer> regions = new ArrayList<Integer>();
+        List<Integer> regions = new ArrayList<>();
         regions.add(RegionLabel.TOP_LEFT);
         regions.add(RegionLabel.ABOVE);
         regions.add(RegionLabel.SUPERSCRIPT);
@@ -260,7 +274,7 @@ public class BSTBuilder {
             RegionNode regionNode = node2.getRegion(regionLabel);
             List<SymbolNode> SL = regionNode.getChildren();
             if(SymbolClass.symbolClass(node1.getSymbol()) == SymbolClass.NON_SCRIPTED)
-                modifiedNodes.superOrSubscriptRegionSymbols = new ArrayList<SymbolNode>();
+                modifiedNodes.superOrSubscriptRegionSymbols = new ArrayList<>();
             else if(SymbolClass.symbolClass(node2.getSymbol()) != SymbolClass.VARIABLE_RANGE || 
                     (SymbolClass.symbolClass(node2.getSymbol()) == SymbolClass.VARIABLE_RANGE
                     && !hasNonEmptyRegion(node2, node2Region)))
@@ -269,7 +283,7 @@ public class BSTBuilder {
                     && hasNonEmptyRegion(node2, node2Region))
                 modifiedNodes.superOrSubscriptRegionSymbols = selecectSubScriptOrSubScriptNodes(SL, node2);
             boolean isSelected;
-            List<SymbolNode> nonSelected = new ArrayList<SymbolNode>();
+            List<SymbolNode> nonSelected = new ArrayList<>();
             for (SymbolNode symbolNode : SL) {
                 isSelected = false;
                 for (SymbolNode selected : modifiedNodes.superOrSubscriptRegionSymbols) {
@@ -356,7 +370,7 @@ public class BSTBuilder {
         this.root = root;
     }    
 
-    private void partitionFinal(List<SymbolNode> symbolNodes, SymbolNode aSymbolNode) {
+    protected void partitionFinal(List<SymbolNode> symbolNodes, SymbolNode aSymbolNode) {
         for (SymbolNode symbolNode : symbolNodes) {
             if(aSymbolNode != symbolNode){
                 if(StructuralRelation.isSymbolAtSubscriptRegion(aSymbolNode.getSymbol(), symbolNode.getSymbol()) || 

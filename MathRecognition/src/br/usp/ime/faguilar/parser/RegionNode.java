@@ -4,8 +4,6 @@
  */
 package br.usp.ime.faguilar.parser;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -16,22 +14,11 @@ public class RegionNode extends Node<SymbolNode>{
      * contains a label, defined in RegionLabel
      */
     private int label;
-    List<RegionNode> optionalRegions;
 
     public RegionNode() {
         super();
         label = RegionLabel.NOT_DEFINED;
-        optionalRegions = new ArrayList<>();
     }
-
-    public List<RegionNode> getOptionalRegions() {
-        return optionalRegions;
-    }
-
-    public void setOptionalRegions(List<RegionNode> optionalRegions) {
-        this.optionalRegions = optionalRegions;
-    }
-
     
     public int getLabel() {
         return label;
