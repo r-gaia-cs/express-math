@@ -41,14 +41,6 @@ public class RegionNode extends Node<SymbolNode>{
             if(!getParent().getSymbolLabel().equalsIgnoreCase("\\frac")){
                  string += "^ ";              
             } 
-//            else {
-//                if (!getChildren().isEmpty()){
-//                    string += "^{" + getChildren().get(0).latexString() + "}";
-//                    if(getChildren().size() > 1)
-//                        string += "{" + getChildren().get(1).latexString() + "}";
-//                } 
-//            }
-     
         }
         else if(label == RegionLabel.BELOW || label == RegionLabel.SUBSCRIPT){
             if(!getParent().getSymbolLabel().equalsIgnoreCase("\\frac")){
@@ -71,4 +63,26 @@ public class RegionNode extends Node<SymbolNode>{
 
         return string;
     }
+
+    @Override
+    public String latexStringWithoutChilds() {
+        String string = "";
+        if(label == RegionLabel.ABOVE || label == RegionLabel.SUPERSCRIPT){
+            if(!getParent().getSymbolLabel().equalsIgnoreCase("\\frac")){
+                 string += "^ ";              
+            } 
+        }
+        else if(label == RegionLabel.BELOW || label == RegionLabel.SUBSCRIPT){
+            if(!getParent().getSymbolLabel().equalsIgnoreCase("\\frac")){
+                 string += "_ ";              
+            } 
+        }
+        if(label != RegionLabel.EXPRESSION)
+            if (!getChildren().isEmpty())
+                string += "{ ";                           
+        return string;
+    }
+
+    
+    
 }

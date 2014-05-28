@@ -121,7 +121,7 @@ public class SymbolNode extends Node<RegionNode>{
     }
     
     public RegionNode createNewRegion(int regionLabel){
-        RegionNode newRegion = new RegionNode();
+        RegionNode newRegion = new MultipleBaselineRegionNode();//new RegionNode();
         newRegion.setLabel(regionLabel);
 //        getChildren().add(newRegion);
         addChild(newRegion);
@@ -174,8 +174,17 @@ public class SymbolNode extends Node<RegionNode>{
                 above = true;
             else if(regionNode.getLabel() == RegionLabel.BELOW)
                 below = true;
-            
         }
         return above && below;
+    }
+
+    @Override
+    public String latexStringWithoutChilds() {
+        String string = "";
+        String label = getSymbol().getLabel();
+        string = label + " ";
+        if(label.equals("-") && hasAboveAndBelow(getChildren())) 
+            string = "\\frac ";                    
+        return string;
     }
 }
