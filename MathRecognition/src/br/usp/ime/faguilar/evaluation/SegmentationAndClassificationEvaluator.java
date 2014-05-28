@@ -23,6 +23,7 @@ import br.usp.ime.faguilar.matching.GraphMatching;
 import br.usp.ime.faguilar.parser.BSTBuilder;
 import br.usp.ime.faguilar.parser.ExpressionCost;
 import br.usp.ime.faguilar.parser.MultipleBSTBuilder;
+import br.usp.ime.faguilar.parser.conversors.MultipleBSTToLatex;
 import br.usp.ime.faguilar.parser.crohme2014.ParserCrohme2014;
 import br.usp.ime.faguilar.segmentation.HypothesisTree.Partition;
 import br.usp.ime.faguilar.segmentation.HypothesisTree.PartitionTreeEvaluator;
@@ -161,9 +162,17 @@ public class SegmentationAndClassificationEvaluator {
         int countForTimer = 0;
         int count = 0;
         ExpressionCost newCost;
+        List<String> latexStrings;
+        MultipleBSTToLatex latexExtractor = new MultipleBSTToLatex();
         int maxPartitions = Math.min(partitions.size(), 200);
         for (Partition  symbopartition : partitions.subList(0, maxPartitions)) {
             parserBST.buildBST(symbopartition.getSymbols(), classifier);
+            latexStrings = latexExtractor.convert(parserBST.getRoot());
+            System.out.println(latexStrings.size());
+            for (String string : latexStrings) {
+                System.out.println(string);
+            }
+//            System.out.println(latexExtractor);
             newCost = new ExpressionCost();
             newCost.setMyPartition(symbopartition);
             newCost.setExpressionRoot(parserBST.getRoot());

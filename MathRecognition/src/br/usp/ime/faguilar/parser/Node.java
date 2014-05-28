@@ -43,6 +43,8 @@ public abstract class Node<T extends Node>
     
     public abstract String latexString();
     
+    public abstract String latexStringWithoutChilds();
+    
     public String LabelGraphString(){
 //        String string = "";
 //        if(this instanceof SymbolNode)

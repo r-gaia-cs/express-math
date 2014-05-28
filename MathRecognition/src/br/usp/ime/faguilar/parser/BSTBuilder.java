@@ -127,7 +127,7 @@ public class BSTBuilder {
         int regionLabel;
         List<SymbolNode> remainingNodes = new ArrayList<>();
         for (SymbolNode symbolNode : nodes) {
-            if(symbol != symbolNode){
+            if(symbol.getSymbol() != symbolNode.getSymbol()){
                 regionLabel = symbol.determineRegionForPartitionFunction(symbolNode.getSymbol());
                 if(regionLabel == RegionLabel.NOT_DEFINED)
                     remainingNodes.add(symbolNode);
@@ -241,10 +241,15 @@ public class BSTBuilder {
                 newRegion = RegionLabel.SUBSCRIPT;
                 currentRegion = RegionLabel.BELOW;
             }
-            if(newRegion != -1)
-                firstNode.getRegion(currentRegion).setLabel(newRegion);
+            if(newRegion != -1){
+                for (SymbolNode symbolNode : firstNode.getRegion(currentRegion).getChildren()) {
+                    firstNode.addNodeToRegion(symbolNode, newRegion);
+//                    firstNode.getRegion(newRegion).addChild(symbolNode);
+                }
+                firstNode.removeRegion(currentRegion);
+//                firstNode.getRegion(currentRegion).setLabel(newRegion);
+            }
         }
-            
         List<SymbolNode> firstNodeList = new ArrayList<>();
         firstNodeList.add(firstNode);
         return ListUtil.concat(firstNodeList, recursiveCollectRegions(
@@ -372,7 +377,7 @@ public class BSTBuilder {
 
     protected void partitionFinal(List<SymbolNode> symbolNodes, SymbolNode aSymbolNode) {
         for (SymbolNode symbolNode : symbolNodes) {
-            if(aSymbolNode != symbolNode){
+            if(aSymbolNode.getSymbol() != symbolNode.getSymbol()){
                 if(StructuralRelation.isSymbolAtSubscriptRegion(aSymbolNode.getSymbol(), symbolNode.getSymbol()) || 
                         StructuralRelation.isSymbolAtBelowRegion(aSymbolNode.getSymbol(), symbolNode.getSymbol()))
                     aSymbolNode.addNodeToRegion(symbolNode, RegionLabel.SUBSCRIPT);

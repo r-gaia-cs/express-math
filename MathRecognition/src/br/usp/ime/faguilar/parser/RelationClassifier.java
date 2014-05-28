@@ -32,7 +32,7 @@ public class RelationClassifier {
     public static final String INSIDE_LABEL = "I";
     public static final String SUPERSCRIPT_LABEL = "Sup";
     public static final String SUBSCRIPT_LABEL = "Sub";
-    private static final double AMBIGUITY_TREASHOLD = 0.15;//0.85; //0.1
+    private static final double AMBIGUITY_TREASHOLD = 0.35;//0.15;//0.86; //0.1
     
     public static final String JUNK_LABEL = "junk";
     private static int lastAmbiguityType = -1;

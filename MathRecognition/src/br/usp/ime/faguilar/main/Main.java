@@ -170,7 +170,7 @@ public class Main {
 //        System.out.println("total: " + generateCombinations.size());
         
         
-//        recognizeExpressionWithNeuralNetworkClassifier(args);
+        recognizeExpressionWithNeuralNetworkClassifier(args);
 //        ArrayList<String> notHiddenFileNames = FilesUtil.getNotHiddenFileNames("../MathFiles/CROHME/crohme2014/lastSegmentation/");relationLabelsTrainLabelesWithJunk
 //        for (String string : notHiddenFileNames) {
 //            FilesUtil.append("listFilesTestCrohme2014.txt", "../MathFiles/CROHME/crohme2014/lastSegmentation/" + 
@@ -318,8 +318,8 @@ public class Main {
 //            evaluator.setOutputFile(inputAndOutputFiles[1]);
 //            evaluator.setaFileToTest(MathRecognitionFiles.INKML_CROHME_2013_TEST_DIR + "105_em_63.inkml");
 //            evaluator.setOutputFile("105_em_63.lg");
-            evaluator.setaFileToTest(MathRecognitionFiles.INKML_CROHME_2013_TEST_DIR + "103_em_19.inkml");
-            evaluator.setOutputFile("103_em_19.lg");
+            evaluator.setaFileToTest(MathRecognitionFiles.INKML_CROHME_2013_TEST_DIR + "104_em_42.inkml"); // problems for 6 posibvle structures in 103_em_9
+            evaluator.setOutputFile("104_em_42.lg");
             evaluator.recognizeAExpressionWithNeauralNetworkClassifier();
     }
     
